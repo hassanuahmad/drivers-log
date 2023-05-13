@@ -15,7 +15,7 @@ interface Request {
     remarks: string;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: any) {
     const {
         firstName,
         lastName,

@@ -9,7 +9,7 @@ interface Request {
     remarks: string;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: any) {
     const { date, odometer, fueling, gas, maintenance, remarks } = request;
 
     // Add code to save the vehicle maintenance record to the database.

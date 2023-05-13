@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-interface Request {
+interface vehicleMaintenanceRequest {
     date: string;
     odometer: number;
     fueling: number;
@@ -9,7 +9,7 @@ interface Request {
     remarks: string;
 }
 
-export async function POST(request: any) {
+export async function POST(request: vehicleMaintenanceRequest) {
     const { date, odometer, fueling, gas, maintenance, remarks } = request;
 
     // Add code to save the vehicle maintenance record to the database.

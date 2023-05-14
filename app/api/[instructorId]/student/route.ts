@@ -29,7 +29,22 @@ export async function POST(request: any) {
         province,
         country,
         remarks,
-    } = request;
+    } = await request.json();
+
+    console.log(
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        drivingClass,
+        bde,
+        streetAddress,
+        postalCode,
+        city,
+        province,
+        country,
+        remarks
+    );
 
     // Add code to save the vehicle maintenance record to the database.
 

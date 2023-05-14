@@ -46,7 +46,7 @@ export async function POST(request: any) {
         remarks
     );
 
-    // Add code to save the vehicle maintenance record to the database.
+    // Add code to save the student record to the database.
 
     return NextResponse.json({ message: "Student added." });
 }

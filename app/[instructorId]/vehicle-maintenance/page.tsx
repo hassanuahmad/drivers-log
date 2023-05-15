@@ -36,7 +36,17 @@ export default function Page() {
     };
 
     const handleSubmit = (values: typeof initialValues) => {
-        console.log(values);
+        try {
+            fetch("/api/2/vehicle-maintenance", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+            });
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (

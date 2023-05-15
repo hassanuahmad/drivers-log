@@ -10,7 +10,10 @@ interface vehicleMaintenanceRequest {
 }
 
 export async function POST(request: any) {
-    const { date, odometer, fueling, gas, maintenance, remarks } = request;
+    const { date, odometer, fueling, gas, maintenance, remarks } =
+        await request.json();
+
+    console.log(date, odometer, fueling, gas, maintenance, remarks);
 
     // Add code to save the vehicle maintenance record to the database.
 

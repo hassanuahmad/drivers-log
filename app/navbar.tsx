@@ -53,7 +53,7 @@ export default function Navbar() {
                     >
                         Log in <span aria-hidden="true">&rarr;</span>
                     </a>
-                    <UserButton />
+                    <UserButton afterSignOutUrl="/" />
                 </div>
             </nav>
             <Dialog
@@ -98,7 +98,7 @@ export default function Navbar() {
                                 >
                                     Log in
                                 </a>
-                                <UserButton />
+                                <UserButton afterSignOutUrl="/" />
                             </div>
                         </div>
                     </div>

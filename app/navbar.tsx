@@ -1,6 +1,8 @@
+"use client";
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { UserButton } from "@clerk/nextjs";
 
 const navigation = [
     { name: "Product", href: "#" },
@@ -51,6 +53,7 @@ export default function Navbar() {
                     >
                         Log in <span aria-hidden="true">&rarr;</span>
                     </a>
+                    <UserButton />
                 </div>
             </nav>
             <Dialog
@@ -95,6 +98,7 @@ export default function Navbar() {
                                 >
                                     Log in
                                 </a>
+                                <UserButton />
                             </div>
                         </div>
                     </div>

@@ -37,7 +37,7 @@ export default function Page() {
 
     const handleSubmit = (values: typeof initialValues) => {
         try {
-            fetch("/api/2/vehicle-maintenance", {
+            fetch("/api/1/vehicle-maintenance", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

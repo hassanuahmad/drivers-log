@@ -35,3 +35,15 @@ export async function POST(request: any) {
 
     return NextResponse.json({ message: "Vehicle maintenance added.", record });
 }
+
+export async function GET(request: any) {
+    const instructorId = 1;
+
+    const records = await prisma.vehicleMaintenance.findMany({
+        where: {
+            instructorId: Number(instructorId),
+        },
+    });
+
+    return NextResponse.json({ records });
+}

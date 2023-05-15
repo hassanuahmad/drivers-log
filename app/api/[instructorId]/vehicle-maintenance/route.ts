@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-interface Request {
+interface vehicleMaintenanceRequest {
     date: string;
     odometer: number;
     fueling: number;

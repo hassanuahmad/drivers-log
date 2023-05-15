@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 interface Request {
     firstName: string;
@@ -31,22 +34,22 @@ export async function POST(request: any) {
         remarks,
     } = await request.json();
 
-    console.log(
-        firstName,
-        lastName,
-        phoneNumber,
-        email,
-        drivingClass,
-        bde,
-        streetAddress,
-        postalCode,
-        city,
-        province,
-        country,
-        remarks
-    );
+    const record = await prisma.student.create({
+        data: {
+            firstName: firstName,
+            lastName: lastName,
+            phoneNumber: phoneNumber,
+            email: email,
+            drivingClass: drivingClass,
+            bde: bde,
+            streetAddress: streetAddress,
+            postalCode: postalCode,
+            city: city,
+            province: province,
+            country: country,
+            remarks: remarks,
+        },
+    });
 
-    // Add code to save the student record to the database.
-
-    return NextResponse.json({ message: "Student added." });
+    return NextResponse.json({ message: "Student added.", record });
 }

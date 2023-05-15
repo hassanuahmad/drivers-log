@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { calculateTotals } from "./utils";
 
 type Record = {
     date: string;
@@ -12,11 +13,18 @@ type Record = {
 
 export default function View() {
     const [records, setRecords] = useState<Record[]>([]);
+    const [totalGas, setTotalGas] = useState<number>(0);
+    const [totalMaintenance, setTotalMaintenance] = useState<number>(0);
 
     useEffect(() => {
         fetch("/api/1/vehicle-maintenance")
             .then((res) => res.json())
-            .then((data) => setRecords(data.records))
+            .then((data) => {
+                setRecords(data.records);
+                const totals = calculateTotals(data.records);
+                setTotalGas(totals.totalGas);
+                setTotalMaintenance(totals.totalMaintenance);
+            })
             .catch((err) => console.log(err));
     }, []);
 
@@ -116,6 +124,44 @@ export default function View() {
                                     </tr>
                                 ))}
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th
+                                        scope="row"
+                                        colSpan={7}
+                                        className="hidden pr-3 pt-6 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
+                                    >
+                                        Gas
+                                    </th>
+                                    <th
+                                        scope="row"
+                                        className="pr-3 pt-6 text-left text-sm font-bold text-gray-500 sm:hidden "
+                                    >
+                                        Gas
+                                    </th>
+                                    <td className="pl-3 pr-6 pt-6 text-right text-sm text-gray-500 sm:pr-0">
+                                        ${totalGas}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th
+                                        scope="row"
+                                        colSpan={7}
+                                        className="hidden pr-3 pt-4 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
+                                    >
+                                        Maintenance
+                                    </th>
+                                    <th
+                                        scope="row"
+                                        className="pr-3 pt-4 text-left text-sm font-bold text-gray-500 sm:hidden"
+                                    >
+                                        Maintenance
+                                    </th>
+                                    <td className="pl-3 pr-6 pt-4 text-right text-sm text-gray-500 sm:pr-0">
+                                        ${totalMaintenance}
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

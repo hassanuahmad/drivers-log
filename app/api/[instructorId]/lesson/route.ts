@@ -46,3 +46,17 @@ export async function POST(request: any) {
 
     return NextResponse.json({ message: "Lesson added.", record });
 }
+
+export async function GET(request: any) {
+    // Add code to get the instructorId from the URL instead of manually adding it.
+    const instructorId = 1;
+
+    // Add code to get the lessons for the instructorId from the database.
+    const records = await prisma.lesson.findMany({
+        where: {
+            instructorId: Number(instructorId),
+        },
+    });
+
+    return NextResponse.json({ records });
+}

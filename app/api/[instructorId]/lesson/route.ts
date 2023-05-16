@@ -24,17 +24,21 @@ export async function POST(request: any) {
         remarks,
     } = await request.json();
 
-    // Also add code to calulate the duration of the lesson and add it to the database.
+    // Parse the startTime and endTime strings to Date objects
+    const start = new Date(`1970-01-01T${startTime}:00`); // Adding ":00" for seconds
+    const end = new Date(`1970-01-01T${endTime}:00`);
+
+    // Calculate the duration in minutes
+    const duration = (end.getTime() - start.getTime()) / 60000;
 
     // Add code to get the instructorId and studentId from the URL instead of manually adding it.
 
-    // Add code to save the lesson record to the database.
     const record = await prisma.lesson.create({
         data: {
             date: date,
             startTime: startTime,
             endTime: endTime,
-            duration: 120,
+            duration: duration,
             paymentType: paymentType,
             paymentAmount: paymentAmount,
             roadTest: roadTest,

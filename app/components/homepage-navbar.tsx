@@ -10,7 +10,7 @@ const navigation = [
     { name: "About Us", href: "#" },
 ];
 
-export default function Navbar() {
+export default function HomepageNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (

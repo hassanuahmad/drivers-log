@@ -1,4 +1,4 @@
-import Navbar from "../components/navbar";
+import HomepageNavbar from "../components/homepage-navbar";
 
 export default function HomepageLayout({
     children,
@@ -7,7 +7,7 @@ export default function HomepageLayout({
 }) {
     return (
         <section>
-            <Navbar />
+            <HomepageNavbar />
             <div className="px-8"> {children}</div>
         </section>
     );

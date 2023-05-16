@@ -53,3 +53,9 @@ export async function POST(request: any) {
 
     return NextResponse.json({ message: "Student added.", record });
 }
+
+export async function GET(request: any) {
+    const records = await prisma.student.findMany();
+
+    return NextResponse.json({ records });
+}

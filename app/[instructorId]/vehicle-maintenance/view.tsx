@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import KebabMenu from "../../components/kebabMenu";
 import { calculateTotals } from "./utils";
 
 type Record = {
@@ -81,9 +82,7 @@ export default function View() {
                                     <th
                                         scope="col"
                                         className="relative py-3.5 pl-3 pr-4 sm:pr-3"
-                                    >
-                                        <span className="sr-only">Edit</span>
-                                    </th>
+                                    ></th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white">
@@ -114,12 +113,8 @@ export default function View() {
                                             <a
                                                 href="#"
                                                 className="text-indigo-600 hover:text-indigo-900"
-                                            >
-                                                Edit
-                                                <span className="sr-only">
-                                                    , {record.date}
-                                                </span>
-                                            </a>
+                                            ></a>
+                                            <KebabMenu />
                                         </td>
                                     </tr>
                                 ))}

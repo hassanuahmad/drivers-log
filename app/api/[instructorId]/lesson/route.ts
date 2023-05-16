@@ -56,6 +56,9 @@ export async function GET(request: any) {
         where: {
             instructorId: Number(instructorId),
         },
+        include: {
+            student: true, // Include the related student data
+        },
     });
 
     return NextResponse.json({ records });

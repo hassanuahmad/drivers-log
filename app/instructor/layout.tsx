@@ -1,4 +1,4 @@
-import InstructorNavbar from "../components/instructor-navbar";
+import InstructorNavbar from "../components/instructorNavbar";
 
 export default function VehicleMaintenanceLayout({
     children, // will be a page or nested layout

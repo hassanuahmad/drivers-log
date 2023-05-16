@@ -44,14 +44,14 @@ export default function Page() {
         { resetForm }: { resetForm: () => void }
     ) => {
         try {
-            const res = await fetch("/api/1/vehicle-maintenance", {
+            const response = await fetch("/api/1/vehicle-maintenance", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(values),
             });
-            if (res.ok) {
+            if (response.ok) {
                 setShowNotification(true);
                 resetForm();
 

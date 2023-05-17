@@ -17,17 +17,30 @@ export default function View() {
     const [totalGas, setTotalGas] = useState<number>(0);
     const [totalMaintenance, setTotalMaintenance] = useState<number>(0);
 
+    const testData = {
+        date: "2021-08-01",
+        odometer: 1000,
+        fueling: 10,
+        gas: 20,
+        maintenance: 30,
+        remarks: "test",
+    };
+
     useEffect(() => {
-        fetch("/api/1/vehicle-maintenance")
-            .then((res) => res.json())
-            .then((data) => {
-                setRecords(data.records);
-                const totals = calculateTotals(data.records);
-                setTotalGas(totals.totalGas);
-                setTotalMaintenance(totals.totalMaintenance);
-            })
-            .catch((err) => console.log(err));
+        setRecords([testData]);
     }, []);
+
+    // useEffect(() => {
+    //     fetch("/api/1/vehicle-maintenance")
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             setRecords(data.records);
+    //             const totals = calculateTotals(data.records);
+    //             setTotalGas(totals.totalGas);
+    //             setTotalMaintenance(totals.totalMaintenance);
+    //         })
+    //         .catch((err) => console.log(err));
+    // }, []);
 
     return (
         <div className="px-4 sm:px-6 lg:px-8">

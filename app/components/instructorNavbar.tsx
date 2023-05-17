@@ -5,12 +5,13 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { UserButton } from "@clerk/nextjs";
 
 const navigation = [
-    { name: "Product", href: "#" },
-    { name: "Pricing", href: "#" },
-    { name: "About Us", href: "#" },
+    { name: "Dashboard", href: "#" },
+    { name: "Lessons", href: "#" },
+    { name: "Students", href: "#" },
+    { name: "Vehicle Maintenance", href: "#" },
 ];
 
-export default function Navbar() {
+export default function InstructorNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (

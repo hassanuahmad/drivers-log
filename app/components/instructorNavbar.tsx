@@ -4,7 +4,12 @@ import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { UserButton } from "@clerk/nextjs";
 
-const navigation: any[] = [];
+const navigation = [
+    { name: "Dashboard", href: "#" },
+    { name: "Lessons", href: "#" },
+    { name: "Students", href: "#" },
+    { name: "Vehicle Maintenance", href: "#" },
+];
 
 export default function InstructorNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

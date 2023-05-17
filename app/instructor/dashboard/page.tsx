@@ -1,5 +1,5 @@
 "use client";
 
-export default function Pricing() {
+export default function Dashboard() {
     return <p>I am instructor dashboard page!</p>;
 }

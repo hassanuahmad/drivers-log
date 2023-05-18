@@ -1,6 +1,6 @@
 "use client";
 import { PlusSmallIcon } from "@heroicons/react/20/solid";
-import { useAuth } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 
 const secondaryNavigation = [
     { name: "Last 7 days", href: "#", current: true },
@@ -8,9 +8,48 @@ const secondaryNavigation = [
     { name: "All-time", href: "#", current: false },
 ];
 
+interface User {
+    googleId: string | undefined;
+    firstName: string | undefined | null;
+    lastName: string | undefined | null;
+    emailAddress: string | undefined;
+}
+
 export default function Dashboard() {
-    const { userId } = useAuth();
-    // console.log(userId);
+    const { isSignedIn, user } = useUser();
+
+    if (!isSignedIn) {
+        return;
+    }
+
+    let userInfo: User = {
+        googleId: user?.id,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        emailAddress: user?.primaryEmailAddress?.emailAddress,
+    };
+
+    console.log(userInfo);
+
+    const createUser = async (value: User) => {
+        try {
+            const response = await fetch("/api/instructor", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(value),
+            });
+            if (response.ok) {
+                console.log("Yessirrr");
+                console.log(response);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    createUser(userInfo);
 
     return (
         <main>

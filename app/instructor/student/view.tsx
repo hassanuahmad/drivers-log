@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import KebabMenu from "../../components/kebabMenu";
 
 type Record = {
+    id: number;
     firstName: string;
     lastName: string;
     phoneNumber: string;
@@ -28,6 +29,15 @@ export default function View() {
             })
             .catch((err) => console.log(err));
     }, []);
+
+    const handleDelete = (id: number, endpoint: string) => {
+        console.log("DELETE", id, endpoint);
+    };
+
+    const handleEdit = (id: number, endpoint: string) => {
+        console.log("EDIT", id, endpoint);
+        // Your edit handling logic
+    };
 
     return (
         <div className="px-4 sm:px-6 lg:px-8">
@@ -135,7 +145,20 @@ export default function View() {
                                                 href="#"
                                                 className="text-indigo-600 hover:text-indigo-900"
                                             >
-                                                <KebabMenu />
+                                                <KebabMenu
+                                                    onDelete={() =>
+                                                        handleDelete(
+                                                            record.id,
+                                                            "/api/1/vehicle-maintenance"
+                                                        )
+                                                    }
+                                                    onEdit={() =>
+                                                        handleEdit(
+                                                            record.id,
+                                                            "/api/1/vehicle-maintenance"
+                                                        )
+                                                    }
+                                                />
                                             </a>
                                         </td>
                                     </tr>

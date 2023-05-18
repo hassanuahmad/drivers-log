@@ -1,5 +1,6 @@
 "use client";
 import { PlusSmallIcon } from "@heroicons/react/20/solid";
+import { useAuth } from "@clerk/nextjs";
 
 const secondaryNavigation = [
     { name: "Last 7 days", href: "#", current: true },
@@ -8,6 +9,9 @@ const secondaryNavigation = [
 ];
 
 export default function Dashboard() {
+    const { userId } = useAuth();
+    // console.log(userId);
+
     return (
         <main>
             <div className="relative isolate overflow-hidden">

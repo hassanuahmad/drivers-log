@@ -149,13 +149,13 @@ export default function View() {
                                                     onDelete={() =>
                                                         handleDelete(
                                                             record.id,
-                                                            "/api/1/vehicle-maintenance"
+                                                            "/api/1/student"
                                                         )
                                                     }
                                                     onEdit={() =>
                                                         handleEdit(
                                                             record.id,
-                                                            "/api/1/vehicle-maintenance"
+                                                            "/api/1/student"
                                                         )
                                                     }
                                                 />

@@ -29,8 +29,6 @@ export default function View() {
             .catch((err) => console.log(err));
     }, []);
 
-    console.log(records);
-
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="mt-8 flow-root">

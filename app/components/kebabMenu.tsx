@@ -2,10 +2,16 @@ import { Fragment } from "react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 
+interface KebabMenuProps {
+    onDelete: () => void;
+    onEdit: () => void;
+}
+
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
 }
-export default function KebabMenu() {
+
+export default function KebabMenu({ onDelete, onEdit }: KebabMenuProps) {
     return (
         <>
             <Menu
@@ -36,7 +42,7 @@ export default function KebabMenu() {
                             <Menu.Item>
                                 {({ active }) => (
                                     <a
-                                        href="#"
+                                        onClick={onEdit}
                                         className={classNames(
                                             active
                                                 ? "bg-gray-100 text-gray-900"
@@ -51,7 +57,7 @@ export default function KebabMenu() {
                             <Menu.Item>
                                 {({ active }) => (
                                     <a
-                                        href="#"
+                                        onClick={onDelete}
                                         className={classNames(
                                             active
                                                 ? "bg-gray-100 text-gray-900"

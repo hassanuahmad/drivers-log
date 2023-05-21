@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
+import Edit from "./edit";
 import { calculateTotals } from "./utils";
 
 type Record = {
@@ -23,6 +24,7 @@ export default function View() {
         endpoint: string;
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [editRecordId, setEditRecordId] = useState<number | null>(null);
 
     useEffect(() => {
         fetch("/api/1/vehicle-maintenance")
@@ -54,9 +56,23 @@ export default function View() {
         }
     };
 
-    const handleEdit = (id: number, endpoint: string) => {
-        console.log("EDIT", id, endpoint);
-        // Your edit handling logic
+    const handleEdit = (id: number) => {
+        setEditRecordId(id);
+    };
+
+    const handleEditSave = (id: number, updatedRecord: Record) => {
+        const updatedRecords = records.map((record) =>
+            record.id === id ? { ...record, ...updatedRecord } : record
+        );
+        setRecords(updatedRecords);
+        const totals = calculateTotals(updatedRecords);
+        setTotalGas(totals.totalGas);
+        setTotalMaintenance(totals.totalMaintenance);
+        setEditRecordId(null);
+    };
+
+    const handleEditCancel = () => {
+        setEditRecordId(null);
     };
 
     return (
@@ -122,43 +138,53 @@ export default function View() {
                                             key={index}
                                             className="even:bg-gray-50"
                                         >
-                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                {index + 1}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.date}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.odometer}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.fueling}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.gas}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.maintenance}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.remarks}
-                                            </td>
-                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                                <KebabMenu
-                                                    onDelete={() =>
-                                                        handleDelete(
-                                                            record.id,
-                                                            "/api/1/vehicle-maintenance"
-                                                        )
-                                                    }
-                                                    onEdit={() =>
-                                                        handleEdit(
-                                                            record.id,
-                                                            "/api/1/vehicle-maintenance"
-                                                        )
-                                                    }
+                                            {editRecordId === record.id ? (
+                                                <Edit
+                                                    record={record}
+                                                    index={index}
+                                                    onEditSave={handleEditSave}
+                                                    onCancel={handleEditCancel}
                                                 />
-                                            </td>
+                                            ) : (
+                                                <>
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                        {index + 1}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.date}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.odometer}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.fueling}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.gas}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.maintenance}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.remarks}
+                                                    </td>
+                                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                        <KebabMenu
+                                                            onDelete={() =>
+                                                                handleDelete(
+                                                                    record.id,
+                                                                    "/api/1/vehicle-maintenance"
+                                                                )
+                                                            }
+                                                            onEdit={() =>
+                                                                handleEdit(
+                                                                    record.id
+                                                                )
+                                                            }
+                                                        />
+                                                    </td>
+                                                </>
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>

@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { Formik, Field, ErrorMessage } from "formik";
 import { XMarkIcon, CheckIcon } from "@heroicons/react/20/solid";
-import { PlusSmallIcon } from "@heroicons/react/20/solid";
+
 type Record = {
     id: number;
     date: string;

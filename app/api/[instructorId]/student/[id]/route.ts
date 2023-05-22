@@ -39,3 +39,27 @@ export async function DELETE(request: any, { params }: any) {
         });
     }
 }
+
+export async function PUT(request: any, { params }: any) {
+    const { id } = params;
+
+    try {
+        const record = await prisma.student.update({
+            where: {
+                id: Number(id),
+            },
+            data: await request.json(),
+        });
+
+        return NextResponse.json({
+            message: "Student updated.",
+            status: "success",
+        });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({
+            message: "Error updating student.",
+            status: "error",
+        });
+    }
+}

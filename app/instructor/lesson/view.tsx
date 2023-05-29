@@ -1,12 +1,19 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
+import Edit from "./edit";
 import {
     formatDuration,
     calculateTotalDuration,
     calculateTotalPayment,
 } from "./utils";
+
+type SetStringAction = Dispatch<SetStateAction<string>>;
+type SetNumberAction = Dispatch<SetStateAction<number>>;
+type SetLessonArrayAction = Dispatch<
+    SetStateAction<LessonWithFormattedDuration[]>
+>;
 
 type Student = {
     firstName: string;
@@ -30,7 +37,7 @@ type Lesson = {
     endTime: string;
     duration: number;
     paymentType: string;
-    paymentAmount: Number;
+    paymentAmount: number;
     roadTest: string;
     remarks: string;
     student: Student;
@@ -50,8 +57,15 @@ export default function View() {
         endpoint: string;
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [editRecordId, setEditRecordId] = useState<number | null>(null);
 
-    useEffect(() => {
+    // Define this function outside of your component.
+    const fetchRecords = (
+        setRecords: SetLessonArrayAction,
+        setTotalDuration: SetStringAction,
+        setTotalCash: SetNumberAction,
+        setTotalInterac: SetNumberAction
+    ) => {
         fetch("/api/1/lesson")
             .then((res) => res.json())
             .then((data) => {
@@ -66,6 +80,15 @@ export default function View() {
                 setTotalInterac(calculateTotalPayment(data.records, "Interac"));
             })
             .catch((err) => console.log(err));
+    };
+
+    useEffect(() => {
+        fetchRecords(
+            setRecords,
+            setTotalDuration,
+            setTotalCash,
+            setTotalInterac
+        );
     }, []);
 
     const handleDelete = (id: number, endpoint: string) => {
@@ -87,9 +110,22 @@ export default function View() {
         }
     };
 
-    const handleEdit = (id: number, endpoint: string) => {
-        console.log("EDIT", id, endpoint);
-        // Your edit handling logic
+    const handleEdit = (id: number) => {
+        setEditRecordId(id);
+    };
+
+    const handleEditSave = () => {
+        fetchRecords(
+            setRecords,
+            setTotalDuration,
+            setTotalCash,
+            setTotalInterac
+        );
+        setEditRecordId(null);
+    };
+
+    const handleEditCancel = () => {
+        setEditRecordId(null);
     };
 
     return (
@@ -141,13 +177,17 @@ export default function View() {
                                             scope="col"
                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                         >
-                                            Cash Payment
+                                            {editRecordId === null
+                                                ? "Cash Payment"
+                                                : "Payment Type"}
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                         >
-                                            Interac Payment
+                                            {editRecordId === null
+                                                ? "Interac Payment"
+                                                : "Payment Amount"}
                                         </th>
                                         <th
                                             scope="col"
@@ -180,61 +220,80 @@ export default function View() {
                                             key={index}
                                             className="even:bg-gray-50"
                                         >
-                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                {index + 1}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.student.firstName}{" "}
-                                                {record.student.lastName}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.date}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.startTime}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.endTime}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.formattedDuration}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.paymentType === "Cash"
-                                                    ? record.paymentAmount.toString()
-                                                    : ""}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.paymentType ===
-                                                "Interac"
-                                                    ? record.paymentAmount.toString()
-                                                    : ""}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.roadTest}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.student.bde}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {record.remarks}
-                                            </td>
-                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                                <KebabMenu
-                                                    onDelete={() =>
-                                                        handleDelete(
-                                                            record.id,
-                                                            "/api/1/lesson"
-                                                        )
-                                                    }
-                                                    onEdit={() =>
-                                                        handleEdit(
-                                                            record.id,
-                                                            "/api/1/lesson"
-                                                        )
-                                                    }
+                                            {editRecordId === record.id ? (
+                                                <Edit
+                                                    record={record}
+                                                    index={index}
+                                                    onEditSave={handleEditSave}
+                                                    onCancel={handleEditCancel}
                                                 />
-                                            </td>
+                                            ) : (
+                                                <>
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                        {index + 1}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {
+                                                            record.student
+                                                                .firstName
+                                                        }{" "}
+                                                        {
+                                                            record.student
+                                                                .lastName
+                                                        }
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.date}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.startTime}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.endTime}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {
+                                                            record.formattedDuration
+                                                        }
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.paymentType ===
+                                                        "Cash"
+                                                            ? record.paymentAmount.toString()
+                                                            : ""}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.paymentType ===
+                                                        "Interac"
+                                                            ? record.paymentAmount.toString()
+                                                            : ""}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.roadTest}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.student.bde}
+                                                    </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                        {record.remarks}
+                                                    </td>
+                                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                        <KebabMenu
+                                                            onDelete={() =>
+                                                                handleDelete(
+                                                                    record.id,
+                                                                    "/api/1/lesson"
+                                                                )
+                                                            }
+                                                            onEdit={() =>
+                                                                handleEdit(
+                                                                    record.id
+                                                                )
+                                                            }
+                                                        />
+                                                    </td>
+                                                </>
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>

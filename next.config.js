@@ -5,4 +5,17 @@ const nextConfig = {
     },
 };
 
-module.exports = nextConfig;
+module.exports = {
+    async redirects() {
+        return [
+            {
+                source: "/",
+                destination: "/homepage/home",
+                permanent: true,
+            },
+        ];
+    },
+    ...nextConfig,
+};
+
+// module.exports = nextConfig;

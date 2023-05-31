@@ -4,7 +4,7 @@ import { Dialog } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 const navigation = [
     { name: "Home", href: "/homepage/home" },
@@ -41,7 +41,16 @@ export default function Example() {
                         ))}
                     </nav>
                     <div className="flex flex-1 items-center justify-end gap-x-8">
-                        <UserButton afterSignOutUrl="/" />
+                        <SignedIn>
+                            {/* Mount the UserButton component */}
+                            <UserButton afterSignOutUrl="/" />
+                        </SignedIn>
+                        <SignedOut>
+                            {/* Signed out users get sign in button */}
+                            <SignInButton mode="modal">
+                                <button className="btn">Sign in</button>
+                            </SignInButton>
+                        </SignedOut>
                     </div>
                 </div>
                 <Dialog

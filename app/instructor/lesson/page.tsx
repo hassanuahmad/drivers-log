@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
+import { InstructorIdContextType, InstructorIdContext } from "../layout";
 
 interface LessonFormValues {
     selectStudent: string;
@@ -27,6 +28,12 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
+    // This is a test
+    console.log("Testing");
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
+    if (instructorId) console.log(instructorId);
+
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
         today.getMonth() + 1

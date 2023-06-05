@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
+import { InstructorIdContext, InstructorIdContextType } from "../layout";
 
 interface VehicleMaintenanceFormValues {
     date: string;
@@ -23,6 +24,11 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
+    console.log("Testing VM");
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
+    if (instructorId) console.log(instructorId);
+
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
         today.getMonth() + 1

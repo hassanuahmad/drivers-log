@@ -12,9 +12,9 @@ export async function POST(request: any) {
         },
     });
 
-    if (!findUser) {
+    if (findUser) {
         // User already exists
-        return NextResponse.json({ message: "User exists" });
+        return NextResponse.json({ body: "User exists" });
     }
 
     const record = await prisma.instructor.create({

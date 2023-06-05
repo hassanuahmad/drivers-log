@@ -1,6 +1,8 @@
 "use client";
 import { PlusSmallIcon } from "@heroicons/react/20/solid";
 import { useUser } from "@clerk/nextjs";
+import { InstructorIdContextType, InstructorIdContext } from "../layout";
+import { useContext } from "react";
 
 const secondaryNavigation = [
     { name: "Last 7 days", href: "#", current: true },
@@ -8,7 +10,7 @@ const secondaryNavigation = [
     { name: "All-time", href: "#", current: false },
 ];
 
-interface User {
+export interface User {
     googleId: string | undefined;
     firstName: string | undefined | null;
     lastName: string | undefined | null;
@@ -29,8 +31,6 @@ export default function Dashboard() {
         emailAddress: user?.primaryEmailAddress?.emailAddress,
     };
 
-    console.log(userInfo);
-
     const createUser = async (value: User) => {
         try {
             const response = await fetch("/api/instructor", {
@@ -49,7 +49,32 @@ export default function Dashboard() {
         }
     };
 
+    const getUser = async (value: User) => {
+        console.log("Trying to get");
+        try {
+            const response = await fetch(`/api/instructor/${value.googleId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            if (response.ok) {
+                const { id } = await response.json();
+                if (setInstructorId) setInstructorId(id);
+                console.log(instructorId);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     createUser(userInfo);
+
+    // SET CONTEXT
+    const { instructorId, setInstructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
+
+    getUser(userInfo);
 
     return (
         <main>

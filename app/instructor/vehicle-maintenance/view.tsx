@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
 import { calculateTotals } from "./utils";
+import { InstructorIdContext, InstructorIdContextType } from "../layout";
 
 type Record = {
     id: number;
@@ -25,9 +26,11 @@ export default function View() {
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
 
     useEffect(() => {
-        fetch("/api/1/vehicle-maintenance")
+        fetch(`/api/${instructorId}/vehicle-maintenance`)
             .then((res) => res.json())
             .then((data) => {
                 setRecords(data.records);
@@ -36,7 +39,7 @@ export default function View() {
                 setTotalMaintenance(totals.totalMaintenance);
             })
             .catch((err) => console.log(err));
-    }, []);
+    }, [instructorId]);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });
@@ -173,7 +176,7 @@ export default function View() {
                                                             onDelete={() =>
                                                                 handleDelete(
                                                                     record.id,
-                                                                    "/api/1/vehicle-maintenance"
+                                                                    `/api/${instructorId}/vehicle-maintenance`
                                                                 )
                                                             }
                                                             onEdit={() =>

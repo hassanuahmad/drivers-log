@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
+import { InstructorIdContext, InstructorIdContextType } from "../layout";
 
 interface StudentFormValues {
     firstName: string;
@@ -37,6 +38,11 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
+    console.log("Testing Student");
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
+    if (instructorId) console.log(instructorId);
+
     const [showNotification, setShowNotification] = useState(false);
 
     const initialValues: StudentFormValues = {

@@ -18,63 +18,69 @@ export interface User {
 }
 
 export default function Dashboard() {
-    const { isSignedIn, user } = useUser();
+    // const { isSignedIn, user } = useUser();
 
-    if (!isSignedIn) {
-        return;
-    }
+    // let userInfo: User = {
+    //     googleId: user?.id,
+    //     firstName: user?.firstName,
+    //     lastName: user?.lastName,
+    //     emailAddress: user?.primaryEmailAddress?.emailAddress,
+    // };
 
-    let userInfo: User = {
-        googleId: user?.id,
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-        emailAddress: user?.primaryEmailAddress?.emailAddress,
-    };
+    // const createUser = async (value: User) => {
+    //     try {
+    //         const response = await fetch("/api/instructor", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(value),
+    //         });
+    //         if (response.ok) {
+    //             // console.log("Yessirrr");
+    //             // console.log(response);
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
 
-    const createUser = async (value: User) => {
-        try {
-            const response = await fetch("/api/instructor", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(value),
-            });
-            if (response.ok) {
-                console.log("Yessirrr");
-                console.log(response);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    // const getUser = async (
+    //     value: User,
+    //     { instructorId, setInstructorId }: InstructorIdContextType
+    // ) => {
+    //     console.log("Trying to get");
+    //     try {
+    //         const response = await fetch(`/api/instructor/${value.googleId}`, {
+    //             method: "GET",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //         });
+    //         if (response.ok) {
+    //             const { id } = await response.json();
+    //             if (setInstructorId) setInstructorId(id);
+    //             console.log(instructorId);
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
 
-    const getUser = async (value: User) => {
-        console.log("Trying to get");
-        try {
-            const response = await fetch(`/api/instructor/${value.googleId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            if (response.ok) {
-                const { id } = await response.json();
-                if (setInstructorId) setInstructorId(id);
-                console.log(instructorId);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    // if (isSignedIn) {
+    //     createUser(userInfo);
 
-    createUser(userInfo);
+    //     // SET CONTEXT
+    //     const { instructorId, setInstructorId }: InstructorIdContextType =
+    //         useContext(InstructorIdContext);
 
-    // SET CONTEXT
-    const { instructorId, setInstructorId }: InstructorIdContextType =
+    //     getUser(userInfo, { instructorId, setInstructorId });
+    // }
+
+    console.log("Testing Dashboard");
+    const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
-
-    getUser(userInfo);
+    if (instructorId) console.log(instructorId);
 
     return (
         <main>

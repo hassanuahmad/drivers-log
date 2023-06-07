@@ -1,5 +1,7 @@
+import { useContext } from "react";
 import { Formik, Field, ErrorMessage } from "formik";
 import { XMarkIcon, CheckIcon } from "@heroicons/react/20/solid";
+import { InstructorIdContext, InstructorIdContextType } from "../layout";
 
 type Record = {
     id: number;
@@ -33,8 +35,11 @@ export default function Edit({
         remarks: record.remarks,
     };
 
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
+
     const handleSubmit = async (values: typeof initialValues) => {
-        fetch(`/api/1/vehicle-maintenance/${record.id}`, {
+        fetch(`/api/${instructorId}/vehicle-maintenance/${record.id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

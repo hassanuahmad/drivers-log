@@ -50,13 +50,16 @@ export default function Page() {
         { resetForm }: { resetForm: () => void }
     ) => {
         try {
-            const response = await fetch("/api/1/vehicle-maintenance", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            });
+            const response = await fetch(
+                `/api/${instructorId}/vehicle-maintenance`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(values),
+                }
+            );
             if (response.ok) {
                 setShowNotification(true);
                 resetForm();

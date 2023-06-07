@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function DELETE(request: any, { params }: any) {
-    const { id } = params;
+    const { instructorId, id } = params;
 
     try {
         const lessons = await prisma.lesson.findMany({
@@ -20,6 +20,13 @@ export async function DELETE(request: any, { params }: any) {
                 status: "error",
             });
         } else {
+            await prisma.studentInstructor.deleteMany({
+                where: {
+                    studentId: Number(id),
+                    instructorId: Number(instructorId),
+                },
+            });
+
             await prisma.student.delete({
                 where: {
                     id: Number(id),

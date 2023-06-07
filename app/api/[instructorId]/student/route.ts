@@ -18,7 +18,7 @@ interface Request {
     remarks: string;
 }
 
-export async function POST(request: any) {
+export async function POST(request: any, { params }: any) {
     const {
         firstName,
         lastName,
@@ -33,6 +33,8 @@ export async function POST(request: any) {
         country,
         remarks,
     } = await request.json();
+
+    const { instructorId } = params;
 
     const record = await prisma.student.create({
         data: {
@@ -51,11 +53,34 @@ export async function POST(request: any) {
         },
     });
 
+    await prisma.studentInstructor.create({
+        data: {
+            studentId: record.id,
+            instructorId: Number(instructorId),
+        },
+    });
+
     return NextResponse.json({ message: "Student added.", record });
 }
 
-export async function GET(request: any) {
-    const records = await prisma.student.findMany();
+export async function GET(request: any, { params }: any) {
+    const { instructorId } = params;
+
+    if (!instructorId) {
+        return NextResponse.json({
+            status: 400,
+            message: "Missing instructorId.",
+        });
+    }
+
+    const records = await prisma.studentInstructor.findMany({
+        where: {
+            instructorId: Number(instructorId),
+        },
+        include: {
+            student: true,
+        },
+    });
 
     return NextResponse.json({ records });
 }

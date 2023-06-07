@@ -1,8 +1,10 @@
+// @ts-nocheck
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
+import { InstructorIdContext, InstructorIdContextType } from "../layout";
 
 type Record = {
     id: number;
@@ -28,15 +30,18 @@ export default function View() {
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
 
     useEffect(() => {
-        fetch("/api/1/student")
+        if (!instructorId) return;
+        fetch(`/api/${instructorId}/student`)
             .then((res) => res.json())
             .then((data) => {
                 setRecords(data.records);
             })
             .catch((err) => console.log(err));
-    }, []);
+    }, [instructorId]);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });
@@ -144,7 +149,8 @@ export default function View() {
                                             key={index}
                                             className="even:bg-gray-50"
                                         >
-                                            {editRecordId === record.id ? (
+                                            {editRecordId ===
+                                            record.student.id ? (
                                                 <Edit
                                                     record={record}
                                                     index={index}
@@ -157,44 +163,69 @@ export default function View() {
                                                         {index + 1}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.firstName}
+                                                        {
+                                                            record.student
+                                                                .firstName
+                                                        }
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.lastName}
+                                                        {
+                                                            record.student
+                                                                .lastName
+                                                        }
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.phoneNumber}
+                                                        {
+                                                            record.student
+                                                                .phoneNumber
+                                                        }
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.email}
+                                                        {record.student.email}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.streetAddress}{" "}
-                                                        {record.city}{" "}
-                                                        {record.province}{" "}
-                                                        {record.postalCode}{" "}
-                                                        {record.country}
+                                                        {
+                                                            record.student
+                                                                .streetAddress
+                                                        }{" "}
+                                                        {record.student.city}{" "}
+                                                        {
+                                                            record.student
+                                                                .province
+                                                        }{" "}
+                                                        {
+                                                            record.student
+                                                                .postalCode
+                                                        }{" "}
+                                                        {record.student.country}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.drivingClass}
+                                                        {
+                                                            record.student
+                                                                .drivingClass
+                                                        }
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.bde}
+                                                        {record.student.bde}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.remarks}
+                                                        {record.student.remarks}
                                                     </td>
                                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                         <KebabMenu
                                                             onDelete={() =>
                                                                 handleDelete(
-                                                                    record.id,
-                                                                    "/api/1/student"
+                                                                    record
+                                                                        .student
+                                                                        .id,
+                                                                    `/api/${instructorId}/student`
                                                                 )
                                                             }
                                                             onEdit={() =>
                                                                 handleEdit(
-                                                                    record.id
+                                                                    record
+                                                                        .student
+                                                                        .id
                                                                 )
                                                             }
                                                         />

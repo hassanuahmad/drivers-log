@@ -22,6 +22,7 @@ export async function POST(request: any, { params }: any) {
         paymentAmount,
         roadTest,
         remarks,
+        selectStudent,
     } = await request.json();
 
     const { instructorId } = params;
@@ -45,7 +46,7 @@ export async function POST(request: any, { params }: any) {
             paymentAmount: paymentAmount,
             roadTest: roadTest,
             remarks: remarks,
-            studentId: 1,
+            studentId: Number(selectStudent),
             instructorId: Number(instructorId),
         },
     });

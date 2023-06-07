@@ -11,6 +11,7 @@ const navigation = [
     { name: "Lessons", href: "/instructor/lesson" },
     { name: "Students", href: "/instructor/student" },
     { name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance" },
+    { name: "Yearly Data", href: "/instructor/yearly-data" },
 ];
 
 export default function Example() {

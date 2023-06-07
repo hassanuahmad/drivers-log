@@ -34,8 +34,6 @@ export async function POST(request: any, { params }: any) {
     // Calculate the duration in minutes
     const duration = (end.getTime() - start.getTime()) / 60000;
 
-    // Add code to get the instructorId and studentId from the URL instead of manually adding it.
-
     const record = await prisma.lesson.create({
         data: {
             date: date,
@@ -55,7 +53,6 @@ export async function POST(request: any, { params }: any) {
 }
 
 export async function GET(request: any, { params }: any) {
-    // Add code to get the instructorId from the URL instead of manually adding it.
     const { instructorId } = params;
 
     if (!instructorId) {
@@ -65,7 +62,6 @@ export async function GET(request: any, { params }: any) {
         });
     }
 
-    // Add code to get the lessons for the instructorId from the database.
     const records = await prisma.lesson.findMany({
         where: {
             instructorId: Number(instructorId),
@@ -73,6 +69,19 @@ export async function GET(request: any, { params }: any) {
         include: {
             student: true, // Include the related student data
         },
+    });
+
+    // Sort the records based on date and time
+    records.sort((a, b) => {
+        // Compare dates
+        const dateComparison = a.date.localeCompare(b.date);
+        if (dateComparison !== 0) {
+            // If dates are different, return the comparison result
+            return dateComparison;
+        } else {
+            // If dates are the same, compare times
+            return a.startTime.localeCompare(b.startTime);
+        }
     });
 
     return NextResponse.json({ records });

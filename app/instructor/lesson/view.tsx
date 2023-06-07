@@ -75,6 +75,7 @@ export default function View() {
         setTotalCash: SetNumberAction,
         setTotalInterac: SetNumberAction
     ) => {
+        if (!instructorId) return;
         fetch(`/api/${instructorId}/lesson`)
             .then((res) => res.json())
             .then((data) => {
@@ -98,7 +99,7 @@ export default function View() {
             setTotalCash,
             setTotalInterac
         );
-    }, []);
+    }, [fetchRecords]);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });

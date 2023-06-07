@@ -1,5 +1,6 @@
+// @ts-nocheck
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
@@ -33,6 +34,7 @@ export default function Page() {
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
     if (instructorId) console.log(instructorId);
+    const [records, setRecords] = useState([]);
 
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
@@ -51,6 +53,16 @@ export default function Page() {
         roadTest: "No",
         remarks: "",
     };
+
+    useEffect(() => {
+        if (!instructorId) return;
+        fetch(`/api/${instructorId}/student`)
+            .then((res) => res.json())
+            .then((data) => {
+                setRecords(data.records);
+            })
+            .catch((err) => console.log(err));
+    }, [instructorId]);
 
     const handleSubmit = async (
         values: typeof initialValues,
@@ -113,8 +125,16 @@ export default function Page() {
                                             autoComplete="selectStudent"
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                                         >
-                                            <option>John In</option>
-                                            <option>Jimmy Ornage</option>
+                                            <option value=""></option>
+                                            {records.map((record) => (
+                                                <option
+                                                    key={record.student.id}
+                                                    value={record.student.id}
+                                                >
+                                                    {record.student.firstName}{" "}
+                                                    {record.student.lastName}
+                                                </option>
+                                            ))}
                                         </Field>
                                         <ErrorMessage
                                             name="selectStudent"

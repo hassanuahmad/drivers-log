@@ -18,6 +18,7 @@ export default function DeleteModal({
     endpoint,
 }: DeleteModalProps) {
     const handleDeleteConfirm = async () => {
+        console.log("#######", id, endpoint);
         const response = await fetch(`${endpoint}/${id}`, {
             method: "DELETE",
         });

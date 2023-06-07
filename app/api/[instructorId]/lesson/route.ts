@@ -13,7 +13,7 @@ interface Request {
     remarks: string;
 }
 
-export async function POST(request: any) {
+export async function POST(request: any, { params }: any) {
     const {
         date,
         startTime,
@@ -23,6 +23,8 @@ export async function POST(request: any) {
         roadTest,
         remarks,
     } = await request.json();
+
+    const { instructorId } = params;
 
     // Parse the startTime and endTime strings to Date objects
     const start = new Date(`1970-01-01T${startTime}:00`); // Adding ":00" for seconds
@@ -44,16 +46,23 @@ export async function POST(request: any) {
             roadTest: roadTest,
             remarks: remarks,
             studentId: 1,
-            instructorId: 1,
+            instructorId: Number(instructorId),
         },
     });
 
     return NextResponse.json({ message: "Lesson added.", record });
 }
 
-export async function GET(request: any) {
+export async function GET(request: any, { params }: any) {
     // Add code to get the instructorId from the URL instead of manually adding it.
-    const instructorId = 1;
+    const { instructorId } = params;
+
+    if (!instructorId) {
+        return NextResponse.json({
+            status: 400,
+            message: "Missing instructorId.",
+        });
+    }
 
     // Add code to get the lessons for the instructorId from the database.
     const records = await prisma.lesson.findMany({

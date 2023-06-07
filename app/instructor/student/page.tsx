@@ -65,7 +65,7 @@ export default function Page() {
         { resetForm }: { resetForm: () => void }
     ) => {
         try {
-            const response = await fetch("/api/2/student", {
+            const response = await fetch(`/api/${instructorId}/student`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

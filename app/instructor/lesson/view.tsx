@@ -1,5 +1,11 @@
 "use client";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+    Dispatch,
+    SetStateAction,
+    useEffect,
+    useState,
+    useContext,
+} from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
@@ -8,6 +14,7 @@ import {
     calculateTotalDuration,
     calculateTotalPayment,
 } from "./utils";
+import { InstructorIdContextType, InstructorIdContext } from "../layout";
 
 type SetStringAction = Dispatch<SetStateAction<string>>;
 type SetNumberAction = Dispatch<SetStateAction<number>>;
@@ -58,6 +65,8 @@ export default function View() {
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
+    const { instructorId }: InstructorIdContextType =
+        useContext(InstructorIdContext);
 
     // Define this function outside of your component.
     const fetchRecords = (
@@ -66,7 +75,7 @@ export default function View() {
         setTotalCash: SetNumberAction,
         setTotalInterac: SetNumberAction
     ) => {
-        fetch("/api/1/lesson")
+        fetch(`/api/${instructorId}/lesson`)
             .then((res) => res.json())
             .then((data) => {
                 const formattedRecords = data.records.map((record: Lesson) => ({

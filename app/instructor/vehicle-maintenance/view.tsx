@@ -30,6 +30,7 @@ export default function View() {
         useContext(InstructorIdContext);
 
     useEffect(() => {
+        if (!instructorId) return;
         fetch(`/api/${instructorId}/vehicle-maintenance`)
             .then((res) => res.json())
             .then((data) => {

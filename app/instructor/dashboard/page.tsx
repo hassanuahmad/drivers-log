@@ -21,7 +21,8 @@ function classNames(...classes: any[]) {
 
 export default function Dashboard() {
     const [secondaryNavigation, setSecondaryNavigation] = useState([
-        { name: "Last 7 days", id: "last-7-days", current: true },
+        { name: "Today", id: "today", current: true },
+        { name: "Last 7 days", id: "last-7-days", current: false },
         { name: "Last 30 days", id: "last-30-days", current: false },
     ]);
 

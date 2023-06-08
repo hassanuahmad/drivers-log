@@ -29,11 +29,8 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
-    // This is a test
-    console.log("Testing Lesson");
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
-    if (instructorId) console.log(instructorId);
     const [records, setRecords] = useState([]);
 
     const today = new Date();

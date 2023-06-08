@@ -1,4 +1,3 @@
-import Stats from "./stats";
 import RecentActivity from "./recentActivity";
 
 export default function InstructorDashboardLayout({
@@ -9,7 +8,6 @@ export default function InstructorDashboardLayout({
     return (
         <section>
             {children}
-            <Stats />
             <RecentActivity />
         </section>
     );

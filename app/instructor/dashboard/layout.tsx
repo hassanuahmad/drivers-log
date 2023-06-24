@@ -1,4 +1,5 @@
 import RecentActivity from "./recentActivity";
+import Calender from "./tempCaledner";
 
 export default function InstructorDashboardLayout({
     children, // will be a page or nested layout
@@ -9,6 +10,7 @@ export default function InstructorDashboardLayout({
         <section>
             {children}
             <RecentActivity />
+            <Calender />
         </section>
     );
 }

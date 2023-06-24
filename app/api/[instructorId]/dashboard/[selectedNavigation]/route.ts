@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function GET(request: any, { params }: any) {
-    const { instructorId, id } = params;
+    const { instructorId, selectedNavigation } = params;
 
     if (!instructorId) {
         return NextResponse.json({
@@ -17,9 +17,12 @@ export async function GET(request: any, { params }: any) {
     let fromDate = new Date();
     let toDate = new Date();
 
-    if (id === "last-7-days") {
+    if (selectedNavigation === "today") {
+        fromDate = new Date();
+        toDate = new Date();
+    } else if (selectedNavigation === "last-7-days") {
         fromDate.setDate(fromDate.getDate() - 6);
-    } else if (id === "last-30-days") {
+    } else if (selectedNavigation === "last-30-days") {
         fromDate.setDate(fromDate.getDate() - 29);
     } else {
         return NextResponse.json({

@@ -38,10 +38,8 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
-    console.log("Testing Student");
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
-    if (instructorId) console.log(instructorId);
 
     const [showNotification, setShowNotification] = useState(false);
 

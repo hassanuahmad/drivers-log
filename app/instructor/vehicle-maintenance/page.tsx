@@ -24,10 +24,8 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
-    console.log("Testing VM");
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
-    if (instructorId) console.log(instructorId);
 
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(

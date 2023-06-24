@@ -46,7 +46,6 @@ export default function VehicleMaintenanceLayout({
                 body: JSON.stringify(value),
             });
             if (response.ok) {
-                // console.log("Yessirrr");
                 // console.log(response);
             }
         } catch (error) {
@@ -68,7 +67,6 @@ export default function VehicleMaintenanceLayout({
             if (response.ok) {
                 const { id } = await response.json();
                 if (setInstructorId) setInstructorId(id);
-                console.log("I am layout", instructorId);
             }
         } catch (error) {
             console.log(error);

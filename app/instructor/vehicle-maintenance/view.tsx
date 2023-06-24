@@ -1,10 +1,16 @@
 "use client";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, Fragment } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
 import { calculateTotals } from "./utils";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
+import { Menu, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+
+function classNames(...classes: any[]) {
+    return classes.filter(Boolean).join(" ");
+}
 
 type Record = {
     id: number;
@@ -29,9 +35,37 @@ export default function View() {
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
 
+    const monthOptions = [
+        { label: "Jan", value: "01" },
+        { label: "Feb", value: "02" },
+        { label: "Mar", value: "03" },
+        { label: "Apr", value: "04" },
+        { label: "May", value: "05" },
+        { label: "Jun", value: "06" },
+        { label: "Jul", value: "07" },
+        { label: "Aug", value: "08" },
+        { label: "Sep", value: "09" },
+        { label: "Oct", value: "10" },
+        { label: "Nov", value: "11" },
+        { label: "Dec", value: "12" },
+    ];
+
+    const [selectedMonth, setSelectedMonth] = useState(
+        monthOptions[new Date().getMonth()].value
+    );
+
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    const [selectedYear, setSelectedYear] = useState(currentYear);
+    const years = [
+        2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030,
+    ];
+
     useEffect(() => {
         if (!instructorId) return;
-        fetch(`/api/${instructorId}/vehicle-maintenance`)
+        fetch(
+            `/api/${instructorId}/vehicle-maintenance/${selectedMonth}/${selectedYear}`
+        )
             .then((res) => res.json())
             .then((data) => {
                 setRecords(data.records);
@@ -40,7 +74,7 @@ export default function View() {
                 setTotalMaintenance(totals.totalMaintenance);
             })
             .catch((err) => console.log(err));
-    }, [instructorId]);
+    }, [instructorId, selectedMonth, selectedYear]);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });
@@ -81,6 +115,109 @@ export default function View() {
 
     return (
         <>
+            {/* Dropdowns Start */}
+            <div className="flex">
+                <div className="mr-4">
+                    <Menu as="div" className="relative inline-block text-left">
+                        <div>
+                            <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                {
+                                    monthOptions.find(
+                                        (monthOption) =>
+                                            monthOption.value === selectedMonth
+                                    )?.label
+                                }
+                                <ChevronDownIcon
+                                    className="-mr-1 h-5 w-5 text-gray-400"
+                                    aria-hidden="true"
+                                />
+                            </Menu.Button>
+                        </div>
+
+                        <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                        >
+                            <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <div className="py-1">
+                                    {monthOptions.map((monthOption, index) => (
+                                        <Menu.Item key={index}>
+                                            {({ active }) => (
+                                                <a
+                                                    className={classNames(
+                                                        active
+                                                            ? "bg-gray-100 text-gray-900"
+                                                            : "text-gray-700",
+                                                        "block px-4 py-2 text-sm"
+                                                    )}
+                                                    onClick={() =>
+                                                        setSelectedMonth(
+                                                            monthOption.value
+                                                        )
+                                                    }
+                                                >
+                                                    {monthOption.label}
+                                                </a>
+                                            )}
+                                        </Menu.Item>
+                                    ))}
+                                </div>
+                            </Menu.Items>
+                        </Transition>
+                    </Menu>
+                </div>
+                <Menu as="div" className="relative inline-block text-left">
+                    <div>
+                        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                            {selectedYear}
+                            <ChevronDownIcon
+                                className="-mr-1 h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </Menu.Button>
+                    </div>
+
+                    <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                    >
+                        <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div className="py-1">
+                                {years.map((yearOption, index) => (
+                                    <Menu.Item key={index}>
+                                        {({ active }) => (
+                                            <a
+                                                className={classNames(
+                                                    active
+                                                        ? "bg-gray-100 text-gray-900"
+                                                        : "text-gray-700",
+                                                    "block px-4 py-2 text-sm"
+                                                )}
+                                                onClick={() =>
+                                                    setSelectedYear(yearOption)
+                                                }
+                                            >
+                                                {yearOption}
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                ))}
+                            </div>
+                        </Menu.Items>
+                    </Transition>
+                </Menu>
+            </div>
+            {/* Dropdowns End */}
             <div className="px-4 sm:px-6 lg:px-8">
                 <div className="mt-8 flow-root">
                     <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

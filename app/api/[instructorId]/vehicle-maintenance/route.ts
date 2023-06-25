@@ -3,17 +3,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface vehicleMaintenanceRequest {
-    date: string;
-    odometer: number;
-    fueling: number;
-    gas: number;
-    maintenance: number;
-    remarks: string;
-    instructorId: number;
-}
-
-export async function POST(request: any, { params }: any) {
+export async function POST(
+    request: Request,
+    { params }: { params: { instructorId: string } }
+) {
     const { date, odometer, fueling, gas, maintenance, remarks } =
         await request.json();
 

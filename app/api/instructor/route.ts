@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function POST(request: any) {
+export async function POST(request: Request) {
     const userInfo = await request.json();
 
     const findUser = await prisma.instructor.findFirst({

@@ -3,17 +3,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface Request {
-    date: string;
-    startTime: string;
-    endTime: string;
-    paymentType: string;
-    paymentAmount: Number;
-    roadTest: string;
-    remarks: string;
-}
-
-export async function POST(request: any, { params }: any) {
+export async function POST(
+    request: Request,
+    { params }: { params: { instructorId: string } }
+) {
     const {
         date,
         startTime,

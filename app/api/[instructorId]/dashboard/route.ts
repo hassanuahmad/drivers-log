@@ -3,7 +3,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: any, { params }: any) {
+export async function GET(
+    request: Request,
+    { params }: { params: { instructorId: string } }
+) {
     const { instructorId } = params;
 
     if (!instructorId) {

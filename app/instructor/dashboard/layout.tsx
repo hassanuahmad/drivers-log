@@ -1,5 +1,10 @@
 import RecentActivity from "./recentActivity";
 import Calender from "./tempCaledner";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Instructor Dashboard",
+};
 
 export default function InstructorDashboardLayout({
     children, // will be a page or nested layout

@@ -1,7 +1,7 @@
-import { useContext } from "react";
+import { useContext, Fragment, useState } from "react";
 import { Formik, Field, ErrorMessage } from "formik";
-import { XMarkIcon, CheckIcon } from "@heroicons/react/20/solid";
 import { InstructorIdContextType, InstructorIdContext } from "../layout";
+import { Transition, Dialog } from "@headlessui/react";
 
 type Record = {
     id: number;
@@ -32,23 +32,37 @@ export default function Edit({
     onEditSave,
     onCancel,
 }: EditComponentProps) {
+    // @ts-ignore  TODO: Fix this
     const initialValues = {
-        firstName: record.firstName,
-        lastName: record.lastName,
-        phoneNumber: record.phoneNumber,
-        email: record.email,
-        drivingClass: record.drivingClass,
-        bde: record.bde,
-        streetAddress: record.streetAddress,
-        postalCode: record.postalCode,
-        city: record.city,
-        province: record.province,
-        country: record.country,
-        remarks: record.remarks,
+        // @ts-ignore
+        firstName: record.student.firstName,
+        // @ts-ignore
+        lastName: record.student.lastName,
+        // @ts-ignore
+        phoneNumber: record.student.phoneNumber,
+        // @ts-ignore
+        email: record.student.email,
+        // @ts-ignore
+        drivingClass: record.student.drivingClass,
+        // @ts-ignore
+        bde: record.student.bde,
+        // @ts-ignore
+        streetAddress: record.student.streetAddress,
+        // @ts-ignore
+        postalCode: record.student.postalCode,
+        // @ts-ignore
+        city: record.student.city,
+        // @ts-ignore
+        province: record.student.province,
+        // @ts-ignore
+        country: record.student.country,
+        // @ts-ignore
+        remarks: record.student.remarks,
     };
 
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
+    const [open, setOpen] = useState(true);
 
     const handleSubmit = async (values: typeof initialValues) => {
         // @ts-ignore TODO: Fix this
@@ -82,200 +96,427 @@ export default function Edit({
 
                 return (
                     <>
+                        {/* START */}
+                        <Transition.Root show={open} as={Fragment}>
+                            <Dialog
+                                as="div"
+                                className="relative z-10"
+                                onClose={() => {
+                                    setOpen(false);
+                                    onCancel();
+                                }}
+                            >
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 z-10 overflow-y-auto">
+                                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        >
+                                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                                                <div>
+                                                    <div className="mt-3 text-center sm:mt-5">
+                                                        <Dialog.Title
+                                                            as="h3"
+                                                            className="text-base font-semibold leading-6 text-gray-900"
+                                                        >
+                                                            Edit Student #
+                                                            {index + 1}
+                                                        </Dialog.Title>
+                                                        <div className="mt-2">
+                                                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                                                {/* First Name */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="firstName"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        First
+                                                                        name
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="firstName"
+                                                                            id="firstName"
+                                                                            autoComplete="firstName"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="firstName"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Last Name */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="lastName"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Last
+                                                                        name
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="lastName"
+                                                                            id="lastName"
+                                                                            autoComplete="lastName"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="lastName"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Phone Number */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="phoneNumber"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Phone
+                                                                        number
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            id="phoneNumber"
+                                                                            name="phoneNumber"
+                                                                            type="tel"
+                                                                            autoComplete="tel"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="phoneNumber"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Email */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="email"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Email
+                                                                        address
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            id="email"
+                                                                            name="email"
+                                                                            type="email"
+                                                                            autoComplete="email"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="email"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Driving Class */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="drivingClass"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Driving
+                                                                        Class
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            component="select"
+                                                                            id="drivingClass"
+                                                                            name="drivingClass"
+                                                                            autoComplete="drivingClass"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                                        >
+                                                                            <option>
+                                                                                G2
+                                                                            </option>
+                                                                            <option>
+                                                                                G
+                                                                            </option>
+                                                                        </Field>
+                                                                        <ErrorMessage
+                                                                            name="drivingClass"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* BDE */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="bde"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        BDE
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            component="select"
+                                                                            id="bde"
+                                                                            name="bde"
+                                                                            autoComplete="bde"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                                        >
+                                                                            <option>
+                                                                                No
+                                                                            </option>
+                                                                            <option>
+                                                                                Yes
+                                                                            </option>
+                                                                        </Field>
+                                                                        <ErrorMessage
+                                                                            name="bde"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Street Address */}
+                                                                <div className="col-span-2 sm:col-span-6">
+                                                                    <label
+                                                                        htmlFor="streetAddress"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Street
+                                                                        address
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="streetAddress"
+                                                                            id="streetAddress"
+                                                                            autoComplete="streetAddress"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="streetAddress"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Postal code */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="postalCode"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Postal
+                                                                        code /
+                                                                        ZIP
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="postalCode"
+                                                                            id="postalCode"
+                                                                            autoComplete="postalCode"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="postalCode"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* City */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="city"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        City
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="city"
+                                                                            id="city"
+                                                                            autoComplete="city"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="city"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Province */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="province"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Province
+                                                                        / State
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="province"
+                                                                            id="province"
+                                                                            autoComplete="province"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="province"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Country */}
+                                                                <div className="col-span-1 sm:col-span-3">
+                                                                    <label
+                                                                        htmlFor="country"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Country
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            component="select"
+                                                                            id="country"
+                                                                            name="country"
+                                                                            autoComplete="country"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                                        >
+                                                                            <option>
+                                                                                Canada
+                                                                            </option>
+                                                                            <option>
+                                                                                United
+                                                                                States
+                                                                            </option>
+                                                                            <option>
+                                                                                Mexico
+                                                                            </option>
+                                                                        </Field>
+                                                                        <ErrorMessage
+                                                                            name="country"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Remarks */}
+                                                                <div className="col-span-2 sm:col-span-6">
+                                                                    <label
+                                                                        htmlFor="remarks"
+                                                                        className="block text-left text-sm font-medium leading-6 text-gray-900"
+                                                                    >
+                                                                        Remarks
+                                                                    </label>
+                                                                    <div className="mt-2">
+                                                                        <Field
+                                                                            type="text"
+                                                                            name="remarks"
+                                                                            id="remarks"
+                                                                            autoComplete="remarks"
+                                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name="remarks"
+                                                                            component="div"
+                                                                            className="text-red-500"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                                                    <button
+                                                        type="submit"
+                                                        className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                                                        onClick={onSubmit}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                                                        onClick={onCancel}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition.Root>
+                        {/* END */}
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
                             {index + 1}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="firstName"
-                                id="firstName"
-                                autoComplete="firstName"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="firstName"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.firstName}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="lastName"
-                                id="lastName"
-                                autoComplete="lastName"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="lastName"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.lastName}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                id="phoneNumber"
-                                name="phoneNumber"
-                                type="tel"
-                                autoComplete="tel"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="phoneNumber"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.phoneNumber}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="email"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.email}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="streetAddress"
-                                id="streetAddress"
-                                autoComplete="streetAddress"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="streetAddress"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.streetAddress} {initialValues.city}{" "}
+                            {initialValues.province} {initialValues.postalCode}{" "}
+                            {initialValues.country}
                         </td>
-                        {/* TODO: Somehow include the other Fields in the edit row */}
-                        {/* <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="postalCode"
-                                id="postalCode"
-                                autoComplete="postalCode"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="postalCode"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.drivingClass}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="city"
-                                id="city"
-                                autoComplete="city"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="city"
-                                component="div"
-                                className="text-red-500"
-                            />
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.bde}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="province"
-                                id="province"
-                                autoComplete="province"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="province"
-                                component="div"
-                                className="text-red-500"
-                            />
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                component="select"
-                                id="country"
-                                name="country"
-                                autoComplete="country"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                            >
-                                <option>Canada</option>
-                                <option>United States</option>
-                                <option>Mexico</option>
-                            </Field>
-                            <ErrorMessage
-                                name="country"
-                                component="div"
-                                className="text-red-500"
-                            />
-                        </td> */}
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                component="select"
-                                id="drivingClass"
-                                name="drivingClass"
-                                autoComplete="drivingClass"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                            >
-                                <option>G2</option>
-                                <option>G</option>
-                            </Field>
-                            <ErrorMessage
-                                name="drivingClass"
-                                component="div"
-                                className="text-red-500"
-                            />
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                component="select"
-                                id="bde"
-                                name="bde"
-                                autoComplete="bde"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                            >
-                                <option>No</option>
-                                <option>Yes</option>
-                            </Field>
-                            <ErrorMessage
-                                name="bde"
-                                component="div"
-                                className="text-red-500"
-                            />
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Field
-                                type="text"
-                                name="remarks"
-                                id="remarks"
-                                autoComplete="remarks"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                            <ErrorMessage
-                                name="remarks"
-                                component="div"
-                                className="text-red-500"
-                            />
-                        </td>
-                        {/* TODO: Make this look better */}
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                            <button
-                                type="submit"
-                                className="pr-4"
-                                onClick={onSubmit}
-                            >
-                                <CheckIcon className="h-5 w-5" />
-                            </button>
-                            <button type="button" onClick={onCancel}>
-                                <XMarkIcon className="h-5 w-5" />
-                            </button>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                            {initialValues.remarks}
                         </td>
                     </>
                 );

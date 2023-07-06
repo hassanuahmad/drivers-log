@@ -33,25 +33,3 @@ export async function POST(request: any, { params }: any) {
 
     return NextResponse.json({ message: "Vehicle maintenance added.", record });
 }
-
-export async function GET(request: any, { params }: any) {
-    const { instructorId } = params;
-
-    if (!instructorId) {
-        return NextResponse.json({
-            status: 400,
-            message: "Missing instructorId.",
-        });
-    }
-
-    const records = await prisma.vehicleMaintenance.findMany({
-        where: {
-            instructorId: Number(instructorId),
-        },
-        orderBy: {
-            date: "asc",
-        },
-    });
-
-    return NextResponse.json({ records });
-}

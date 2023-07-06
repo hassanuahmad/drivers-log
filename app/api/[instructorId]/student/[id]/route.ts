@@ -17,11 +17,17 @@ export async function DELETE(
         });
 
         if (lessons.length > 0) {
-            return NextResponse.json({
-                message:
-                    "A lesson is associated with the student, delete the lessons before deleting the student.",
-                status: "error",
-            });
+            return NextResponse.json(
+                {
+                    message:
+                        "A lesson is associated with the student, delete the lessons before deleting the student.",
+                },
+                {
+                    status: 300,
+                    statusText:
+                        "student has lesson, please delete the lesson first",
+                }
+            );
         } else {
             await prisma.studentInstructor.deleteMany({
                 where: {

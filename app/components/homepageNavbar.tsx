@@ -31,7 +31,7 @@ export default function Example() {
                                 aria-hidden="true"
                             />
                         </button>
-                        <h1>Driver's Log</h1>
+                        <Link href="/homepage/home">Driver's Log</Link>
                     </div>
                     <nav className="hidden md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (

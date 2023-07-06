@@ -3,7 +3,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function DELETE(request: any, { params }: any) {
+export async function DELETE(
+    request: Request,
+    { params }: { params: { id: string } }
+) {
     const { id } = params;
 
     const record = await prisma.vehicleMaintenance.delete({
@@ -15,7 +18,10 @@ export async function DELETE(request: any, { params }: any) {
     return NextResponse.json({ message: "Vehicle maintenance deleted." });
 }
 
-export async function PUT(request: any, { params }: any) {
+export async function PUT(
+    request: Request,
+    { params }: { params: { id: string } }
+) {
     const { id } = params;
 
     const record = await prisma.vehicleMaintenance.update({

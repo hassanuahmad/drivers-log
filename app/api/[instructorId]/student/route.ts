@@ -3,22 +3,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface Request {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-}
-
-export async function POST(request: any, { params }: any) {
+export async function POST(
+    request: Request,
+    { params }: { params: { instructorId: string } }
+) {
     const {
         firstName,
         lastName,
@@ -63,7 +51,10 @@ export async function POST(request: any, { params }: any) {
     return NextResponse.json({ message: "Student added.", record });
 }
 
-export async function GET(request: any, { params }: any) {
+export async function GET(
+    request: Request,
+    { params }: { params: { instructorId: string } }
+) {
     const { instructorId } = params;
 
     if (!instructorId) {

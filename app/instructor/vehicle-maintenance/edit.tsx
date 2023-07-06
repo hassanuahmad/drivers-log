@@ -1,6 +1,5 @@
 import { useContext, Fragment, useState } from "react";
 import { Formik, Field, ErrorMessage } from "formik";
-import { XMarkIcon, CheckIcon } from "@heroicons/react/20/solid";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
 import { Transition, Dialog } from "@headlessui/react";
 

@@ -2,13 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import InstructorNavbar from "../components/instructorNavbar";
-import {
-    Dispatch,
-    SetStateAction,
-    createContext,
-    useContext,
-    useState,
-} from "react";
+import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { User } from "./dashboard/page";
 
 export interface InstructorIdContextType {
@@ -36,7 +30,7 @@ export default function VehicleMaintenanceLayout({
         emailAddress: user?.primaryEmailAddress?.emailAddress,
     };
 
-    const createUser = async (value: User) => {
+    const getUserInfo = async (value: User) => {
         try {
             const response = await fetch("/api/instructor", {
                 method: "POST",
@@ -46,27 +40,20 @@ export default function VehicleMaintenanceLayout({
                 body: JSON.stringify(value),
             });
             if (response.ok) {
-                // console.log(response);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const getUser = async (
-        value: User,
-        { instructorId, setInstructorId }: InstructorIdContextType
-    ) => {
-        try {
-            const response = await fetch(`/api/instructor/${value.googleId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            if (response.ok) {
-                const { id } = await response.json();
-                if (setInstructorId) setInstructorId(id);
+                // If user is created, get user info
+                const response = await fetch(
+                    `/api/instructor/${value.googleId}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                if (response.ok) {
+                    const { id } = await response.json();
+                    if (setInstructorId) setInstructorId(id);
+                }
             }
         } catch (error) {
             console.log(error);
@@ -74,9 +61,7 @@ export default function VehicleMaintenanceLayout({
     };
 
     if (isSignedIn) {
-        createUser(userInfo);
-
-        getUser(userInfo, { instructorId, setInstructorId });
+        getUserInfo(userInfo);
     }
 
     return (

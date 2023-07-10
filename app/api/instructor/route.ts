@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         data: {
             googleId: userInfo.googleId,
             firstName: userInfo.firstName,
-            lastName: userInfo.lastName,
+            lastName: userInfo.lastName ? userInfo.lastName : "",
             email: userInfo.emailAddress,
         },
     });

@@ -2,13 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import InstructorNavbar from "../components/instructorNavbar";
-import {
-    Dispatch,
-    SetStateAction,
-    createContext,
-    useContext,
-    useState,
-} from "react";
+import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { User } from "./dashboard/page";
 
 export interface InstructorIdContextType {
@@ -66,30 +60,8 @@ export default function VehicleMaintenanceLayout({
         }
     };
 
-    // const getUser = async (
-    //     value: User,
-    //     { instructorId, setInstructorId }: InstructorIdContextType
-    // ) => {
-    //     try {
-    //         const response = await fetch(`/api/instructor/${value.googleId}`, {
-    //             method: "GET",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //         });
-    //         if (response.ok) {
-    //             const { id } = await response.json();
-    //             if (setInstructorId) setInstructorId(id);
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-
     if (isSignedIn) {
         getUserInfo(userInfo);
-
-        // getUser(userInfo, { instructorId, setInstructorId });
     }
 
     return (

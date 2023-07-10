@@ -15,8 +15,6 @@ export async function GET(
         },
     });
 
-    console.log("get instructor", record);
-
     if (record) {
         return NextResponse.json({ id: record.id });
     }

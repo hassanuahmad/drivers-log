@@ -26,7 +26,5 @@ export async function POST(request: Request) {
         },
     });
 
-    console.log("create instructor", record);
-
     return NextResponse.json({ message: "User added", record });
 }

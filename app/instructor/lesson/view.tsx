@@ -405,13 +405,13 @@ export default function View() {
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                         {record.paymentType ===
                                                         "Cash"
-                                                            ? record.paymentAmount.toString()
+                                                            ? `$${record.paymentAmount.toString()}`
                                                             : ""}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                         {record.paymentType ===
                                                         "Interac"
-                                                            ? record.paymentAmount.toString()
+                                                            ? `$${record.paymentAmount.toString()}`
                                                             : ""}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

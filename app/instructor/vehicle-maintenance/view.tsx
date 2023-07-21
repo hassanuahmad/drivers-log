@@ -330,6 +330,9 @@ export default function View() {
                                     ))}
                                 </tbody>
                                 <tfoot>
+                                    <tr></tr>
+                                </tfoot>
+                                {/* <tfoot>
                                     <tr>
                                         <th
                                             scope="row"
@@ -366,10 +369,29 @@ export default function View() {
                                             ${totalMaintenance}
                                         </td>
                                     </tr>
-                                </tfoot>
+                                </tfoot> */}
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            {/* Lesson Stats */}
+            <div className="flex justify-end">
+                <div className="flex flex-col">
+                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-6 ">
+                        Gas:
+                    </span>
+                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-4 pb-6 ">
+                        Maintenance:
+                    </span>
+                </div>
+                <div className="flex flex-col ml-3">
+                    <span className="text-sm text-gray-500 pr-3 pt-6 text-right">
+                        ${totalGas}
+                    </span>
+                    <span className="text-sm text-gray-500 pr-3 pt-4 pb-6 text-right">
+                        ${totalMaintenance}
+                    </span>
                 </div>
             </div>
             {/* Delete Modal */}

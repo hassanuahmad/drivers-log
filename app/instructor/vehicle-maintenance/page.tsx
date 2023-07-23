@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
+import { VehicleMaintenanceRecordsContext } from "../../context/recordsContext";
 
 interface VehicleMaintenanceFormValues {
     date: string;
@@ -24,6 +25,8 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
+    // @ts-ignore
+    const { setRecords } = useContext(VehicleMaintenanceRecordsContext);
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
 
@@ -59,6 +62,9 @@ export default function Page() {
                 }
             );
             if (response.ok) {
+                const newRecord = await response.json();
+                // @ts-ignore
+                setRecords((prevRecords) => [...prevRecords, newRecord.record]);
                 setShowNotification(true);
                 resetForm();
 

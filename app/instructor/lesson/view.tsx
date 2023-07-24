@@ -444,64 +444,36 @@ export default function View() {
                                     ))}
                                 </tbody>
                                 <tfoot>
-                                    <tr>
-                                        <th
-                                            scope="row"
-                                            colSpan={11}
-                                            className="hidden pr-3 pt-6 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
-                                        >
-                                            Total Hours
-                                        </th>
-                                        <th
-                                            scope="row"
-                                            className="pr-3 pt-6 text-left text-sm font-bold text-gray-500 sm:hidden "
-                                        >
-                                            Total Hours
-                                        </th>
-                                        <td className="pl-3 pr-6 pt-6 text-right text-sm text-gray-500 sm:pr-0">
-                                            {totalDuration}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th
-                                            scope="row"
-                                            colSpan={11}
-                                            className="hidden pr-3 pt-4 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
-                                        >
-                                            Total Interac
-                                        </th>
-                                        <th
-                                            scope="row"
-                                            className="pr-3 pt-4 text-left text-sm font-bold text-gray-500 sm:hidden"
-                                        >
-                                            Total Interac
-                                        </th>
-                                        <td className="pl-3 pr-6 pt-4 text-right text-sm text-gray-500 sm:pr-0">
-                                            ${totalInterac}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th
-                                            scope="row"
-                                            colSpan={11}
-                                            className="hidden pr-3 pt-4 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
-                                        >
-                                            Total Cash
-                                        </th>
-                                        <th
-                                            scope="row"
-                                            className="pr-3 pt-4 text-left text-sm font-bold text-gray-500 sm:hidden"
-                                        >
-                                            Total Cash
-                                        </th>
-                                        <td className="pl-3 pr-6 pt-4 text-right text-sm text-gray-500 sm:pr-0">
-                                            ${totalCash}
-                                        </td>
-                                    </tr>
+                                    <tr></tr>
                                 </tfoot>
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            {/* Lesson Stats */}
+            <div className="flex justify-end">
+                <div className="flex flex-col">
+                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-6 ">
+                        Total Hours:
+                    </span>
+                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-4">
+                        Total Interac:
+                    </span>
+                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-4 pb-6 ">
+                        Total Cash:
+                    </span>
+                </div>
+                <div className="flex flex-col ml-3">
+                    <span className="text-sm text-gray-500 pr-3 pt-6 text-right">
+                        {totalDuration}
+                    </span>
+                    <span className="text-sm text-gray-500 pr-3 pt-4 text-right">
+                        ${totalInterac}
+                    </span>
+                    <span className="text-sm text-gray-500 pr-3 pt-4 pb-6 text-right">
+                        ${totalCash}
+                    </span>
                 </div>
             </div>
             {/* Delete Modal */}

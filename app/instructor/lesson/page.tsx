@@ -56,7 +56,11 @@ export default function Page() {
         fetch(`/api/${instructorId}/student`)
             .then((res) => res.json())
             .then((data) => {
-                setRecords(data.records);
+                // sort the students alphabetically by first name
+                const sortedRecords = data.records.sort((a, b) =>
+                    a.student.firstName.localeCompare(b.student.firstName)
+                );
+                setRecords(sortedRecords);
             })
             .catch((err) => console.log(err));
     }, [instructorId]);

@@ -42,6 +42,12 @@ export default function Example() {
                     </nav>
                     <div className="flex flex-1 items-center justify-end gap-x-8">
                         <SignedIn>
+                            <Link
+                                className="btn md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700"
+                                href="/instructor/dashboard"
+                            >
+                                Dashboard
+                            </Link>
                             {/* Mount the UserButton component */}
                             <UserButton afterSignOutUrl="/" />
                         </SignedIn>

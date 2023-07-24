@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useContext, Fragment } from "react";
+import { useState, useContext, Fragment } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
@@ -7,6 +7,7 @@ import { calculateTotals } from "./utils";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { VehicleMaintenanceRecordsContext } from "../../context/recordsContext";
 
 function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(" ");
@@ -23,9 +24,6 @@ type Record = {
 };
 
 export default function View() {
-    const [records, setRecords] = useState<Record[]>([]);
-    const [totalGas, setTotalGas] = useState<number>(0);
-    const [totalMaintenance, setTotalMaintenance] = useState<number>(0);
     const [deleteRecord, setDeleteRecord] = useState<{
         id: number;
         endpoint: string;
@@ -34,6 +32,29 @@ export default function View() {
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
+
+    const {
+        // @ts-ignore
+        records,
+        // @ts-ignore
+        setRecords,
+        // @ts-ignore
+        selectedMonth,
+        // @ts-ignore
+        setSelectedMonth,
+        // @ts-ignore
+        selectedYear,
+        // @ts-ignore
+        setSelectedYear,
+        // @ts-ignore
+        totalGas,
+        // @ts-ignore
+        setTotalGas,
+        // @ts-ignore
+        totalMaintenance,
+        // @ts-ignore
+        setTotalMaintenance,
+    } = useContext(VehicleMaintenanceRecordsContext);
 
     const monthOptions = [
         { label: "Jan", value: "01" },
@@ -50,31 +71,9 @@ export default function View() {
         { label: "Dec", value: "12" },
     ];
 
-    const [selectedMonth, setSelectedMonth] = useState(
-        monthOptions[new Date().getMonth()].value
-    );
-
-    const date = new Date();
-    const currentYear = date.getFullYear();
-    const [selectedYear, setSelectedYear] = useState(currentYear);
     const years = [
         2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030,
     ];
-
-    useEffect(() => {
-        if (!instructorId) return;
-        fetch(
-            `/api/${instructorId}/vehicle-maintenance/${selectedMonth}/${selectedYear}`
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                setRecords(data.records);
-                const totals = calculateTotals(data.records);
-                setTotalGas(totals.totalGas);
-                setTotalMaintenance(totals.totalMaintenance);
-            })
-            .catch((err) => console.log(err));
-    }, [instructorId, selectedMonth, selectedYear]);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });
@@ -84,6 +83,7 @@ export default function View() {
     const handleDeleteConfirmed = () => {
         if (deleteRecord) {
             const newRecords = records.filter(
+                // @ts-ignore
                 (record) => record.id !== deleteRecord.id
             );
             setRecords(newRecords);
@@ -99,6 +99,7 @@ export default function View() {
     };
 
     const handleEditSave = (id: number, updatedRecord: Record) => {
+        // @ts-ignore
         const updatedRecords = records.map((record) =>
             record.id === id ? { ...record, ...updatedRecord } : record
         );
@@ -274,6 +275,7 @@ export default function View() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white">
+                                    {/* @ts-ignore */}
                                     {records.map((record, index) => (
                                         <tr
                                             key={index}
@@ -332,44 +334,6 @@ export default function View() {
                                 <tfoot>
                                     <tr></tr>
                                 </tfoot>
-                                {/* <tfoot>
-                                    <tr>
-                                        <th
-                                            scope="row"
-                                            colSpan={7}
-                                            className="hidden pr-3 pt-6 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
-                                        >
-                                            Gas
-                                        </th>
-                                        <th
-                                            scope="row"
-                                            className="pr-3 pt-6 text-left text-sm font-bold text-gray-500 sm:hidden "
-                                        >
-                                            Gas
-                                        </th>
-                                        <td className="pl-3 pr-6 pt-6 text-right text-sm text-gray-500 sm:pr-0">
-                                            ${totalGas}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th
-                                            scope="row"
-                                            colSpan={7}
-                                            className="hidden pr-3 pt-4 text-right text-sm font-bold text-gray-500 sm:table-cell sm:pl-0"
-                                        >
-                                            Maintenance
-                                        </th>
-                                        <th
-                                            scope="row"
-                                            className="pr-3 pt-4 text-left text-sm font-bold text-gray-500 sm:hidden"
-                                        >
-                                            Maintenance
-                                        </th>
-                                        <td className="pl-3 pr-6 pt-4 text-right text-sm text-gray-500 sm:pr-0">
-                                            ${totalMaintenance}
-                                        </td>
-                                    </tr>
-                                </tfoot> */}
                             </table>
                         </div>
                     </div>

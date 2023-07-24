@@ -301,10 +301,10 @@ export default function View() {
                                                         {record.fueling}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.gas}
+                                                        ${record.gas}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.maintenance}
+                                                        ${record.maintenance}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                         {record.remarks}

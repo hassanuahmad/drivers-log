@@ -1,5 +1,6 @@
 import View from "./view";
 import { Metadata } from "next";
+import { StudentProvider } from "../../context/studentProvider";
 
 export const metadata: Metadata = {
     title: "Students",
@@ -12,8 +13,10 @@ export default function StudentLayout({
 }) {
     return (
         <section>
-            {children}
-            <View />
+            <StudentProvider>
+                {children}
+                <View />
+            </StudentProvider>
         </section>
     );
 }

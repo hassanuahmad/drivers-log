@@ -1,10 +1,11 @@
 // @ts-nocheck
 "use client";
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
+import { StudentRecordsContext } from "../../context/studentRecordsContext";
 
 type Record = {
     id: number;
@@ -23,7 +24,6 @@ type Record = {
 };
 
 export default function View() {
-    const [records, setRecords] = useState<Record[]>([]);
     const [deleteRecord, setDeleteRecord] = useState<{
         id: number;
         endpoint: string;
@@ -33,15 +33,12 @@ export default function View() {
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
 
-    useEffect(() => {
-        if (!instructorId) return;
-        fetch(`/api/${instructorId}/student`)
-            .then((res) => res.json())
-            .then((data) => {
-                setRecords(data.records);
-            })
-            .catch((err) => console.log(err));
-    }, [instructorId]);
+    const {
+        // @ts-ignore
+        records,
+        // @ts-ignore
+        setRecords,
+    } = useContext(StudentRecordsContext);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });
@@ -51,7 +48,7 @@ export default function View() {
     const handleDeleteConfirmed = () => {
         if (deleteRecord) {
             const newRecords = records.filter(
-                (record) => record.id !== deleteRecord.id
+                (record) => record.student.id !== deleteRecord.id
             );
             setRecords(newRecords);
             setDeleteModalOpen(false);
@@ -64,7 +61,12 @@ export default function View() {
 
     const handleEditSave = (id: number, updatedRecord: Record) => {
         const updatedRecords = records.map((record) =>
-            record.id === id ? { ...record, ...updatedRecord } : record
+            record.id === id
+                ? {
+                      ...record,
+                      student: { ...record.student, ...updatedRecord },
+                  }
+                : record
         );
         setRecords(updatedRecords);
         setEditRecordId(null);

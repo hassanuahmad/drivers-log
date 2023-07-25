@@ -86,7 +86,7 @@ export default function View() {
                 >
                     Quick search
                 </label>
-                <div className="relative mt-2 flex items-center">
+                <div className="relative w-full sm:w-6/12 lg:w-1/4 mt-2 flex items-center">
                     <input
                         type="text"
                         name="search"

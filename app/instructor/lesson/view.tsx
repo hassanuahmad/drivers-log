@@ -1,12 +1,5 @@
 "use client";
-import {
-    Dispatch,
-    SetStateAction,
-    useEffect,
-    useState,
-    useContext,
-    Fragment,
-} from "react";
+import { useState, useContext, Fragment } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
@@ -18,54 +11,13 @@ import {
 import { InstructorIdContextType, InstructorIdContext } from "../layout";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { LessonRecordsContext } from "../../context/lessonRecordsContext";
 
 function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(" ");
 }
 
-type SetStringAction = Dispatch<SetStateAction<string>>;
-type SetNumberAction = Dispatch<SetStateAction<number>>;
-type SetLessonArrayAction = Dispatch<
-    SetStateAction<LessonWithFormattedDuration[]>
->;
-
-type Student = {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-};
-
-type Lesson = {
-    id: number;
-    date: string;
-    startTime: string;
-    endTime: string;
-    duration: number;
-    paymentType: string;
-    paymentAmount: number;
-    roadTest: string;
-    remarks: string;
-    student: Student;
-};
-
-type LessonWithFormattedDuration = Lesson & {
-    formattedDuration: string;
-};
-
 export default function View() {
-    const [records, setRecords] = useState<LessonWithFormattedDuration[]>([]);
-    const [totalDuration, setTotalDuration] = useState("");
-    const [totalCash, setTotalCash] = useState(0);
-    const [totalInterac, setTotalInterac] = useState(0);
     const [deleteRecord, setDeleteRecord] = useState<{
         id: number;
         endpoint: string;
@@ -74,6 +26,35 @@ export default function View() {
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
+
+    const {
+        // @ts-ignore
+        studentRecords,
+        // @ts-ignore
+        records,
+        // @ts-ignore
+        setRecords,
+        // @ts-ignore
+        selectedMonth,
+        // @ts-ignore
+        setSelectedMonth,
+        // @ts-ignore
+        selectedYear,
+        // @ts-ignore
+        setSelectedYear,
+        // @ts-ignore
+        totalDuration,
+        // @ts-ignore
+        setTotalDuration,
+        // @ts-ignore
+        totalCash,
+        // @ts-ignore
+        setTotalCash,
+        // @ts-ignore
+        totalInterac,
+        // @ts-ignore
+        setTotalInterac,
+    } = useContext(LessonRecordsContext);
 
     const monthOptions = [
         { label: "Jan", value: "01" },
@@ -90,49 +71,9 @@ export default function View() {
         { label: "Dec", value: "12" },
     ];
 
-    const [selectedMonth, setSelectedMonth] = useState(
-        monthOptions[new Date().getMonth()].value
-    );
-
-    const date = new Date();
-    const currentYear = date.getFullYear();
-    const [selectedYear, setSelectedYear] = useState(currentYear);
     const years = [
         2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030,
     ];
-
-    // Define this function outside of your component.
-    const fetchRecords = (
-        setRecords: SetLessonArrayAction,
-        setTotalDuration: SetStringAction,
-        setTotalCash: SetNumberAction,
-        setTotalInterac: SetNumberAction
-    ) => {
-        if (!instructorId) return;
-        fetch(`/api/${instructorId}/lesson/${selectedMonth}/${selectedYear}`)
-            .then((res) => res.json())
-            .then((data) => {
-                const formattedRecords = data.records.map((record: Lesson) => ({
-                    ...record,
-                    formattedDuration: formatDuration(Number(record.duration)),
-                }));
-                setRecords(formattedRecords);
-                const total = calculateTotalDuration(data.records);
-                setTotalDuration(total);
-                setTotalCash(calculateTotalPayment(data.records, "Cash"));
-                setTotalInterac(calculateTotalPayment(data.records, "Interac"));
-            })
-            .catch((err) => console.log(err));
-    };
-
-    useEffect(() => {
-        fetchRecords(
-            setRecords,
-            setTotalDuration,
-            setTotalCash,
-            setTotalInterac
-        );
-    }, [fetchRecords]);
 
     const handleDelete = (id: number, endpoint: string) => {
         setDeleteRecord({ id, endpoint });
@@ -142,6 +83,7 @@ export default function View() {
     const handleDeleteConfirmed = () => {
         if (deleteRecord) {
             const newRecords = records.filter(
+                // @ts-ignore
                 (record) => record.id !== deleteRecord.id
             );
             setRecords(newRecords);
@@ -157,13 +99,51 @@ export default function View() {
         setEditRecordId(id);
     };
 
-    const handleEditSave = () => {
-        fetchRecords(
-            setRecords,
-            setTotalDuration,
-            setTotalCash,
-            setTotalInterac
-        );
+    // @ts-ignore
+    const handleEditSave = (id: number, updatedRecord) => {
+        // @ts-ignore
+        const updatedRecords = records.map((record) => {
+            if (record.id === id) {
+                // Parse the startTime and endTime strings to Date objects
+                const start = new Date(
+                    `1970-01-01T${updatedRecord.startTime}:00`
+                ); // Adding ":00" for seconds
+                const end = new Date(`1970-01-01T${updatedRecord.endTime}:00`);
+
+                // Calculate the duration in minutes
+                const duration = (end.getTime() - start.getTime()) / 60000;
+
+                // Return the updated record with the new duration
+                return {
+                    ...record,
+                    ...updatedRecord,
+                    duration,
+                    formattedDuration: formatDuration(duration),
+                };
+            }
+            return record;
+        });
+
+        // @ts-ignore
+        updatedRecords.sort((a, b) => {
+            // Compare dates
+            const dateComparison = a.date.localeCompare(b.date);
+            if (dateComparison !== 0) {
+                // If dates are different, return the comparison result
+                return dateComparison;
+            } else {
+                // If dates are the same, compare times
+                return a.startTime.localeCompare(b.startTime);
+            }
+        });
+
+        setRecords(updatedRecords);
+
+        const total = calculateTotalDuration(updatedRecords);
+        setTotalDuration(total);
+        setTotalCash(calculateTotalPayment(updatedRecords, "Cash"));
+        setTotalInterac(calculateTotalPayment(updatedRecords, "Interac"));
+        setDeleteModalOpen(false);
         setEditRecordId(null);
     };
 
@@ -361,6 +341,7 @@ export default function View() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white">
+                                    {/* @ts-ignore */}
                                     {records.map((record, index) => (
                                         <tr
                                             key={index}
@@ -428,7 +409,7 @@ export default function View() {
                                                             onDelete={() =>
                                                                 handleDelete(
                                                                     record.id,
-                                                                    "/api/1/lesson"
+                                                                    `/api/${instructorId}/lesson`
                                                                 )
                                                             }
                                                             onEdit={() =>

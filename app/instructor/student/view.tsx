@@ -28,6 +28,7 @@ export default function View() {
         id: number;
         endpoint: string;
     } | null>(null);
+    const [searchName, setSearchName] = useState<String>("");
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const { instructorId }: InstructorIdContextType =
@@ -78,6 +79,18 @@ export default function View() {
 
     return (
         <>
+            <form>
+                <label htmlFor="input">
+                    Search Name:{" "}
+                    <input
+                        placeholder="Name"
+                        onChange={(e) => {
+                            setSearchName(e.target.value);
+                        }}
+                    />
+                    Entered Name: {searchName}
+                </label>
+            </form>
             <div className="px-4 sm:px-6 lg:px-8">
                 <div className="mt-8 flow-root">
                     <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -146,96 +159,137 @@ export default function View() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white">
-                                    {records.map((record, index) => (
-                                        <tr
-                                            key={index}
-                                            className="even:bg-gray-50"
-                                        >
-                                            {editRecordId ===
-                                            record.student.id ? (
-                                                <Edit
-                                                    record={record}
-                                                    index={index}
-                                                    onEditSave={handleEditSave}
-                                                    onCancel={handleEditCancel}
-                                                />
-                                            ) : (
-                                                <>
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                        {index + 1}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.student
-                                                                .firstName
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.student
-                                                                .lastName
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.student
-                                                                .phoneNumber
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.student.email}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.student
-                                                                .streetAddress
-                                                        }{" "}
-                                                        {record.student.city}{" "}
-                                                        {
-                                                            record.student
-                                                                .province
-                                                        }{" "}
-                                                        {
-                                                            record.student
-                                                                .postalCode
-                                                        }{" "}
-                                                        {record.student.country}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.student
-                                                                .drivingClass
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.student.bde}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.student.remarks}
-                                                    </td>
-                                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                                        <KebabMenu
-                                                            onDelete={() =>
-                                                                handleDelete(
-                                                                    record
-                                                                        .student
-                                                                        .id,
-                                                                    `/api/${instructorId}/student`
-                                                                )
+                                    {records.map((record, index) => {
+                                        if (
+                                            searchName == "" ||
+                                            record.student.firstName
+                                                .toLowerCase()
+                                                .includes(
+                                                    searchName.toLowerCase()
+                                                )
+                                        )
+                                            return (
+                                                <tr
+                                                    key={index}
+                                                    className="even:bg-gray-50"
+                                                >
+                                                    {editRecordId ===
+                                                    record.student.id ? (
+                                                        <Edit
+                                                            record={record}
+                                                            index={index}
+                                                            onEditSave={
+                                                                handleEditSave
                                                             }
-                                                            onEdit={() =>
-                                                                handleEdit(
-                                                                    record
-                                                                        .student
-                                                                        .id
-                                                                )
+                                                            onCancel={
+                                                                handleEditCancel
                                                             }
                                                         />
-                                                    </td>
-                                                </>
-                                            )}
-                                        </tr>
-                                    ))}
+                                                    ) : (
+                                                        <>
+                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                                {index + 1}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .firstName
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .lastName
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .phoneNumber
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .email
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .streetAddress
+                                                                }{" "}
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .city
+                                                                }{" "}
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .province
+                                                                }{" "}
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .postalCode
+                                                                }{" "}
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .country
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .drivingClass
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .bde
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .remarks
+                                                                }
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                                <KebabMenu
+                                                                    onDelete={() =>
+                                                                        handleDelete(
+                                                                            record
+                                                                                .student
+                                                                                .id,
+                                                                            `/api/${instructorId}/student`
+                                                                        )
+                                                                    }
+                                                                    onEdit={() =>
+                                                                        handleEdit(
+                                                                            record
+                                                                                .student
+                                                                                .id
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+                                                </tr>
+                                            );
+                                    })}
                                 </tbody>
                             </table>
                         </div>

@@ -88,7 +88,6 @@ export default function View() {
                             setSearchName(e.target.value);
                         }}
                     />
-                    Entered Name: {searchName}
                 </label>
             </form>
             <div className="px-4 sm:px-6 lg:px-8">
@@ -164,7 +163,7 @@ export default function View() {
                                             searchName == "" ||
                                             record.student.firstName
                                                 .toLowerCase()
-                                                .includes(
+                                                .contains(
                                                     searchName.toLowerCase()
                                                 )
                                         )

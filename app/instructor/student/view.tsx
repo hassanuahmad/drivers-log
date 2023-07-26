@@ -97,7 +97,7 @@ export default function View() {
                     />
                     <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
                         <kbd className="inline-flex items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
-                            ⌘S
+                            ⌘K
                         </kbd>
                     </div>
                 </div>

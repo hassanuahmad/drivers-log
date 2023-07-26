@@ -11,10 +11,16 @@ export let contains = (toCheck: Array<string>, search: string): Boolean => {
 
     let searchArray: Array<string> = search.split(" ");
 
-    for (let element of toCheck) {
+    // Convert all strings to lower case
+    toCheck = toCheck.map((element) => element.toLowerCase());
+    searchArray = searchArray.map((element) => element.toLowerCase());
+
+    for (let toCheckElement of toCheck) {
+        let match: boolean = false;
         searchArray.forEach((searchSubstring) => {
-            if (element.includes(searchSubstring)) return true;
+            if (toCheckElement.includes(searchSubstring)) match = true;
         });
+        if (match) return true;
     }
 
     return false;

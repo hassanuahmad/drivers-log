@@ -1,3 +1,5 @@
+import { strict } from "assert";
+
 /**
  * Compares toCheck, the array of strings, to the Search string
  * To search, the Search string, will be split up by spaces, then each of those parts will be matched with all elements in the toCheck array
@@ -10,18 +12,26 @@ export let contains = (toCheck: Array<string>, search: string): Boolean => {
     if (search == "") return true;
 
     let searchArray: Array<string> = search.split(" ");
+    // Edge case: Remove empty strings from array
+    searchArray = searchArray.filter((element) => element != "");
 
     // Convert all strings to lower case
     toCheck = toCheck.map((element) => element.toLowerCase());
     searchArray = searchArray.map((element) => element.toLowerCase());
 
-    for (let toCheckElement of toCheck) {
-        let match: boolean = false;
-        searchArray.forEach((searchSubstring) => {
-            if (toCheckElement.includes(searchSubstring)) match = true;
-        });
-        if (match) return true;
+    let strictMatch = true;
+    for (let searchSubstring of searchArray) {
+        let singleMatch = false;
+        for (let toCheckElement of toCheck) {
+            if (toCheckElement.includes(searchSubstring)) {
+                singleMatch = true;
+                break;
+            }
+        }
+        if (!singleMatch) {
+            strictMatch = false;
+        }
     }
 
-    return false;
+    return strictMatch;
 };

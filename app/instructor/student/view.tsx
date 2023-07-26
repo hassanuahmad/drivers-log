@@ -6,7 +6,7 @@ import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
 import { StudentRecordsContext } from "../../context/studentRecordsContext";
-import { contains } from "@/app/functions/contains";
+import { contains } from "@/app/utils/contains";
 
 type Record = {
     id: number;

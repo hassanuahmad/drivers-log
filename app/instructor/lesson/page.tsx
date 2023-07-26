@@ -1,10 +1,16 @@
 // @ts-nocheck
 "use client";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
+import {
+    formatDuration,
+    calculateTotalDuration,
+    calculateTotalPayment,
+} from "./utils";
 import { InstructorIdContextType, InstructorIdContext } from "../layout";
+import { LessonRecordsContext } from "../../context/lessonRecordsContext";
 
 interface LessonFormValues {
     selectStudent: string;
@@ -29,9 +35,17 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
+    // @ts-ignore
+    const {
+        studentRecords,
+        records,
+        setRecords,
+        setTotalDuration,
+        setTotalCash,
+        setTotalInterac,
+    } = useContext(LessonRecordsContext);
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
-    const [records, setRecords] = useState([]);
 
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
@@ -51,20 +65,6 @@ export default function Page() {
         remarks: "",
     };
 
-    useEffect(() => {
-        if (!instructorId) return;
-        fetch(`/api/${instructorId}/student`)
-            .then((res) => res.json())
-            .then((data) => {
-                // sort the students alphabetically by first name
-                const sortedRecords = data.records.sort((a, b) =>
-                    a.student.firstName.localeCompare(b.student.firstName)
-                );
-                setRecords(sortedRecords);
-            })
-            .catch((err) => console.log(err));
-    }, [instructorId]);
-
     const handleSubmit = async (
         values: typeof initialValues,
         { resetForm }: { resetForm: () => void }
@@ -78,6 +78,60 @@ export default function Page() {
                 body: JSON.stringify(values),
             });
             if (response.ok) {
+                let newRecord = await response.json();
+
+                // Find the student object that matches the studentId from the values
+                let student = studentRecords.find(
+                    (student) =>
+                        student.studentId === newRecord.record.studentId
+                );
+
+                if (student) {
+                    newRecord.record = {
+                        ...newRecord.record,
+                        student: student.student,
+                        formattedDuration: formatDuration(
+                            Number(newRecord.record.duration)
+                        ),
+                    };
+                }
+
+                setRecords((prevRecords) => {
+                    const newRecords = [...prevRecords, newRecord.record];
+
+                    newRecords.sort((a, b) => {
+                        // Compare dates
+                        const dateComparison = a.date.localeCompare(b.date);
+                        if (dateComparison !== 0) {
+                            // If dates are different, return the comparison result
+                            return dateComparison;
+                        } else {
+                            // If dates are the same, compare times
+                            return a.startTime.localeCompare(b.startTime);
+                        }
+                    });
+
+                    return newRecords;
+                });
+
+                const total = calculateTotalDuration([
+                    ...records,
+                    newRecord.record,
+                ]);
+                setTotalDuration(total);
+                setTotalCash(
+                    calculateTotalPayment(
+                        [...records, newRecord.record],
+                        "Cash"
+                    )
+                );
+                setTotalInterac(
+                    calculateTotalPayment(
+                        [...records, newRecord.record],
+                        "Interac"
+                    )
+                );
+
                 setShowNotification(true);
                 resetForm();
 
@@ -127,7 +181,7 @@ export default function Page() {
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                                         >
                                             <option value=""></option>
-                                            {records.map((record) => (
+                                            {studentRecords.map((record) => (
                                                 <option
                                                     key={record.student.id}
                                                     value={record.student.id}

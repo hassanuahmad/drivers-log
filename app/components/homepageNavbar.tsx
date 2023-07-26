@@ -17,7 +17,7 @@ export default function Example() {
 
     return (
         <>
-            <header className="inset-x-0 top-0 z-50 flex h-16 border-b border-gray-900/10">
+            <header className="inset-x-0 top-0 z-50 flex h-16 border-b border-gray-900/10 absolute">
                 <div className="mx-auto flex w-full max-w-8xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-1 items-center gap-x-6">
                         <button

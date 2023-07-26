@@ -171,20 +171,14 @@ export default function View() {
                                 </thead>
                                 <tbody className="bg-white">
                                     {records.map((record, index) => {
-                                        contains(
-                                            [
-                                                record.student.firstName,
-                                                record.student.lastName,
-                                            ],
-                                            searchName
-                                        );
                                         if (
-                                            searchName == "" ||
-                                            record.student.firstName
-                                                .toLowerCase()
-                                                .includes(
-                                                    searchName.toLowerCase()
-                                                )
+                                            contains(
+                                                [
+                                                    record.student.firstName,
+                                                    record.student.lastName,
+                                                ],
+                                                searchName
+                                            )
                                         )
                                             return (
                                                 <tr

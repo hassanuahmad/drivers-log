@@ -5,11 +5,16 @@
  * @param search A String that will be split up by spaces to search with
  * @returns True if the Search String is a substring in any element inside toCheck
  */
-export let contains = (toCheck: Array<String>, search: String): Boolean => {
-    let searchArray: Array<String> = search.split(" ");
+export let contains = (toCheck: Array<string>, search: string): Boolean => {
+    // Edge case
+    if (search == "") return true;
+
+    let searchArray: Array<string> = search.split(" ");
 
     for (let element of toCheck) {
-        console.log(element);
+        searchArray.forEach((searchSubstring) => {
+            if (element.includes(searchSubstring)) return true;
+        });
     }
 
     return false;

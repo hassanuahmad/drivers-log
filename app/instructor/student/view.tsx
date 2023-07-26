@@ -6,6 +6,7 @@ import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
 import { StudentRecordsContext } from "../../context/studentRecordsContext";
+import { contains } from "@/app/functions/contains";
 
 type Record = {
     id: number;
@@ -170,11 +171,18 @@ export default function View() {
                                 </thead>
                                 <tbody className="bg-white">
                                     {records.map((record, index) => {
+                                        contains(
+                                            [
+                                                record.student.firstName,
+                                                record.student.lastName,
+                                            ],
+                                            searchName
+                                        );
                                         if (
                                             searchName == "" ||
                                             record.student.firstName
                                                 .toLowerCase()
-                                                .contains(
+                                                .includes(
                                                     searchName.toLowerCase()
                                                 )
                                         )

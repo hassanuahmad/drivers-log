@@ -6,5 +6,11 @@
  * @returns True if the Search String is a substring in any element inside toCheck
  */
 export let contains = (toCheck: Array<String>, search: String): Boolean => {
+    let searchArray: Array<String> = search.split(" ");
+
+    for (let element of toCheck) {
+        console.log(element);
+    }
+
     return false;
 };

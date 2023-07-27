@@ -12,6 +12,7 @@ import { InstructorIdContextType, InstructorIdContext } from "../layout";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { LessonRecordsContext } from "../../context/lessonRecordsContext";
+import RemarksModal from "../../components/remarksModal";
 
 function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(" ");
@@ -26,6 +27,8 @@ export default function View() {
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalContent, setModalContent] = useState("");
 
     const {
         // @ts-ignore
@@ -401,8 +404,32 @@ export default function View() {
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                         {record.student.bde}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.remarks}
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
+                                                        {record.remarks.length >
+                                                        25 ? (
+                                                            <>
+                                                                {record.remarks.substring(
+                                                                    0,
+                                                                    25
+                                                                )}
+                                                                ...{" "}
+                                                                <button
+                                                                    className="text-indigo-600 hover:text-indigo-900"
+                                                                    onClick={() => {
+                                                                        setModalContent(
+                                                                            record.remarks
+                                                                        );
+                                                                        setIsModalOpen(
+                                                                            true
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    View More
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            record.remarks
+                                                        )}
                                                     </td>
                                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                         <KebabMenu
@@ -465,6 +492,14 @@ export default function View() {
                     onDeleteConfirm={handleDeleteConfirmed}
                     id={deleteRecord.id}
                     endpoint={deleteRecord.endpoint}
+                />
+            )}
+            {/* Remarks Modal */}
+            {isModalOpen && (
+                <RemarksModal
+                    open={isModalOpen}
+                    setOpen={setIsModalOpen}
+                    modalContent={modalContent}
                 />
             )}
         </>

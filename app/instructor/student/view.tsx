@@ -7,6 +7,7 @@ import Edit from "./edit";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
 import { StudentRecordsContext } from "../../context/studentRecordsContext";
 import { contains } from "@/app/utils/contains";
+import RemarksModal from "../../components/remarksModal";
 
 type Record = {
     id: number;
@@ -34,6 +35,8 @@ export default function View() {
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalContent, setModalContent] = useState("");
 
     const {
         // @ts-ignore
@@ -271,14 +274,42 @@ export default function View() {
                                                                         .bde
                                                                 }
                                                             </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
+                                                                {record.student
+                                                                    .remarks
+                                                                    .length >
+                                                                25 ? (
+                                                                    <>
+                                                                        {record.student.remarks.substring(
+                                                                            0,
+                                                                            25
+                                                                        )}
+                                                                        ...{" "}
+                                                                        <button
+                                                                            className="text-indigo-600 hover:text-indigo-900"
+                                                                            onClick={() => {
+                                                                                setModalContent(
+                                                                                    record
+                                                                                        .student
+                                                                                        .remarks
+                                                                                );
+                                                                                setIsModalOpen(
+                                                                                    true
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            View
+                                                                            More
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
                                                                     record
                                                                         .student
                                                                         .remarks
-                                                                }
+                                                                )}
                                                             </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
                                                                 <KebabMenu
                                                                     onDelete={() =>
                                                                         handleDelete(
@@ -316,6 +347,13 @@ export default function View() {
                     onDeleteConfirm={handleDeleteConfirmed}
                     id={deleteRecord.id}
                     endpoint={deleteRecord.endpoint}
+                />
+            )}
+            {isModalOpen && (
+                <RemarksModal
+                    open={isModalOpen}
+                    setOpen={setIsModalOpen}
+                    modalContent={modalContent}
                 />
             )}
         </>

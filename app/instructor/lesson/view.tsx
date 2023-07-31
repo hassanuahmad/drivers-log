@@ -1,5 +1,5 @@
 "use client";
-import { useState, useContext, Fragment } from "react";
+import { useState, useContext, Fragment, useEffect } from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
@@ -13,6 +13,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { LessonRecordsContext } from "../../context/lessonRecordsContext";
 import RemarksModal from "../../components/remarksModal";
+import { contains } from "@/app/utils/contains";
 
 function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(" ");
@@ -29,6 +30,7 @@ export default function View() {
         useContext(InstructorIdContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState("");
+    const [searchName, setSearchName] = useState<String>("");
 
     const {
         // @ts-ignore
@@ -58,6 +60,29 @@ export default function View() {
         // @ts-ignore
         setTotalInterac,
     } = useContext(LessonRecordsContext);
+
+    const [displayedRecords, setDisplayedRecords] = useState(records);
+
+    useEffect(() => {
+        // Filter the records based on the search term
+        // @ts-ignore
+        const filteredRecords = records.filter((record) =>
+            contains(
+                [record.student.firstName, record.student.lastName],
+                // @ts-ignore
+                searchName
+            )
+        );
+
+        // Set the displayed records
+        setDisplayedRecords(filteredRecords);
+
+        // Calculate and set the totals
+        const total = calculateTotalDuration(filteredRecords);
+        setTotalDuration(total);
+        setTotalCash(calculateTotalPayment(filteredRecords, "Cash"));
+        setTotalInterac(calculateTotalPayment(filteredRecords, "Interac"));
+    }, [records, searchName]);
 
     const monthOptions = [
         { label: "Jan", value: "01" },
@@ -157,106 +182,136 @@ export default function View() {
     return (
         <>
             {/* Dropdowns Start */}
-            <div className="flex">
-                <div className="mr-4">
-                    <Menu as="div" className="relative inline-block text-left">
-                        <div>
-                            <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                {
-                                    monthOptions.find(
-                                        (monthOption) =>
-                                            monthOption.value === selectedMonth
-                                    )?.label
-                                }
-                                <ChevronDownIcon
-                                    className="-mr-1 h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                            </Menu.Button>
-                        </div>
-
-                        <Transition
-                            as={Fragment}
-                            enter="transition ease-out duration-100"
-                            enterFrom="transform opacity-0 scale-95"
-                            enterTo="transform opacity-100 scale-100"
-                            leave="transition ease-in duration-75"
-                            leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95"
-                        >
-                            <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                <div className="py-1">
-                                    {monthOptions.map((monthOption, index) => (
-                                        <Menu.Item key={index}>
-                                            {({ active }) => (
-                                                <a
-                                                    className={classNames(
-                                                        active
-                                                            ? "bg-gray-100 text-gray-900"
-                                                            : "text-gray-700",
-                                                        "block px-4 py-2 text-sm"
-                                                    )}
-                                                    onClick={() =>
-                                                        setSelectedMonth(
-                                                            monthOption.value
-                                                        )
-                                                    }
-                                                >
-                                                    {monthOption.label}
-                                                </a>
-                                            )}
-                                        </Menu.Item>
-                                    ))}
-                                </div>
-                            </Menu.Items>
-                        </Transition>
-                    </Menu>
-                </div>
-                <Menu as="div" className="relative inline-block text-left">
-                    <div>
-                        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                            {selectedYear}
-                            <ChevronDownIcon
-                                className="-mr-1 h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                            />
-                        </Menu.Button>
+            <div className="flex justify-between mt-6">
+                <div className="relative w-full sm:w-6/12 lg:w-1/4 flex items-center">
+                    <input
+                        type="text"
+                        name="search"
+                        id="search"
+                        className="block w-full rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="Quick Search..."
+                        onChange={(e) => setSearchName(e.target.value)}
+                    />
+                    <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
+                        <kbd className="inline-flex items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
+                            ⌘K
+                        </kbd>
                     </div>
-
-                    <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                    >
-                        <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <div className="py-1">
-                                {years.map((yearOption, index) => (
-                                    <Menu.Item key={index}>
-                                        {({ active }) => (
-                                            <a
-                                                className={classNames(
-                                                    active
-                                                        ? "bg-gray-100 text-gray-900"
-                                                        : "text-gray-700",
-                                                    "block px-4 py-2 text-sm"
-                                                )}
-                                                onClick={() =>
-                                                    setSelectedYear(yearOption)
-                                                }
-                                            >
-                                                {yearOption}
-                                            </a>
-                                        )}
-                                    </Menu.Item>
-                                ))}
+                </div>
+                <div className="flex">
+                    <div className="mr-4">
+                        <Menu
+                            as="div"
+                            className="relative inline-block text-left"
+                        >
+                            <div>
+                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                    {
+                                        monthOptions.find(
+                                            (monthOption) =>
+                                                monthOption.value ===
+                                                selectedMonth
+                                        )?.label
+                                    }
+                                    <ChevronDownIcon
+                                        className="-mr-1 h-5 w-5 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+                                </Menu.Button>
                             </div>
-                        </Menu.Items>
-                    </Transition>
-                </Menu>
+
+                            <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95"
+                            >
+                                <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div className="py-1">
+                                        {monthOptions.map(
+                                            (monthOption, index) => (
+                                                <Menu.Item key={index}>
+                                                    {({ active }) => (
+                                                        <a
+                                                            className={classNames(
+                                                                active
+                                                                    ? "bg-gray-100 text-gray-900"
+                                                                    : "text-gray-700",
+                                                                "block px-4 py-2 text-sm"
+                                                            )}
+                                                            onClick={() =>
+                                                                setSelectedMonth(
+                                                                    monthOption.value
+                                                                )
+                                                            }
+                                                        >
+                                                            {monthOption.label}
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                            )
+                                        )}
+                                    </div>
+                                </Menu.Items>
+                            </Transition>
+                        </Menu>
+                    </div>
+                    <div>
+                        <Menu
+                            as="div"
+                            className="relative inline-block text-left"
+                        >
+                            <div>
+                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                    {selectedYear}
+                                    <ChevronDownIcon
+                                        className="-mr-1 h-5 w-5 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+                                </Menu.Button>
+                            </div>
+
+                            <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95"
+                            >
+                                <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div className="py-1">
+                                        {years.map((yearOption, index) => (
+                                            <Menu.Item key={index}>
+                                                {({ active }) => (
+                                                    <a
+                                                        className={classNames(
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700",
+                                                            "block px-4 py-2 text-sm"
+                                                        )}
+                                                        onClick={() =>
+                                                            setSelectedYear(
+                                                                yearOption
+                                                            )
+                                                        }
+                                                    >
+                                                        {yearOption}
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                        ))}
+                                    </div>
+                                </Menu.Items>
+                            </Transition>
+                        </Menu>
+                    </div>
+                </div>
             </div>
             {/* Dropdowns End */}
             <div className="px-4 sm:px-6 lg:px-8">
@@ -345,111 +400,140 @@ export default function View() {
                                 </thead>
                                 <tbody className="bg-white">
                                     {/* @ts-ignore */}
-                                    {records.map((record, index) => (
-                                        <tr
-                                            key={index}
-                                            className="even:bg-gray-50"
-                                        >
-                                            {editRecordId === record.id ? (
-                                                <Edit
-                                                    record={record}
-                                                    index={index}
-                                                    onEditSave={handleEditSave}
-                                                    onCancel={handleEditCancel}
-                                                />
-                                            ) : (
-                                                <>
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                        {index + 1}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.student
-                                                                .firstName
-                                                        }{" "}
-                                                        {
-                                                            record.student
-                                                                .lastName
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.date}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.startTime}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.endTime}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            record.formattedDuration
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.paymentType ===
-                                                        "Cash"
-                                                            ? `$${record.paymentAmount.toString()}`
-                                                            : ""}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.paymentType ===
-                                                        "Interac"
-                                                            ? `$${record.paymentAmount.toString()}`
-                                                            : ""}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.roadTest}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.student.bde}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
-                                                        {record.remarks.length >
-                                                        25 ? (
-                                                            <>
-                                                                {record.remarks.substring(
-                                                                    0,
-                                                                    25
-                                                                )}
-                                                                ...{" "}
-                                                                <button
-                                                                    className="text-indigo-600 hover:text-indigo-900"
-                                                                    onClick={() => {
-                                                                        setModalContent(
-                                                                            record.remarks
-                                                                        );
-                                                                        setIsModalOpen(
-                                                                            true
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    View More
-                                                                </button>
-                                                            </>
-                                                        ) : (
-                                                            record.remarks
-                                                        )}
-                                                    </td>
-                                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
-                                                        <KebabMenu
-                                                            onDelete={() =>
-                                                                handleDelete(
-                                                                    record.id,
-                                                                    `/api/${instructorId}/lesson`
-                                                                )
+                                    {displayedRecords.map((record, index) => {
+                                        if (
+                                            contains(
+                                                [
+                                                    record.student.firstName,
+                                                    record.student.lastName,
+                                                ],
+                                                // @ts-ignore
+                                                searchName
+                                            )
+                                        )
+                                            return (
+                                                <tr
+                                                    key={index}
+                                                    className="even:bg-gray-50"
+                                                >
+                                                    {editRecordId ===
+                                                    record.id ? (
+                                                        <Edit
+                                                            record={record}
+                                                            index={index}
+                                                            onEditSave={
+                                                                handleEditSave
                                                             }
-                                                            onEdit={() =>
-                                                                handleEdit(
-                                                                    record.id
-                                                                )
+                                                            onCancel={
+                                                                handleEditCancel
                                                             }
                                                         />
-                                                    </td>
-                                                </>
-                                            )}
-                                        </tr>
-                                    ))}
+                                                    ) : (
+                                                        <>
+                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                                {index + 1}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .firstName
+                                                                }{" "}
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .lastName
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {record.date}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record.startTime
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {record.endTime}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record.formattedDuration
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {record.paymentType ===
+                                                                "Cash"
+                                                                    ? `$${record.paymentAmount.toString()}`
+                                                                    : ""}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {record.paymentType ===
+                                                                "Interac"
+                                                                    ? `$${record.paymentAmount.toString()}`
+                                                                    : ""}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record.roadTest
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                                {
+                                                                    record
+                                                                        .student
+                                                                        .bde
+                                                                }
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
+                                                                {record.remarks
+                                                                    .length >
+                                                                25 ? (
+                                                                    <>
+                                                                        {record.remarks.substring(
+                                                                            0,
+                                                                            25
+                                                                        )}
+                                                                        ...{" "}
+                                                                        <button
+                                                                            className="text-indigo-600 hover:text-indigo-900"
+                                                                            onClick={() => {
+                                                                                setModalContent(
+                                                                                    record.remarks
+                                                                                );
+                                                                                setIsModalOpen(
+                                                                                    true
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            View
+                                                                            More
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    record.remarks
+                                                                )}
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
+                                                                <KebabMenu
+                                                                    onDelete={() =>
+                                                                        handleDelete(
+                                                                            record.id,
+                                                                            `/api/${instructorId}/lesson`
+                                                                        )
+                                                                    }
+                                                                    onEdit={() =>
+                                                                        handleEdit(
+                                                                            record.id
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+                                                </tr>
+                                            );
+                                    })}
                                 </tbody>
                                 <tfoot>
                                     <tr></tr>

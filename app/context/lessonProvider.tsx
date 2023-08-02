@@ -58,7 +58,7 @@ export const LessonProvider = ({ children }) => {
                 setTotalInterac(calculateTotalPayment(data.records, "Interac"));
             })
             .catch((err) => console.log(err));
-    }, [instructorId]);
+    }, [instructorId, selectedMonth, selectedYear]);
 
     useEffect(() => {
         if (!instructorId) return;

@@ -5,7 +5,6 @@ import * as Yup from "yup";
 import Notification from "../../components/notification";
 import { InstructorIdContext, InstructorIdContextType } from "../layout";
 import { VehicleMaintenanceRecordsContext } from "../../context/recordsContext";
-import { calculateTotals } from "./utils";
 
 interface VehicleMaintenanceFormValues {
     date: string;

@@ -56,7 +56,14 @@ export default function Page() {
                 <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div className="ml-4 mt-2">
                         <h3 className="text-base font-semibold leading-6 text-gray-900">
-                            Student Progress
+                            {selectedStudent
+                                ? // @ts-ignore
+                                  selectedStudent.student.firstName +
+                                  " " +
+                                  // @ts-ignore
+                                  selectedStudent.student.lastName +
+                                  "'s Progress"
+                                : "Student Progress"}
                         </h3>
                     </div>
                     <div className="ml-4 mt-2 flex-shrink-0">

@@ -10,6 +10,7 @@ const navigation = [
     { name: "Dashboard", href: "/instructor/dashboard" },
     { name: "Lessons", href: "/instructor/lesson" },
     { name: "Students", href: "/instructor/student" },
+    { name: "Student Progress", href: "/instructor/student-progress" },
     { name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance" },
     { name: "Yearly Data", href: "/instructor/yearly-data" },
 ];

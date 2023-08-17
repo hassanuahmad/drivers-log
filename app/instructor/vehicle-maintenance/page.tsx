@@ -26,7 +26,9 @@ const validationSchema = Yup.object({
 
 export default function Page() {
     // @ts-ignore
-    const { setRecords } = useContext(VehicleMaintenanceRecordsContext);
+    const { setRecords, setTotalGas, setTotalMaintenance } = useContext(
+        VehicleMaintenanceRecordsContext
+    );
     const { instructorId }: InstructorIdContextType =
         useContext(InstructorIdContext);
 
@@ -65,6 +67,15 @@ export default function Page() {
                 const newRecord = await response.json();
                 // @ts-ignore
                 setRecords((prevRecords) => [...prevRecords, newRecord.record]);
+                setTotalGas(
+                    // @ts-ignore
+                    (prevTotalGas) => prevTotalGas + newRecord.record.gas
+                );
+                setTotalMaintenance(
+                    // @ts-ignore
+                    (prevTotalMaintenance) =>
+                        prevTotalMaintenance + newRecord.record.maintenance
+                );
                 setShowNotification(true);
                 resetForm();
 

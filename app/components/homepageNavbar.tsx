@@ -5,6 +5,8 @@ import { Bars3Icon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
+import logo from "../static/logo/logo.png";
 
 const navigation = [
     { name: "Home", href: "/homepage/home" },
@@ -31,7 +33,9 @@ export default function Example() {
                                 aria-hidden="true"
                             />
                         </button>
-                        <Link href="/homepage/home">Driver's Log</Link>
+                        <Link href="/homepage/home">
+                            <Image src={logo} alt="logo" width={175} />
+                        </Link>
                     </div>
                     <nav className="hidden md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
@@ -79,14 +83,9 @@ export default function Example() {
                                     aria-hidden="true"
                                 />
                             </button>
-                            <div className="-ml-0.5">
-                                <a href="#" className="-m-1.5 block p-1.5">
-                                    <span className="sr-only">
-                                        Driver's Log
-                                    </span>
-                                    <h1>Driver's Log</h1>
-                                </a>
-                            </div>
+                            <Link href="/homepage/home" className="-ml-0.5">
+                                <Image src={logo} alt="logo" width={175} />
+                            </Link>
                         </div>
                         <div className="mt-2 space-y-2">
                             {navigation.map((item) => (

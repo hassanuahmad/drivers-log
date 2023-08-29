@@ -7,6 +7,7 @@ import {
     formatDuration,
     calculateTotalDuration,
     calculateTotalPayment,
+    downloadCSV,
 } from "./utils";
 import { InstructorIdContextType, InstructorIdContext } from "../layout";
 import { Menu, Transition } from "@headlessui/react";
@@ -586,6 +587,20 @@ export default function View() {
                     modalContent={modalContent}
                 />
             )}
+            <div className="flex justify-end">
+                <button
+                    type="button"
+                    className="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    onClick={() =>
+                        downloadCSV(
+                            records,
+                            `${selectedMonth}-${selectedYear}-lessons.csv`
+                        )
+                    }
+                >
+                    Download CSV
+                </button>
+            </div>
         </>
     );
 }

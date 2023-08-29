@@ -1,5 +1,4 @@
 import RecentActivity from "./recentActivity";
-import Calender from "./tempCaledner";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,7 +14,6 @@ export default function InstructorDashboardLayout({
         <section>
             {children}
             <RecentActivity />
-            <Calender />
         </section>
     );
 }

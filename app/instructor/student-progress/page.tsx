@@ -1,7 +1,6 @@
 "use client";
-import { Fragment, useContext, useEffect, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useContext, useEffect, useState } from "react";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { InstructorIdContextType, InstructorIdContext } from "../layout";
 import { LessonRecordsContext } from "../../context/lessonRecordsContext";
 import {
@@ -10,6 +9,7 @@ import {
     calculateTotalPayment,
 } from "./utils";
 import RemarksModal from "../../components/remarksModal";
+import { Combobox } from "@headlessui/react";
 
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
@@ -27,6 +27,7 @@ export default function Page() {
     const [totalInterac, setTotalInterac] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState("");
+    const [query, setQuery] = useState("");
 
     useEffect(() => {
         if (!instructorId || !selectedStudent) return;
@@ -50,12 +51,22 @@ export default function Page() {
             .catch((err) => console.log(err));
     }, [instructorId, selectedStudent]);
 
+    const filteredPeople =
+        query === ""
+            ? studentRecords
+            : // @ts-ignore
+              studentRecords.filter((record) => {
+                  return record.student.firstName
+                      .toLowerCase()
+                      .includes(query.toLowerCase());
+              });
+
     return (
         <>
             <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
                 <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div className="ml-4 mt-2">
-                        <h3 className="text-base font-semibold leading-6 text-gray-900">
+                        <h3 className="text-xl font-semibold leading-6 text-gray-900">
                             {selectedStudent
                                 ? // @ts-ignore
                                   selectedStudent.student.firstName +
@@ -67,65 +78,107 @@ export default function Page() {
                         </h3>
                     </div>
                     <div className="ml-4 mt-2 flex-shrink-0">
-                        <Menu
+                        <Combobox
                             as="div"
-                            className="relative inline-block text-left"
+                            className="sm:col-span-1"
+                            value={
+                                // @ts-ignore
+                                selectedStudent?.student.id || ""
+                            }
+                            onChange={(selectedId) => {
+                                const matchedRecord = studentRecords.find(
+                                    // @ts-ignore
+                                    (record) => record.student.id === selectedId
+                                );
+                                if (matchedRecord) {
+                                    setSelectedStudent(matchedRecord);
+                                }
+                            }}
                         >
-                            <div>
-                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                    {selectedStudent
-                                        ? // @ts-ignore
-                                          selectedStudent.student.firstName +
-                                          " " +
-                                          // @ts-ignore
-                                          selectedStudent.student.lastName
-                                        : "Select Student"}
-                                    <ChevronDownIcon
-                                        className="-mr-1 h-5 w-5 text-gray-400"
+                            <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
+                                Select Student
+                            </Combobox.Label>
+                            <div className="relative mt-2">
+                                <Combobox.Input
+                                    className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    onChange={(event) =>
+                                        setQuery(event.target.value)
+                                    }
+                                    displayValue={() => {
+                                        return selectedStudent
+                                            ? // @ts-ignore
+                                              `${selectedStudent.student.firstName} ${selectedStudent.student.lastName}`
+                                            : "";
+                                    }}
+                                />
+                                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                                    <ChevronUpDownIcon
+                                        className="h-5 w-5 text-gray-400"
                                         aria-hidden="true"
                                     />
-                                </Menu.Button>
-                            </div>
+                                </Combobox.Button>
 
-                            <Transition
-                                as={Fragment}
-                                enter="transition ease-out duration-100"
-                                enterFrom="transform opacity-0 scale-95"
-                                enterTo="transform opacity-100 scale-100"
-                                leave="transition ease-in duration-75"
-                                leaveFrom="transform opacity-100 scale-100"
-                                leaveTo="transform opacity-0 scale-95"
-                            >
-                                <Menu.Items className="absolute right-0 w-56 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                    <div className="py-1">
+                                {filteredPeople.length > 0 && (
+                                    <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                         {/* @ts-ignore */}
-                                        {studentRecords.map((info, index) => (
-                                            <Menu.Item key={index}>
-                                                {({ active }) => (
-                                                    <a
-                                                        href="#"
-                                                        className={classNames(
-                                                            active
-                                                                ? "bg-gray-100 text-gray-900"
-                                                                : "text-gray-700",
-                                                            "block px-4 py-2 text-sm"
+                                        {filteredPeople.map((record) => (
+                                            <Combobox.Option
+                                                key={record.student.id}
+                                                value={record.student.id}
+                                                className={({ active }) =>
+                                                    classNames(
+                                                        "relative cursor-default select-none py-2 pl-3 pr-9",
+                                                        active
+                                                            ? "bg-indigo-600 text-white"
+                                                            : "text-gray-900"
+                                                    )
+                                                }
+                                                onSelect={() =>
+                                                    setSelectedStudent(record)
+                                                }
+                                            >
+                                                {({ active, selected }) => (
+                                                    <>
+                                                        <span
+                                                            className={classNames(
+                                                                "block truncate",
+                                                                selected &&
+                                                                    "font-semibold"
+                                                            )}
+                                                        >
+                                                            {
+                                                                record.student
+                                                                    .firstName
+                                                            }{" "}
+                                                            {
+                                                                record.student
+                                                                    .lastName
+                                                            }
+                                                        </span>
+
+                                                        {selected && (
+                                                            <span
+                                                                className={classNames(
+                                                                    "absolute inset-y-0 right-0 flex items-center pr-4",
+                                                                    active
+                                                                        ? "text-white"
+                                                                        : "text-indigo-600"
+                                                                )}
+                                                            >
+                                                                <CheckIcon
+                                                                    className="h-5 w-5"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </span>
                                                         )}
-                                                        onClick={(e) => {
-                                                            setSelectedStudent(
-                                                                info
-                                                            );
-                                                        }}
-                                                    >
-                                                        {info.student.firstName}{" "}
-                                                        {info.student.lastName}
-                                                    </a>
+                                                    </>
                                                 )}
-                                            </Menu.Item>
+                                            </Combobox.Option>
                                         ))}
-                                    </div>
-                                </Menu.Items>
-                            </Transition>
-                        </Menu>
+                                    </Combobox.Options>
+                                )}
+                            </div>
+                        </Combobox>
                     </div>
                 </div>
             </div>

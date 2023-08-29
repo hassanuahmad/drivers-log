@@ -1,21 +1,31 @@
 "use client";
-import { useState } from "react";
-import { Dialog } from "@headlessui/react";
-import { Bars3Icon } from "@heroicons/react/20/solid";
+import { useState, Fragment } from "react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
+import Image from "next/image";
+import logo from "../static/logo/logo.png";
 
 const navigation = [
     { name: "Dashboard", href: "/instructor/dashboard" },
     { name: "Lessons", href: "/instructor/lesson" },
     { name: "Students", href: "/instructor/student" },
-    { name: "Student Progress", href: "/instructor/student-progress" },
+];
+
+const dropdownNavigation = [
     { name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance" },
+    { name: "Student Progress", href: "/instructor/student-progress" },
     { name: "Yearly Data", href: "/instructor/yearly-data" },
 ];
 
-export default function Example() {
+// @ts-ignore
+function classNames(...classes) {
+    return classes.filter(Boolean).join(" ");
+}
+
+export default function InstructorNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -34,14 +44,67 @@ export default function Example() {
                                 aria-hidden="true"
                             />
                         </button>
-                        <Link href="/homepage/home">Driver's Log</Link>
+                        <Link href="/homepage/home" className="mr-8">
+                            <Image src={logo} alt="logo" width={175} />
+                        </Link>
                     </div>
-                    <nav className="hidden md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
+                    <nav className="hidden md:flex items-center md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
                             <Link key={itemIdx} href={item.href}>
                                 {item.name}
                             </Link>
                         ))}
+                        {/* Dropdown Start */}
+                        <Menu
+                            as="div"
+                            className="relative inline-block text-left"
+                        >
+                            <div>
+                                <Menu.Button className="inline-flex w-full justify-center px-3 py-2 gap-x-1.5 bg-white text-sm rounded-md font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
+                                    More
+                                    <ChevronDownIcon
+                                        className="-mr-1 h-5 w-5 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+                                </Menu.Button>
+                            </div>
+
+                            <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95"
+                            >
+                                <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div className="py-1">
+                                        {dropdownNavigation.map(
+                                            (item, index) => (
+                                                <Menu.Item key={index}>
+                                                    {({ active }) => (
+                                                        <Link
+                                                            key={index}
+                                                            href={item.href}
+                                                            className={classNames(
+                                                                active
+                                                                    ? "bg-gray-100 text-gray-900"
+                                                                    : "text-gray-700",
+                                                                "block px-4 py-2 text-sm"
+                                                            )}
+                                                        >
+                                                            {item.name}
+                                                        </Link>
+                                                    )}
+                                                </Menu.Item>
+                                            )
+                                        )}
+                                    </div>
+                                </Menu.Items>
+                            </Transition>
+                        </Menu>
+                        {/* Dropdown End */}
                     </nav>
                     <div className="flex flex-1 items-center justify-end gap-x-8">
                         <UserButton afterSignOutUrl="/" />
@@ -67,14 +130,21 @@ export default function Example() {
                                     aria-hidden="true"
                                 />
                             </button>
-                            <div className="-ml-0.5">
-                                <a href="#" className="-m-1.5 block p-1.5">
-                                    <h1>Driver's Log</h1>
-                                </a>
-                            </div>
+                            <Link href="/homepage/home" className="-ml-0.5">
+                                <Image src={logo} alt="logo" width={175} />
+                            </Link>
                         </div>
                         <div className="mt-2 space-y-2">
                             {navigation.map((item) => (
+                                <a
+                                    key={item.name}
+                                    href={item.href}
+                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                >
+                                    {item.name}
+                                </a>
+                            ))}
+                            {dropdownNavigation.map((item) => (
                                 <a
                                     key={item.name}
                                     href={item.href}

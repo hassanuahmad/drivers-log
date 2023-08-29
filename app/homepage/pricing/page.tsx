@@ -1,12 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Dialog, Disclosure, RadioGroup } from "@headlessui/react";
-import {
-    Bars3Icon,
-    MinusSmallIcon,
-    PlusSmallIcon,
-    XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { Disclosure, RadioGroup } from "@headlessui/react";
+import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/24/outline";
 import { CheckIcon } from "@heroicons/react/20/solid";
 
 const pricing = {
@@ -16,47 +11,30 @@ const pricing = {
     ],
     tiers: [
         {
-            name: "Hobby",
-            id: "tier-hobby",
+            name: "Free",
+            id: "tier-free",
             href: "#",
-            price: { monthly: "$15", annually: "$144" },
-            description:
-                "The essentials to provide your best work for clients.",
+            price: { monthly: "$0", annually: "$0" },
+            description: "Ideal for personal use",
             features: [
-                "5 products",
-                "Up to 1,000 subscribers",
-                "Basic analytics",
+                "100 data entries",
+                "Basic analytics features",
+                "Downloadable reports",
             ],
             mostPopular: false,
         },
         {
-            name: "Freelancer",
-            id: "tier-freelancer",
+            name: "Individual",
+            id: "tier-individual",
             href: "#",
-            price: { monthly: "$30", annually: "$288" },
+            price: { monthly: "$10", annually: "$110" },
             description:
-                "The essentials to provide your best work for clients.",
+                "Ideal for individuals in the early stages of their driving instructor schools.",
             features: [
-                "5 products",
-                "Up to 1,000 subscribers",
-                "Basic analytics",
-                "48-hour support response time",
-            ],
-            mostPopular: false,
-        },
-        {
-            name: "Startup",
-            id: "tier-startup",
-            href: "#",
-            price: { monthly: "$60", annually: "$576" },
-            description:
-                "A plan that scales with your rapidly growing business.",
-            features: [
-                "25 products",
-                "Up to 10,000 subscribers",
-                "Advanced analytics",
+                "Everything in Free, plus:",
+                "Unlimited data entries",
+                "Full reporting capabilities",
                 "24-hour support response time",
-                "Marketing automations",
             ],
             mostPopular: true,
         },
@@ -64,15 +42,13 @@ const pricing = {
             name: "Enterprise",
             id: "tier-enterprise",
             href: "#",
-            price: { monthly: "$90", annually: "$864" },
+            price: { monthly: "Get in touch", annually: "Get in touch" },
             description:
                 "Dedicated support and infrastructure for your company.",
             features: [
-                "Unlimited products",
-                "Unlimited subscribers",
-                "Advanced analytics",
-                "1-hour, dedicated support response time",
-                "Marketing automations",
+                "Everything in Individual, plus:",
+                "1-on-1 training sessions",
+                "Proirity support",
                 "Custom reporting tools",
             ],
             mostPopular: false,
@@ -81,10 +57,21 @@ const pricing = {
 };
 const faqs = [
     {
-        question: "What's the best thing about Switzerland?",
-        answer: "I don't know, but the flag is a big plus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.",
+        question: "What does Drivers Log do?",
+        answer: "The Driver's Log feature serves as a centralized hub for recording lesson details, tracking student progress, scheduling follow-ups, and generating insights. It streamlines your teaching process, helping you manage lessons more efficiently and tailor your instruction to each student's needs.",
     },
-    // More questions...
+    {
+        question: "How long does it take to learn Drivers Log?",
+        answer: "Mastering Driver's Log is a breeze. Spend around 10 minutes familiarizing yourself with its features, and you'll be confidently navigating and utilizing it for efficient lesson management.",
+    },
+    {
+        question: "Who typically uses Drivers Log?",
+        answer: "Driver's Log is a valuable tool for driving instructors, schools, and educators who want to streamline lesson management, track student progress, and optimize their teaching process.",
+    },
+    {
+        question: "Is Drivers Log free?",
+        answer: "Absolutely, you can enjoy the benefits of Driver's Log with up to 100 entries at no charge. If you find it indispensable and wish to continue beyond that limit, a subscription plan is available for uninterrupted usage.",
+    },
 ];
 
 // @ts-ignore
@@ -104,13 +91,11 @@ export default function Pricing() {
                         Pricing
                     </h1>
                     <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                        Pricing plans for teams of&nbsp;all&nbsp;sizes
+                        Get started for free and let Drivers Log scale with you.
                     </p>
                 </div>
                 <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
-                    Choose an affordable plan that’s packed with the best
-                    features for engaging your audience, creating customer
-                    loyalty, and driving sales.
+                    All plans come with 100 entries free trial. No credit card
                 </p>
                 <div className="mt-16 flex justify-center">
                     <RadioGroup
@@ -139,7 +124,7 @@ export default function Pricing() {
                         ))}
                     </RadioGroup>
                 </div>
-                <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-4">
+                <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 sm:grid-cols-1 md:max-w-4xl md:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3">
                     {pricing.tiers.map((tier) => (
                         <div
                             key={tier.id}
@@ -169,9 +154,11 @@ export default function Pricing() {
                                     {/* @ts-ignore */}
                                     {tier.price[frequency.value]}
                                 </span>
-                                <span className="text-sm font-semibold leading-6 text-gray-600">
-                                    {frequency.priceSuffix}
-                                </span>
+                                {tier.id === "tier-individual" ? (
+                                    <span className="text-sm font-semibold leading-6 text-gray-600">
+                                        {frequency.priceSuffix}
+                                    </span>
+                                ) : null}
                             </p>
                             <a
                                 href={tier.href}
@@ -183,7 +170,11 @@ export default function Pricing() {
                                     "mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                 )}
                             >
-                                Buy plan
+                                {tier.id === "tier-individual"
+                                    ? "Try for free"
+                                    : tier.id === "tier-enterprise"
+                                    ? "Book a demo"
+                                    : "Get started"}
                             </a>
                             <ul
                                 role="list"
@@ -201,65 +192,6 @@ export default function Pricing() {
                             </ul>
                         </div>
                     ))}
-                </div>
-            </div>
-
-            {/* Testimonial section */}
-            <div className="mx-auto mt-24 max-w-7xl sm:mt-56 sm:px-6 lg:px-8">
-                <div className="relative overflow-hidden bg-gray-900 px-6 py-20 shadow-xl sm:rounded-3xl sm:px-10 sm:py-24 md:px-12 lg:px-20">
-                    <img
-                        className="absolute inset-0 h-full w-full object-cover brightness-150 saturate-0"
-                        src="https://images.unsplash.com/photo-1601381718415-a05fb0a261f3?ixid=MXwxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1216&q=80"
-                        alt=""
-                    />
-                    <div className="absolute inset-0 bg-gray-900/90 mix-blend-multiply" />
-                    <div
-                        className="absolute -left-80 -top-56 transform-gpu blur-3xl"
-                        aria-hidden="true"
-                    >
-                        <div
-                            className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#ff4694] to-[#776fff] opacity-[0.45]"
-                            style={{
-                                clipPath:
-                                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-                            }}
-                        />
-                    </div>
-                    <div
-                        className="hidden md:absolute md:bottom-16 md:left-[50rem] md:block md:transform-gpu md:blur-3xl"
-                        aria-hidden="true"
-                    >
-                        <div
-                            className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#ff4694] to-[#776fff] opacity-25"
-                            style={{
-                                clipPath:
-                                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-                            }}
-                        />
-                    </div>
-                    <div className="relative mx-auto max-w-2xl lg:mx-0">
-                        <img
-                            className="h-12 w-auto"
-                            src="https://tailwindui.com/img/logos/workcation-logo-white.svg"
-                            alt=""
-                        />
-                        <figure>
-                            <blockquote className="mt-6 text-lg font-semibold text-white sm:text-xl sm:leading-8">
-                                <p>
-                                    “Lorem ipsum dolor sit amet consectetur
-                                    adipisicing elit. Nemo expedita voluptas
-                                    culpa sapiente alias molestiae. Numquam
-                                    corrupti in laborum sed rerum et corporis.”
-                                </p>
-                            </blockquote>
-                            <figcaption className="mt-6 text-base text-white">
-                                <div className="font-semibold">
-                                    Judith Black
-                                </div>
-                                <div className="mt-1">CEO of Workcation</div>
-                            </figcaption>
-                        </figure>
-                    </div>
                 </div>
             </div>
 

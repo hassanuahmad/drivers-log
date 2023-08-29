@@ -60,7 +60,6 @@ export default function Page() {
 
     const [showNotification, setShowNotification] = useState(false);
     const [query, setQuery] = useState("");
-    const [selectedPerson, setSelectedPerson] = useState(null);
 
     const filteredPeople =
         query === ""

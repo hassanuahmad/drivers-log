@@ -67,6 +67,7 @@ export default function Page() {
 
     const generateDoc = async () => {
         try {
+            // the template is in the public folder!
             const response = await fetch("/bde-report.docx");
             const blob = await response.blob();
             const arrayBuffer = await blob.arrayBuffer();

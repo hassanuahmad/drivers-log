@@ -410,7 +410,7 @@ export default function Page() {
             )}
             {/* !!! THIS IS ONLY FOR MY FATHER CURRENTLY !!! */}
             {/* @ts-ignore */}
-            {instructorId === "14" ? (
+            {instructorId === 14 ? (
                 <div className="flex justify-end">
                     <button
                         type="button"

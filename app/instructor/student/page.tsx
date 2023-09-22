@@ -1,10 +1,11 @@
 "use client";
-import { useContext, useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import {useContext, useState} from "react";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
-import { InstructorIdContext, InstructorIdContextType } from "../layout";
-import { StudentRecordsContext } from "../../context/studentRecordsContext";
+import {InstructorIdContext, InstructorIdContextType} from "../layout";
+import {StudentRecordsContext} from "../../context/studentRecordsContext";
+import ErrorNotification from '../../components/errorNotification';
 
 interface StudentFormValues {
     firstName: string;
@@ -40,11 +41,12 @@ const validationSchema = Yup.object({
 
 export default function Page() {
     // @ts-ignore
-    const { setRecords } = useContext(StudentRecordsContext);
-    const { instructorId }: InstructorIdContextType =
+    const {setRecords} = useContext(StudentRecordsContext);
+    const {instructorId}: InstructorIdContextType =
         useContext(InstructorIdContext);
 
     const [showNotification, setShowNotification] = useState(false);
+    const [showErrorNotification, setShowErrorNotification] = useState(false);
 
     const initialValues: StudentFormValues = {
         firstName: "",
@@ -63,7 +65,7 @@ export default function Page() {
 
     const handleSubmit = async (
         values: typeof initialValues,
-        { resetForm }: { resetForm: () => void }
+        {resetForm}: { resetForm: () => void }
     ) => {
         try {
             const response = await fetch(`/api/${instructorId}/student`, {
@@ -73,12 +75,19 @@ export default function Page() {
                 },
                 body: JSON.stringify(values),
             });
-            if (response.ok) {
+            // Unique constraint error
+            if (response.status === 409) {
+                setShowErrorNotification(true);
+                setTimeout(() => {
+                    setShowErrorNotification(false);
+                }, 3000);
+                resetForm();
+            } else if (response.ok) {
                 const newRecord = await response.json();
                 // @ts-ignore
                 setRecords((prevRecords) => [
                     ...prevRecords,
-                    { student: newRecord.record },
+                    {student: newRecord.record},
                 ]);
                 setShowNotification(true);
                 resetForm();
@@ -86,6 +95,9 @@ export default function Page() {
                 setTimeout(() => {
                     setShowNotification(false);
                 }, 3000);
+            } else {
+                // Handle other potential errors
+                console.error('Unknown error occurred');
             }
         } catch (error) {
             console.error(error);
@@ -94,6 +106,11 @@ export default function Page() {
 
     return (
         <>
+            <ErrorNotification
+                show={showErrorNotification}
+                text={"Cannot add student. Student already exists."}
+                onClose={() => setShowErrorNotification(false)}
+            />
             <Notification
                 show={showNotification}
                 text={"Student"}

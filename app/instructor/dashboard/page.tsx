@@ -70,7 +70,7 @@ export default function Dashboard() {
                 {/* Secondary navigation */}
                 <header className="pb-4 pt-6 sm:pb-6 flex justify-between">
                     <div>
-                        <h1 className="text-xl font-bold leading-7 text-gray-900 sm:truncate sm:tracking-tight">Welcome {instructorName}!</h1>
+                        <h1 className="text-xl font-medium leading-7 text-gray-900 sm:truncate sm:tracking-tight">Welcome {instructorName}!</h1>
                     </div>
                     <div className="flex flex-wrap items-center gap-6 sm:flex-nowrap">
                         <div

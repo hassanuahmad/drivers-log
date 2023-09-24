@@ -43,5 +43,12 @@ export async function GET(
         },
     });
 
-    return NextResponse.json({lessonRecords});
+    // Getting the instructor name here because this is where we use this endpoint in the same component.
+    const instructorName = await prisma.instructor.findUnique({
+        where: {
+            id: Number(instructorId),
+        }
+    });
+
+    return NextResponse.json({lessonRecords, instructorName});
 }

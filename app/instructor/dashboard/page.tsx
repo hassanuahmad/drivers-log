@@ -21,6 +21,7 @@ export default function Dashboard() {
         secondaryNavigation[0].id
     );
     const [lessonRecords, setLessonRecords] = useState<LessonRecordsDbRow[]>([]);
+    const [instructorName, setInstructorName] = useState<string>("");
 
     const stats = [
         {
@@ -46,6 +47,7 @@ export default function Dashboard() {
         fetch(`/api/${instructorId}/dashboard/${selectedNavigation}`)
             .then((res) => res.json())
             .then((data) => {
+                setInstructorName(data.instructorName.firstName);
                 setLessonRecords(data.lessonRecords);
             })
             .catch((err) => console.log(err));
@@ -68,7 +70,7 @@ export default function Dashboard() {
                 {/* Secondary navigation */}
                 <header className="pb-4 pt-6 sm:pb-6 flex justify-between">
                     <div>
-                        <h1>Welcome "{"Instructor Name"}</h1>
+                        <h1 className="text-xl font-bold leading-7 text-gray-900 sm:truncate sm:tracking-tight">Welcome {instructorName}!</h1>
                     </div>
                     <div className="flex flex-wrap items-center gap-6 sm:flex-nowrap">
                         <div

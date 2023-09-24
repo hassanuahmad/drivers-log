@@ -1,27 +1,26 @@
 "use client";
-import { useState, Fragment } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {Fragment, useState} from "react";
+import {Dialog, Menu, Transition} from "@headlessui/react";
+import {Bars3Icon, ChevronDownIcon} from "@heroicons/react/20/solid";
+import {XMarkIcon} from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import {UserButton} from "@clerk/nextjs";
 import Image from "next/image";
 import logo from "../static/logo/logo.png";
 
 const navigation = [
-    { name: "Dashboard", href: "/instructor/dashboard" },
-    { name: "Lessons", href: "/instructor/lesson" },
-    { name: "Students", href: "/instructor/student" },
+    {name: "Dashboard", href: "/instructor/dashboard"},
+    {name: "Lessons", href: "/instructor/lesson"},
+    {name: "Students", href: "/instructor/student"},
 ];
 
 const dropdownNavigation = [
-    { name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance" },
-    { name: "Student Progress", href: "/instructor/student-progress" },
-    { name: "Yearly Data", href: "/instructor/yearly-data" },
+    {name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance"},
+    {name: "Student Progress", href: "/instructor/student-progress"},
+    {name: "Yearly Data", href: "/instructor/yearly-data"},
 ];
 
-// @ts-ignore
-function classNames(...classes) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
@@ -45,10 +44,11 @@ export default function InstructorNavbar() {
                             />
                         </button>
                         <Link href="/homepage/home" className="mr-8">
-                            <Image src={logo} alt="logo" width={175} />
+                            <Image src={logo} alt="logo" width={175}/>
                         </Link>
                     </div>
-                    <nav className="hidden md:flex items-center md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
+                    <nav
+                        className="hidden md:flex items-center md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
                             <Link key={itemIdx} href={item.href}>
                                 {item.name}
@@ -60,7 +60,8 @@ export default function InstructorNavbar() {
                             className="relative inline-block text-left"
                         >
                             <div>
-                                <Menu.Button className="inline-flex w-full justify-center px-3 py-2 gap-x-1.5 bg-white text-sm rounded-md font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
+                                <Menu.Button
+                                    className="inline-flex w-full justify-center px-3 py-2 gap-x-1.5 bg-white text-sm rounded-md font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
                                     More
                                     <ChevronDownIcon
                                         className="-mr-1 h-5 w-5 text-gray-400"
@@ -78,12 +79,13 @@ export default function InstructorNavbar() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Items
+                                    className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
                                         {dropdownNavigation.map(
                                             (item, index) => (
                                                 <Menu.Item key={index}>
-                                                    {({ active }) => (
+                                                    {({active}) => (
                                                         <Link
                                                             key={index}
                                                             href={item.href}
@@ -107,7 +109,7 @@ export default function InstructorNavbar() {
                         {/* Dropdown End */}
                     </nav>
                     <div className="flex flex-1 items-center justify-end gap-x-8">
-                        <UserButton afterSignOutUrl="/" />
+                        <UserButton afterSignOutUrl="/"/>
                     </div>
                 </div>
                 <Dialog
@@ -116,8 +118,9 @@ export default function InstructorNavbar() {
                     open={mobileMenuOpen}
                     onClose={setMobileMenuOpen}
                 >
-                    <div className="fixed inset-0 z-50" />
-                    <Dialog.Panel className="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto bg-white px-4 pb-6 sm:max-w-sm sm:px-6 sm:ring-1 sm:ring-gray-900/10">
+                    <div className="fixed inset-0 z-50"/>
+                    <Dialog.Panel
+                        className="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto bg-white px-4 pb-6 sm:max-w-sm sm:px-6 sm:ring-1 sm:ring-gray-900/10">
                         <div className="-ml-0.5 flex h-16 items-center gap-x-6">
                             <button
                                 type="button"
@@ -131,7 +134,7 @@ export default function InstructorNavbar() {
                                 />
                             </button>
                             <Link href="/homepage/home" className="-ml-0.5">
-                                <Image src={logo} alt="logo" width={175} />
+                                <Image src={logo} alt="logo" width={175}/>
                             </Link>
                         </div>
                         <div className="mt-2 space-y-2">

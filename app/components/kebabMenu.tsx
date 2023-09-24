@@ -1,17 +1,13 @@
-import { Fragment } from "react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { Menu, Transition } from "@headlessui/react";
+import {Fragment} from "react";
+import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
+import {Menu, Transition} from "@headlessui/react";
+import {KebabMenuProps} from "@/app/types/components/kebabMenu";
 
-interface KebabMenuProps {
-    onDelete: () => void;
-    onEdit: () => void;
-}
-
-function classNames(...classes: any) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function KebabMenu({ onDelete, onEdit }: KebabMenuProps) {
+export default function KebabMenu({onDelete, onEdit}: KebabMenuProps) {
     return (
         <>
             <Menu
@@ -37,10 +33,11 @@ export default function KebabMenu({ onDelete, onEdit }: KebabMenuProps) {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items
+                        className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <div className="py-1">
                             <Menu.Item>
-                                {({ active }) => (
+                                {({active}) => (
                                     <a
                                         onClick={onEdit}
                                         className={classNames(
@@ -55,7 +52,7 @@ export default function KebabMenu({ onDelete, onEdit }: KebabMenuProps) {
                                 )}
                             </Menu.Item>
                             <Menu.Item>
-                                {({ active }) => (
+                                {({active}) => (
                                     <a
                                         onClick={onDelete}
                                         className={classNames(

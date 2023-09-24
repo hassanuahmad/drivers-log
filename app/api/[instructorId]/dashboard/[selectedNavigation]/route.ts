@@ -1,14 +1,13 @@
-// @ts-nocheck
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET(
     request: Request,
-    { params }: { params: { instructorId: string; selectedNavigation: string } }
+    {params}: { params: { instructorId: string; selectedNavigation: string } }
 ) {
-    const { instructorId, selectedNavigation } = params;
+    const {instructorId, selectedNavigation} = params;
 
     if (!instructorId) {
         return NextResponse.json({
@@ -44,5 +43,5 @@ export async function GET(
         },
     });
 
-    return NextResponse.json({ lessonRecords });
+    return NextResponse.json({lessonRecords});
 }

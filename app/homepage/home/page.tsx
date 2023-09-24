@@ -1,9 +1,4 @@
-import {
-    ArrowPathIcon,
-    CloudArrowUpIcon,
-    FingerPrintIcon,
-    LockClosedIcon,
-} from "@heroicons/react/24/outline";
+import {ArrowPathIcon, CloudArrowUpIcon, FingerPrintIcon, LockClosedIcon,} from "@heroicons/react/24/outline";
 
 const features = [
     {
@@ -73,7 +68,8 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="mt-16 flow-root sm:mt-24">
-                                <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
+                                <div
+                                    className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
                                     <img
                                         src="https://cdn.discordapp.com/attachments/757969943185719311/1133622738079199332/Screenshot_2023-07-26_at_12.50.08_AM.png"
                                         alt="App screenshot"
@@ -119,7 +115,8 @@ export default function Home() {
                                     className="relative pl-16"
                                 >
                                     <dt className="text-base font-semibold leading-7 text-gray-900">
-                                        <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+                                        <div
+                                            className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
                                             <feature.icon
                                                 className="h-6 w-6 text-white"
                                                 aria-hidden="true"
@@ -138,13 +135,14 @@ export default function Home() {
 
                 {/* Testimonial section */}
                 <div className="mx-auto mt-32 max-w-7xl sm:mt-56 sm:px-6 lg:px-8">
-                    <div className="relative overflow-hidden bg-gray-900 px-6 py-20 shadow-xl sm:rounded-3xl sm:px-10 sm:py-24 md:px-12 lg:px-20">
+                    <div
+                        className="relative overflow-hidden bg-gray-900 px-6 py-20 shadow-xl sm:rounded-3xl sm:px-10 sm:py-24 md:px-12 lg:px-20">
                         <img
                             className="absolute inset-0 h-full w-full object-cover brightness-150 saturate-0"
                             src="https://images.unsplash.com/photo-1601381718415-a05fb0a261f3?ixid=MXwxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1216&q=80"
                             alt=""
                         />
-                        <div className="absolute inset-0 bg-gray-900/90 mix-blend-multiply" />
+                        <div className="absolute inset-0 bg-gray-900/90 mix-blend-multiply"/>
                         <div
                             className="absolute -left-80 -top-56 transform-gpu blur-3xl"
                             aria-hidden="true"
@@ -217,7 +215,7 @@ export default function Home() {
                     <div className="mx-auto max-w-2xl text-center">
                         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                             Elevate your workflow.
-                            <br />
+                            <br/>
                             Start using our app today.
                         </h2>
                         <div className="mt-10 flex items-center justify-center gap-x-6">

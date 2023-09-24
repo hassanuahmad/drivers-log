@@ -1,45 +1,17 @@
-type Student = {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-};
+import {LessonRecords, LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
 
-type Lesson = {
-    date: string;
-    startTime: string;
-    endTime: string;
-    duration: number;
-    paymentType: string;
-    paymentAmount: Number;
-    roadTest: string;
-    remarks: string;
-    student: Student;
-};
-
-export function formatDuration(minutes: number): string {
+export function formatDuration(minutes: number) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     return `${hours}hr ${remainingMinutes}m`;
 }
 
-export function calculateTotalDuration(lessons: Lesson[]): string {
+export function calculateTotalDuration(lessons: LessonRecordsPreFormattedDuration[]) {
     const totalMinutes = lessons.reduce((acc, curr) => acc + curr.duration, 0);
     return formatDuration(totalMinutes);
 }
 
-export function calculateTotalPayment(
-    lessons: Lesson[],
-    paymentType: string
-): number {
+export function calculateTotalPayment(lessons: LessonRecordsPreFormattedDuration[], paymentType: string) {
     return lessons.reduce((total, lesson) => {
         if (lesson.paymentType === paymentType) {
             return total + Number(lesson.paymentAmount);
@@ -48,8 +20,7 @@ export function calculateTotalPayment(
     }, 0);
 }
 
-// @ts-ignore
-function convertRecordsToCSV(records) {
+function convertRecordsToCSV(records: LessonRecords[]) {
     // Define the header of our CSV
     const header = [
         "#",
@@ -68,13 +39,16 @@ function convertRecordsToCSV(records) {
         "Student Last Last",
         "Student Phone Number",
         "Student Email",
-        "Student Address",
+        "Student Street Address",
+        "Student City",
+        "Student Province",
+        "Student Postal Code",
+        "Student Country",
         "Student Driving Class",
         "Student Remarks",
     ];
 
     // Convert the records to CSV format
-    // @ts-ignore
     const csvRecords = records.map((record, index) => [
         index + 1,
         `"${record.student.firstName} ${record.student.lastName}"`,
@@ -92,24 +66,25 @@ function convertRecordsToCSV(records) {
         `"${record.student.lastName}"`,
         `"${record.student.phoneNumber}"`,
         `"${record.student.email}"`,
-        `"${record.student.streetAddress} ${record.student.city} ${record.student.province} ${record.student.postalCode} ${record.student.country}"`,
+        `"${record.student.streetAddress}"`,
+        `"${record.student.city}"`,
+        `"${record.student.province}"`,
+        `"${record.student.postalCode}"`,
+        `"${record.student.country}"`,
         `"${record.student.drivingClass}"`,
         `"${record.student.remarks}"`,
     ]);
 
     // Convert the arrays to CSV format
-    const csvData = [header, ...csvRecords]
+    return [header, ...csvRecords]
         .map((row) => row.join(","))
         .join("\n");
-
-    return csvData;
 }
 
 // Download CSV
-// @ts-ignore
-export function downloadCSV(records, filename) {
+export function downloadCSV(records: LessonRecords[], filename: string) {
     const csvData = convertRecordsToCSV(records);
-    const blob = new Blob([csvData], { type: "text/csv" });
+    const blob = new Blob([csvData], {type: "text/csv"});
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.setAttribute("hidden", "");

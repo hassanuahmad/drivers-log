@@ -1,5 +1,5 @@
 "use client";
-import { createContext } from "react";
+import {createContext} from "react";
+import {LessonContextType} from "@/app/types/shared/records";
 
-// @ts-ignore
-export const LessonRecordsContext = createContext();
+export const LessonRecordsContext = createContext<LessonContextType | null>(null);

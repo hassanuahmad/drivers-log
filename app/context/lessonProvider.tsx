@@ -1,36 +1,29 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
-import { LessonRecordsContext } from "./lessonRecordsContext";
-import {
-    formatDuration,
-    calculateTotalDuration,
-    calculateTotalPayment,
-} from "../instructor/lesson/utils";
-import {
-    InstructorIdContext,
-    InstructorIdContextType,
-} from "../instructor/layout";
+import {ReactNode, useContext, useEffect, useState} from "react";
+import {LessonRecordsContext} from "./lessonRecordsContext";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration,} from "../instructor/lesson/utils";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import {LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
 
-// @ts-ignore
-export const LessonProvider = ({ children }) => {
+export const LessonProvider = ({children}: { children: ReactNode }) => {
     const [records, setRecords] = useState([]);
     const [studentRecords, setStudentRecords] = useState([]);
-    const { instructorId }: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const monthOptions = [
-        { label: "Jan", value: "01" },
-        { label: "Feb", value: "02" },
-        { label: "Mar", value: "03" },
-        { label: "Apr", value: "04" },
-        { label: "May", value: "05" },
-        { label: "Jun", value: "06" },
-        { label: "Jul", value: "07" },
-        { label: "Aug", value: "08" },
-        { label: "Sep", value: "09" },
-        { label: "Oct", value: "10" },
-        { label: "Nov", value: "11" },
-        { label: "Dec", value: "12" },
+        {label: "Jan", value: "01"},
+        {label: "Feb", value: "02"},
+        {label: "Mar", value: "03"},
+        {label: "Apr", value: "04"},
+        {label: "May", value: "05"},
+        {label: "Jun", value: "06"},
+        {label: "Jul", value: "07"},
+        {label: "Aug", value: "08"},
+        {label: "Sep", value: "09"},
+        {label: "Oct", value: "10"},
+        {label: "Nov", value: "11"},
+        {label: "Dec", value: "12"},
     ];
 
     const [selectedMonth, setSelectedMonth] = useState(
@@ -46,8 +39,7 @@ export const LessonProvider = ({ children }) => {
         fetch(`/api/${instructorId}/lesson/${selectedMonth}/${selectedYear}`)
             .then((res) => res.json())
             .then((data) => {
-                // @ts-ignore
-                const formattedRecords = data.records.map((record) => ({
+                const formattedRecords = data.records.map((record: LessonRecordsPreFormattedDuration) => ({
                     ...record,
                     formattedDuration: formatDuration(Number(record.duration)),
                 }));
@@ -66,8 +58,7 @@ export const LessonProvider = ({ children }) => {
             .then((res) => res.json())
             .then((data) => {
                 // sort the students alphabetically by first name
-                // @ts-ignore
-                const sortedRecords = data.records.sort((a, b) =>
+                const sortedRecords = data.records.sort((a: StudentRecords, b: StudentRecords) =>
                     a.student.firstName.localeCompare(b.student.firstName)
                 );
                 setStudentRecords(sortedRecords);

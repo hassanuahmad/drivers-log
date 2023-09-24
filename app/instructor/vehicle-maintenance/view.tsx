@@ -1,28 +1,19 @@
 "use client";
-import { useState, useContext, Fragment } from "react";
+import {Fragment, useContext, useState} from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
-import { calculateTotals } from "./utils";
-import { InstructorIdContext, InstructorIdContextType } from "../layout";
-import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { VehicleMaintenanceRecordsContext } from "../../context/recordsContext";
+import {calculateTotals} from "./utils";
+import {Menu, Transition} from "@headlessui/react";
+import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenanceRecordsContext";
 import RemarksModal from "../../components/remarksModal";
+import {VehicleMaintenanceRecordForUpdate} from "@/app/types/shared/records";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-function classNames(...classes: any[]) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
-
-type Record = {
-    id: number;
-    date: string;
-    odometer: number;
-    fueling: number;
-    gas: number;
-    maintenance: number;
-    remarks: string;
-};
 
 export default function View() {
     const [deleteRecord, setDeleteRecord] = useState<{
@@ -31,47 +22,41 @@ export default function View() {
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
-    const { instructorId }: InstructorIdContextType =
-        useContext(InstructorIdContext);
+    const {instructorId} = useContext(InstructorIdContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState("");
 
+    const contextValue = useContext(VehicleMaintenanceRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
     const {
-        // @ts-ignore
         records,
-        // @ts-ignore
         setRecords,
-        // @ts-ignore
         selectedMonth,
-        // @ts-ignore
         setSelectedMonth,
-        // @ts-ignore
         selectedYear,
-        // @ts-ignore
         setSelectedYear,
-        // @ts-ignore
         totalGas,
-        // @ts-ignore
         setTotalGas,
-        // @ts-ignore
         totalMaintenance,
-        // @ts-ignore
         setTotalMaintenance,
-    } = useContext(VehicleMaintenanceRecordsContext);
+    } = contextValue;
 
     const monthOptions = [
-        { label: "Jan", value: "01" },
-        { label: "Feb", value: "02" },
-        { label: "Mar", value: "03" },
-        { label: "Apr", value: "04" },
-        { label: "May", value: "05" },
-        { label: "Jun", value: "06" },
-        { label: "Jul", value: "07" },
-        { label: "Aug", value: "08" },
-        { label: "Sep", value: "09" },
-        { label: "Oct", value: "10" },
-        { label: "Nov", value: "11" },
-        { label: "Dec", value: "12" },
+        {label: "Jan", value: "01"},
+        {label: "Feb", value: "02"},
+        {label: "Mar", value: "03"},
+        {label: "Apr", value: "04"},
+        {label: "May", value: "05"},
+        {label: "Jun", value: "06"},
+        {label: "Jul", value: "07"},
+        {label: "Aug", value: "08"},
+        {label: "Sep", value: "09"},
+        {label: "Oct", value: "10"},
+        {label: "Nov", value: "11"},
+        {label: "Dec", value: "12"},
     ];
 
     const years = [
@@ -79,14 +64,13 @@ export default function View() {
     ];
 
     const handleDelete = (id: number, endpoint: string) => {
-        setDeleteRecord({ id, endpoint });
+        setDeleteRecord({id, endpoint});
         setDeleteModalOpen(true);
     };
 
     const handleDeleteConfirmed = () => {
         if (deleteRecord) {
             const newRecords = records.filter(
-                // @ts-ignore
                 (record) => record.id !== deleteRecord.id
             );
             setRecords(newRecords);
@@ -101,10 +85,9 @@ export default function View() {
         setEditRecordId(id);
     };
 
-    const handleEditSave = (id: number, updatedRecord: Record) => {
-        // @ts-ignore
+    const handleEditSave = (id: number, updatedRecord: VehicleMaintenanceRecordForUpdate) => {
         const updatedRecords = records.map((record) =>
-            record.id === id ? { ...record, ...updatedRecord } : record
+            record.id === id ? {...record, ...updatedRecord} : record
         );
         setRecords(updatedRecords);
         const totals = calculateTotals(updatedRecords);
@@ -124,7 +107,8 @@ export default function View() {
                 <div className="mr-4">
                     <Menu as="div" className="relative inline-block text-left">
                         <div>
-                            <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                            <Menu.Button
+                                className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                 {
                                     monthOptions.find(
                                         (monthOption) =>
@@ -147,11 +131,12 @@ export default function View() {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                         >
-                            <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <Menu.Items
+                                className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div className="py-1">
                                     {monthOptions.map((monthOption, index) => (
                                         <Menu.Item key={index}>
-                                            {({ active }) => (
+                                            {({active}) => (
                                                 <a
                                                     className={classNames(
                                                         active
@@ -177,7 +162,8 @@ export default function View() {
                 </div>
                 <Menu as="div" className="relative inline-block text-left">
                     <div>
-                        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                        <Menu.Button
+                            className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                             {selectedYear}
                             <ChevronDownIcon
                                 className="-mr-1 h-5 w-5 text-gray-400"
@@ -195,11 +181,12 @@ export default function View() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items
+                            className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             <div className="py-1">
                                 {years.map((yearOption, index) => (
                                     <Menu.Item key={index}>
-                                        {({ active }) => (
+                                        {({active}) => (
                                             <a
                                                 className={classNames(
                                                     active
@@ -228,138 +215,137 @@ export default function View() {
                         <div className="inline-block min-w-full py-2 align-middle ">
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead>
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                        >
-                                            #
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Date
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Odometer
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Fueling
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Gas
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Maintenance
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Remarks
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="relative py-3.5 pl-3 pr-4 sm:pr-3"
-                                        ></th>
-                                    </tr>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                    >
+                                        #
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Date
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Odometer
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Fueling
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Gas
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Maintenance
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Remarks
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="relative py-3.5 pl-3 pr-4 sm:pr-3"
+                                    ></th>
+                                </tr>
                                 </thead>
                                 <tbody className="bg-white">
-                                    {/* @ts-ignore */}
-                                    {records.map((record, index) => (
-                                        <tr
-                                            key={index}
-                                            className="even:bg-gray-50"
-                                        >
-                                            {editRecordId === record.id ? (
-                                                <Edit
-                                                    record={record}
-                                                    index={index}
-                                                    onEditSave={handleEditSave}
-                                                    onCancel={handleEditCancel}
-                                                />
-                                            ) : (
-                                                <>
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                        {index + 1}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.date}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.odometer}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {record.fueling}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        ${record.gas}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        ${record.maintenance}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
-                                                        {record.remarks.length >
-                                                        25 ? (
-                                                            <>
-                                                                {record.remarks.substring(
-                                                                    0,
-                                                                    25
-                                                                )}
-                                                                ...{" "}
-                                                                <button
-                                                                    className="text-indigo-600 hover:text-indigo-900"
-                                                                    onClick={() => {
-                                                                        setModalContent(
-                                                                            record.remarks
-                                                                        );
-                                                                        setIsModalOpen(
-                                                                            true
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    View More
-                                                                </button>
-                                                            </>
-                                                        ) : (
-                                                            record.remarks
-                                                        )}
-                                                    </td>
-                                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
-                                                        <KebabMenu
-                                                            onDelete={() =>
-                                                                handleDelete(
-                                                                    record.id,
-                                                                    `/api/${instructorId}/vehicle-maintenance`
-                                                                )
-                                                            }
-                                                            onEdit={() =>
-                                                                handleEdit(
-                                                                    record.id
-                                                                )
-                                                            }
-                                                        />
-                                                    </td>
-                                                </>
-                                            )}
-                                        </tr>
-                                    ))}
+                                {records.map((record, index) => (
+                                    <tr
+                                        key={index}
+                                        className="even:bg-gray-50"
+                                    >
+                                        {editRecordId === record.id ? (
+                                            <Edit
+                                                record={record}
+                                                index={index}
+                                                onEditSave={handleEditSave}
+                                                onCancel={handleEditCancel}
+                                            />
+                                        ) : (
+                                            <>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                    {index + 1}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.date}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.odometer}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.fueling}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    ${record.gas}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    ${record.maintenance}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
+                                                    {record.remarks.length >
+                                                    25 ? (
+                                                        <>
+                                                            {record.remarks.substring(
+                                                                0,
+                                                                25
+                                                            )}
+                                                            ...{" "}
+                                                            <button
+                                                                className="text-indigo-600 hover:text-indigo-900"
+                                                                onClick={() => {
+                                                                    setModalContent(
+                                                                        record.remarks
+                                                                    );
+                                                                    setIsModalOpen(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                            >
+                                                                View More
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        record.remarks
+                                                    )}
+                                                </td>
+                                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
+                                                    <KebabMenu
+                                                        onDelete={() =>
+                                                            handleDelete(
+                                                                record.id,
+                                                                `/api/${instructorId}/vehicle-maintenance`
+                                                            )
+                                                        }
+                                                        onEdit={() =>
+                                                            handleEdit(
+                                                                record.id
+                                                            )
+                                                        }
+                                                    />
+                                                </td>
+                                            </>
+                                        )}
+                                    </tr>
+                                ))}
                                 </tbody>
                                 <tfoot>
-                                    <tr></tr>
+                                <tr></tr>
                                 </tfoot>
                             </table>
                         </div>

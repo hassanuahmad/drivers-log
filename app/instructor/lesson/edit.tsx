@@ -1,56 +1,16 @@
-import { useContext, Fragment, useState } from "react";
-import { Formik, Field, ErrorMessage } from "formik";
-import { InstructorIdContextType, InstructorIdContext } from "../layout";
-import { Transition, Dialog } from "@headlessui/react";
+import {Fragment, useContext, useState} from "react";
+import {ErrorMessage, Field, Formik} from "formik";
+import {Dialog, Transition} from "@headlessui/react";
+import {LessonEditValues} from "@/app/types/pages/lesson";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-type Student = {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-};
-
-type Lesson = {
-    id: number;
-    date: string;
-    startTime: string;
-    endTime: string;
-    duration: number;
-    paymentType: string;
-    paymentAmount: number;
-    roadTest: string;
-    remarks: string;
-    student: Student;
-};
-
-type LessonWithFormattedDuration = Lesson & {
-    formattedDuration: string;
-};
-
-interface EditComponentProps {
-    record: LessonWithFormattedDuration;
-    index: number;
-    onEditSave: (
-        id: number,
-        updatedRecord: LessonWithFormattedDuration
-    ) => void;
-    onCancel: () => void;
-}
 
 export default function Edit({
-    record,
-    index,
-    onEditSave,
-    onCancel,
-}: EditComponentProps) {
+                                 record,
+                                 index,
+                                 onEditSave,
+                                 onCancel,
+                             }: LessonEditValues) {
     const initialValues = {
         date: record.date,
         startTime: record.startTime,
@@ -62,8 +22,7 @@ export default function Edit({
         remarks: record.remarks,
     };
 
-    const { instructorId }: InstructorIdContextType =
-        useContext(InstructorIdContext);
+    const {instructorId} = useContext(InstructorIdContext);
     const [open, setOpen] = useState(true);
 
     const handleSubmit = async (values: typeof initialValues) => {
@@ -75,8 +34,7 @@ export default function Edit({
             body: JSON.stringify(values),
         })
             .then((response) => response.json())
-            .then((data) => {
-                // @ts-ignore TODO: Fix this
+            .then(() => {
                 onEditSave(record.id, values);
                 onCancel();
             })
@@ -85,7 +43,7 @@ export default function Edit({
 
     return (
         <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-            {({ values, handleSubmit }) => {
+            {({values, handleSubmit}) => {
                 // Adding this function because the handleSubmit function returned by Formik expects a FormEvent
                 // but a button's onClick handler gives it a MouseEvent. The two are not compatible.
                 const onSubmit = (
@@ -116,11 +74,12 @@ export default function Edit({
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
                                 >
-                                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"/>
                                 </Transition.Child>
 
                                 <div className="fixed inset-0 z-10 overflow-y-auto">
-                                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                    <div
+                                        className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                                         <Transition.Child
                                             as={Fragment}
                                             enter="ease-out duration-300"
@@ -130,7 +89,8 @@ export default function Edit({
                                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                                         >
-                                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                                            <Dialog.Panel
+                                                className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
                                                 <div>
                                                     <div className="mt-3 text-center sm:mt-5">
                                                         <Dialog.Title
@@ -141,7 +101,8 @@ export default function Edit({
                                                             {index + 1}
                                                         </Dialog.Title>
                                                         <div className="mt-2">
-                                                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                                            <div
+                                                                className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                                                 {/* Date */}
                                                                 <div className="col-span-1 sm:col-span-3">
                                                                     <label
@@ -334,7 +295,8 @@ export default function Edit({
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                                                <div
+                                                    className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                                                     <button
                                                         type="submit"
                                                         className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"

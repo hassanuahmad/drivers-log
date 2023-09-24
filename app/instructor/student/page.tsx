@@ -3,24 +3,12 @@ import {useContext, useState} from "react";
 import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 import Notification from "../../components/notification";
-import {InstructorIdContext, InstructorIdContextType} from "../layout";
 import {StudentRecordsContext} from "../../context/studentRecordsContext";
 import ErrorNotification from '../../components/errorNotification';
+import {StudentFormValues} from "@/app/types/shared/forms";
+import {StudentRecords} from "@/app/types/shared/records";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-interface StudentFormValues {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-}
 
 const validationSchema = Yup.object({
     firstName: Yup.string().required("Required"),
@@ -40,9 +28,13 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
-    // @ts-ignore
-    const {setRecords} = useContext(StudentRecordsContext);
-    const {instructorId}: InstructorIdContextType =
+    const contextValue = useContext(StudentRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
+    const {setRecords} = contextValue;
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const [showNotification, setShowNotification] = useState(false);
@@ -84,8 +76,7 @@ export default function Page() {
                 resetForm();
             } else if (response.ok) {
                 const newRecord = await response.json();
-                // @ts-ignore
-                setRecords((prevRecords) => [
+                setRecords((prevRecords: StudentRecords[]) => [
                     ...prevRecords,
                     {student: newRecord.record},
                 ]);

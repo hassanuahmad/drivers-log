@@ -1,5 +1,3 @@
-import { strict } from "assert";
-
 /**
  * Compares toCheck, the array of strings, to the Search string
  * To search, the Search string, will be split up by spaces, then each of those parts will be matched with all elements in the toCheck array

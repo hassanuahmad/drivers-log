@@ -1,36 +1,26 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
-import { InstructorIdContextType, InstructorIdContext } from "../layout";
-import {
-    getTotalHours,
-    getTotalPaymentAmount,
-    getPassRoadTestCount,
-} from "./utils";
+import {useContext, useEffect, useState} from "react";
+import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount,} from "./utils";
+import {LessonRecordsDbRow} from "@/app/types/shared/records";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-export interface User {
-    googleId: string | undefined;
-    firstName: string | undefined | null;
-    lastName: string | undefined | null;
-    emailAddress: string | undefined;
-}
-
-function classNames(...classes: any[]) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
 export default function Dashboard() {
     const [secondaryNavigation, setSecondaryNavigation] = useState([
-        { name: "Today", id: "today", current: true },
-        { name: "Last 7 days", id: "last-7-days", current: false },
-        { name: "Last 30 days", id: "last-30-days", current: false },
+        {name: "Today", id: "today", current: true},
+        {name: "Last 7 days", id: "last-7-days", current: false},
+        {name: "Last 30 days", id: "last-30-days", current: false},
     ]);
 
-    const { instructorId }: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
     const [selectedNavigation, setSelectedNavigation] = useState(
         secondaryNavigation[0].id
     );
-    const [lessonRecords, setLessonRecords] = useState([]);
+    const [lessonRecords, setLessonRecords] = useState<LessonRecordsDbRow[]>([]);
 
     const stats = [
         {
@@ -66,8 +56,8 @@ export default function Dashboard() {
         setSecondaryNavigation((prevNavigation) =>
             prevNavigation.map((item) =>
                 item.id === name
-                    ? { ...item, current: true }
-                    : { ...item, current: false }
+                    ? {...item, current: true}
+                    : {...item, current: false}
             )
         );
     };
@@ -81,7 +71,8 @@ export default function Dashboard() {
                         <h1>Welcome "{"Instructor Name"}</h1>
                     </div>
                     <div className="flex flex-wrap items-center gap-6 sm:flex-nowrap">
-                        <div className="order-last flex w-full gap-x-8 text-sm font-semibold leading-6 sm:order-none sm:w-auto sm:pl-6 sm:leading-7">
+                        <div
+                            className="order-last flex w-full gap-x-8 text-sm font-semibold leading-6 sm:order-none sm:w-auto sm:pl-6 sm:leading-7">
                             {secondaryNavigation.map((item) => (
                                 <a
                                     key={item.id}
@@ -112,8 +103,8 @@ export default function Dashboard() {
                                 statIdx % 2 === 1
                                     ? "sm:border-l"
                                     : statIdx === 2
-                                    ? "lg:border-l"
-                                    : "",
+                                        ? "lg:border-l"
+                                        : "",
                                 "flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8"
                             )}
                         >

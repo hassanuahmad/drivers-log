@@ -1,74 +1,38 @@
 import {Fragment, useContext, useState} from "react";
 import {ErrorMessage, Field, Formik} from "formik";
-import {InstructorIdContext, InstructorIdContextType} from "../layout";
 import {Dialog, Transition} from "@headlessui/react";
 import {XCircleIcon} from '@heroicons/react/20/solid'
-
-type Record = {
-    id: number;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-};
-
-interface EditComponentProps {
-    record: Record;
-    index: number;
-    onEditSave: (id: number, updatedRecord: Record) => void;
-    onCancel: () => void;
-}
+import {StudentEditValues} from "@/app/types/pages/student";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function Edit({
                                  record,
                                  index,
                                  onEditSave,
                                  onCancel,
-                             }: EditComponentProps) {
-    // @ts-ignore  TODO: Fix this
+                             }: StudentEditValues) {
     const initialValues = {
-        // @ts-ignore
         firstName: record.student.firstName,
-        // @ts-ignore
         lastName: record.student.lastName,
-        // @ts-ignore
         phoneNumber: record.student.phoneNumber,
-        // @ts-ignore
         email: record.student.email,
-        // @ts-ignore
         drivingClass: record.student.drivingClass,
-        // @ts-ignore
         bde: record.student.bde,
-        // @ts-ignore
         streetAddress: record.student.streetAddress,
-        // @ts-ignore
         postalCode: record.student.postalCode,
-        // @ts-ignore
         city: record.student.city,
-        // @ts-ignore
         province: record.student.province,
-        // @ts-ignore
         country: record.student.country,
-        // @ts-ignore
         remarks: record.student.remarks,
     };
 
-    const {instructorId}: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
     const [open, setOpen] = useState(true);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
 
     const handleSubmit = async (values: typeof initialValues) => {
         try {
-            // @ts-ignore
             const response = await fetch(`/api/${instructorId}/student/${record.student.id}`, {
                 method: "PUT",
                 headers: {
@@ -84,7 +48,6 @@ export default function Edit({
                     setShowErrorNotification(false);
                 }, 3000);
             } else if (response.ok) {
-                // @ts-ignore
                 onEditSave(record.id, values);
                 onCancel();
             } else {

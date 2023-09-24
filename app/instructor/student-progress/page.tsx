@@ -1,28 +1,28 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { InstructorIdContextType, InstructorIdContext } from "../layout";
-import { LessonRecordsContext } from "../../context/lessonRecordsContext";
-import {
-    formatDuration,
-    calculateTotalDuration,
-    calculateTotalPayment,
-    generateDoc,
-} from "./utils";
+import {useContext, useEffect, useState} from "react";
+import {CheckIcon, ChevronUpDownIcon} from "@heroicons/react/20/solid";
+import {LessonRecordsContext} from "../../context/lessonRecordsContext";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration, generateDoc,} from "./utils";
 import RemarksModal from "../../components/remarksModal";
-import { Combobox } from "@headlessui/react";
+import {Combobox} from "@headlessui/react";
+import {LessonRecords, LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
 
-function classNames(...classes: any) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
 export default function Page() {
-    // @ts-ignore
-    const { studentRecords } = useContext(LessonRecordsContext);
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const { instructorId }: InstructorIdContextType =
+    const contextValue = useContext(LessonRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
+    const {studentRecords} = contextValue;
+    const [selectedStudent, setSelectedStudent] = useState<StudentRecords | null>(null);
+    const {instructorId} =
         useContext(InstructorIdContext);
-    const [records, setRecords] = useState([]);
+    const [records, setRecords] = useState<LessonRecords[]>([]);
     const [totalDuration, setTotalDuration] = useState("0hr 0min");
     const [totalCash, setTotalCash] = useState(0);
     const [totalInterac, setTotalInterac] = useState(0);
@@ -33,13 +33,11 @@ export default function Page() {
     useEffect(() => {
         if (!instructorId || !selectedStudent) return;
         fetch(
-            // @ts-ignore
             `/api/${instructorId}/student-progress/${selectedStudent.student.id}`
         )
             .then((res) => res.json())
             .then((data) => {
-                // @ts-ignore
-                const formattedRecords = data.records.map((record) => ({
+                const formattedRecords = data.records.map((record: LessonRecordsPreFormattedDuration) => ({
                     ...record,
                     formattedDuration: formatDuration(Number(record.duration)),
                 }));
@@ -55,12 +53,12 @@ export default function Page() {
     const filteredPeople =
         query === ""
             ? studentRecords
-            : // @ts-ignore
-              studentRecords.filter((record) => {
-                  return record.student.firstName
-                      .toLowerCase()
-                      .includes(query.toLowerCase());
-              });
+            :
+            studentRecords.filter((record) => {
+                return record.student.firstName
+                    .toLowerCase()
+                    .includes(query.toLowerCase());
+            });
 
     return (
         <>
@@ -69,12 +67,11 @@ export default function Page() {
                     <div className="ml-4 mt-2">
                         <h3 className="text-xl font-semibold leading-6 text-gray-900">
                             {selectedStudent
-                                ? // @ts-ignore
-                                  selectedStudent.student.firstName +
-                                  " " +
-                                  // @ts-ignore
-                                  selectedStudent.student.lastName +
-                                  "'s Progress"
+                                ?
+                                selectedStudent.student.firstName +
+                                " " +
+                                selectedStudent.student.lastName +
+                                "'s Progress"
                                 : "Student Progress"}
                         </h3>
                     </div>
@@ -83,12 +80,10 @@ export default function Page() {
                             as="div"
                             className="sm:col-span-1"
                             value={
-                                // @ts-ignore
                                 selectedStudent?.student.id || ""
                             }
                             onChange={(selectedId) => {
                                 const matchedRecord = studentRecords.find(
-                                    // @ts-ignore
                                     (record) => record.student.id === selectedId
                                 );
                                 if (matchedRecord) {
@@ -107,12 +102,13 @@ export default function Page() {
                                     }
                                     displayValue={() => {
                                         return selectedStudent
-                                            ? // @ts-ignore
-                                              `${selectedStudent.student.firstName} ${selectedStudent.student.lastName}`
+                                            ?
+                                            `${selectedStudent.student.firstName} ${selectedStudent.student.lastName}`
                                             : "";
                                     }}
                                 />
-                                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                                <Combobox.Button
+                                    className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                                     <ChevronUpDownIcon
                                         className="h-5 w-5 text-gray-400"
                                         aria-hidden="true"
@@ -120,13 +116,13 @@ export default function Page() {
                                 </Combobox.Button>
 
                                 {filteredPeople.length > 0 && (
-                                    <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                        {/* @ts-ignore */}
+                                    <Combobox.Options
+                                        className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                         {filteredPeople.map((record) => (
                                             <Combobox.Option
                                                 key={record.student.id}
                                                 value={record.student.id}
-                                                className={({ active }) =>
+                                                className={({active}) =>
                                                     classNames(
                                                         "relative cursor-default select-none py-2 pl-3 pr-9",
                                                         active
@@ -138,13 +134,13 @@ export default function Page() {
                                                     setSelectedStudent(record)
                                                 }
                                             >
-                                                {({ active, selected }) => (
+                                                {({active, selected}) => (
                                                     <>
                                                         <span
                                                             className={classNames(
                                                                 "block truncate",
                                                                 selected &&
-                                                                    "font-semibold"
+                                                                "font-semibold"
                                                             )}
                                                         >
                                                             {
@@ -191,184 +187,169 @@ export default function Page() {
                         <div className="inline-block min-w-full py-2 align-middle ">
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead>
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                        >
-                                            #
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Name
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Date
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Start Time
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            End Time
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Duration
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Cash Payment
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Interac Payment
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Road Test
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            BDE
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Remarks
-                                        </th>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                    >
+                                        #
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Name
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Date
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Start Time
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        End Time
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Duration
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Cash Payment
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Interac Payment
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Road Test
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        BDE
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Remarks
+                                    </th>
 
-                                        <th
-                                            scope="col"
-                                            className="relative py-3.5 pl-3 pr-4 sm:pr-3"
-                                        ></th>
-                                    </tr>
+                                    <th
+                                        scope="col"
+                                        className="relative py-3.5 pl-3 pr-4 sm:pr-3"
+                                    ></th>
+                                </tr>
                                 </thead>
                                 <tbody className="bg-white">
-                                    {/* @ts-ignore */}
-                                    {records.map((record, index) => {
-                                        return (
-                                            <tr
-                                                key={index}
-                                                className="even:bg-gray-50"
-                                            >
-                                                <>
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                        {index + 1}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            // @ts-ignore
-                                                            record.student
-                                                                .firstName
-                                                        }{" "}
-                                                        {
-                                                            // @ts-ignore
-                                                            record.student
-                                                                .lastName
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.date}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.startTime}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.endTime}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {
-                                                            // @ts-ignore
-                                                            record.formattedDuration
-                                                        }
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.paymentType ===
-                                                        "Cash"
-                                                            ? //@ts-ignore
-                                                              `$${record.paymentAmount.toString()}`
-                                                            : ""}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.paymentType ===
-                                                        "Interac"
-                                                            ? //@ts-ignore
-                                                              `$${record.paymentAmount.toString()}`
-                                                            : ""}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.roadTest}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                        {/* @ts-ignore */}
-                                                        {record.student.bde}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
-                                                        {/* @ts-ignore */}
-                                                        {record.remarks.length >
-                                                        25 ? (
-                                                            <>
-                                                                {/* @ts-ignore */}
-                                                                {record.remarks.substring(
-                                                                    0,
-                                                                    25
-                                                                )}
-                                                                ...{" "}
-                                                                <button
-                                                                    className="text-indigo-600 hover:text-indigo-900"
-                                                                    onClick={() => {
-                                                                        setModalContent(
-                                                                            // @ts-ignore
-                                                                            record.remarks
-                                                                        );
-                                                                        setIsModalOpen(
-                                                                            true
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    View More
-                                                                </button>
-                                                            </>
-                                                        ) : (
-                                                            //@ts-ignore
-                                                            record.remarks
-                                                        )}
-                                                    </td>
-                                                </>
-                                            </tr>
-                                        );
-                                    })}
+                                {records.map((record, index) => {
+                                    return (
+                                        <tr
+                                            key={index}
+                                            className="even:bg-gray-50"
+                                        >
+                                            <>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                    {index + 1}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {
+                                                        record.student
+                                                            .firstName
+                                                    }{" "}
+                                                    {
+                                                        record.student
+                                                            .lastName
+                                                    }
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.date}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.startTime}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.endTime}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {
+                                                        record.formattedDuration
+                                                    }
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.paymentType ===
+                                                    "Cash"
+                                                        ?
+                                                        `$${record.paymentAmount.toString()}`
+                                                        : ""}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.paymentType ===
+                                                    "Interac"
+                                                        ?
+                                                        `$${record.paymentAmount.toString()}`
+                                                        : ""}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.roadTest}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {record.student.bde}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
+                                                    {record.remarks.length >
+                                                    25 ? (
+                                                        <>
+                                                            {record.remarks.substring(
+                                                                0,
+                                                                25
+                                                            )}
+                                                            ...{" "}
+                                                            <button
+                                                                className="text-indigo-600 hover:text-indigo-900"
+                                                                onClick={() => {
+                                                                    setModalContent(
+                                                                        record.remarks
+                                                                    );
+                                                                    setIsModalOpen(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                            >
+                                                                View More
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        record.remarks
+                                                    )}
+                                                </td>
+                                            </>
+                                        </tr>
+                                    );
+                                })}
                                 </tbody>
                                 <tfoot>
-                                    <tr></tr>
+                                <tr></tr>
                                 </tfoot>
                             </table>
                         </div>
@@ -409,7 +390,6 @@ export default function Page() {
                 />
             )}
             {/* !!! THIS IS ONLY FOR MY FATHER CURRENTLY !!! */}
-            {/* @ts-ignore */}
             {instructorId === 14 ? (
                 <div className="flex justify-end">
                     <button

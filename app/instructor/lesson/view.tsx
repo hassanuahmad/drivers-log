@@ -1,22 +1,18 @@
 "use client";
-import { useState, useContext, Fragment, useEffect } from "react";
+import {Fragment, useContext, useEffect, useState} from "react";
 import KebabMenu from "../../components/kebabMenu";
 import DeleteModal from "../../components/deleteModal";
 import Edit from "./edit";
-import {
-    formatDuration,
-    calculateTotalDuration,
-    calculateTotalPayment,
-    downloadCSV,
-} from "./utils";
-import { InstructorIdContextType, InstructorIdContext } from "../layout";
-import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { LessonRecordsContext } from "../../context/lessonRecordsContext";
+import {calculateTotalDuration, calculateTotalPayment, downloadCSV, formatDuration,} from "./utils";
+import {Menu, Transition} from "@headlessui/react";
+import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import RemarksModal from "../../components/remarksModal";
-import { contains } from "@/app/utils/contains";
+import {contains} from "@/app/utils/contains";
+import {LessonRecordsForUpdate} from "@/app/types/shared/records";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-function classNames(...classes: any[]) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
@@ -27,50 +23,39 @@ export default function View() {
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
-    const { instructorId }: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState("");
-    const [searchName, setSearchName] = useState<String>("");
+    const [searchName, setSearchName] = useState<string>("");
 
+    const contextValue = useContext(LessonRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
     const {
-        // @ts-ignore
-        studentRecords,
-        // @ts-ignore
         records,
-        // @ts-ignore
         setRecords,
-        // @ts-ignore
         selectedMonth,
-        // @ts-ignore
         setSelectedMonth,
-        // @ts-ignore
         selectedYear,
-        // @ts-ignore
         setSelectedYear,
-        // @ts-ignore
         totalDuration,
-        // @ts-ignore
         setTotalDuration,
-        // @ts-ignore
         totalCash,
-        // @ts-ignore
         setTotalCash,
-        // @ts-ignore
         totalInterac,
-        // @ts-ignore
         setTotalInterac,
-    } = useContext(LessonRecordsContext);
+    } = contextValue;
 
     const [displayedRecords, setDisplayedRecords] = useState(records);
 
     useEffect(() => {
         // Filter the records based on the search term
-        // @ts-ignore
         const filteredRecords = records.filter((record) =>
             contains(
                 [record.student.firstName, record.student.lastName],
-                // @ts-ignore
                 searchName
             )
         );
@@ -86,18 +71,18 @@ export default function View() {
     }, [records, searchName]);
 
     const monthOptions = [
-        { label: "Jan", value: "01" },
-        { label: "Feb", value: "02" },
-        { label: "Mar", value: "03" },
-        { label: "Apr", value: "04" },
-        { label: "May", value: "05" },
-        { label: "Jun", value: "06" },
-        { label: "Jul", value: "07" },
-        { label: "Aug", value: "08" },
-        { label: "Sep", value: "09" },
-        { label: "Oct", value: "10" },
-        { label: "Nov", value: "11" },
-        { label: "Dec", value: "12" },
+        {label: "Jan", value: "01"},
+        {label: "Feb", value: "02"},
+        {label: "Mar", value: "03"},
+        {label: "Apr", value: "04"},
+        {label: "May", value: "05"},
+        {label: "Jun", value: "06"},
+        {label: "Jul", value: "07"},
+        {label: "Aug", value: "08"},
+        {label: "Sep", value: "09"},
+        {label: "Oct", value: "10"},
+        {label: "Nov", value: "11"},
+        {label: "Dec", value: "12"},
     ];
 
     const years = [
@@ -105,14 +90,13 @@ export default function View() {
     ];
 
     const handleDelete = (id: number, endpoint: string) => {
-        setDeleteRecord({ id, endpoint });
+        setDeleteRecord({id, endpoint});
         setDeleteModalOpen(true);
     };
 
     const handleDeleteConfirmed = () => {
         if (deleteRecord) {
             const newRecords = records.filter(
-                // @ts-ignore
                 (record) => record.id !== deleteRecord.id
             );
             setRecords(newRecords);
@@ -128,9 +112,7 @@ export default function View() {
         setEditRecordId(id);
     };
 
-    // @ts-ignore
-    const handleEditSave = (id: number, updatedRecord) => {
-        // @ts-ignore
+    const handleEditSave = (id: number, updatedRecord: LessonRecordsForUpdate) => {
         const updatedRecords = records.map((record) => {
             if (record.id === id) {
                 // Parse the startTime and endTime strings to Date objects
@@ -153,7 +135,6 @@ export default function View() {
             return record;
         });
 
-        // @ts-ignore
         updatedRecords.sort((a, b) => {
             // Compare dates
             const dateComparison = a.date.localeCompare(b.date);
@@ -194,7 +175,8 @@ export default function View() {
                         onChange={(e) => setSearchName(e.target.value)}
                     />
                     <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
-                        <kbd className="inline-flex items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
+                        <kbd
+                            className="inline-flex items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
                             ⌘K
                         </kbd>
                     </div>
@@ -206,7 +188,8 @@ export default function View() {
                             className="relative inline-block text-left"
                         >
                             <div>
-                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                <Menu.Button
+                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                     {
                                         monthOptions.find(
                                             (monthOption) =>
@@ -230,12 +213,13 @@ export default function View() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Items
+                                    className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
                                         {monthOptions.map(
                                             (monthOption, index) => (
                                                 <Menu.Item key={index}>
-                                                    {({ active }) => (
+                                                    {({active}) => (
                                                         <a
                                                             className={classNames(
                                                                 active
@@ -266,7 +250,8 @@ export default function View() {
                             className="relative inline-block text-left"
                         >
                             <div>
-                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                <Menu.Button
+                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                     {selectedYear}
                                     <ChevronDownIcon
                                         className="-mr-1 h-5 w-5 text-gray-400"
@@ -284,11 +269,12 @@ export default function View() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Items
+                                    className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
                                         {years.map((yearOption, index) => (
                                             <Menu.Item key={index}>
-                                                {({ active }) => (
+                                                {({active}) => (
                                                     <a
                                                         className={classNames(
                                                             active
@@ -321,223 +307,221 @@ export default function View() {
                         <div className="inline-block min-w-full py-2 align-middle ">
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead>
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                        >
-                                            #
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Name
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Date
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Start Time
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            End Time
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Duration
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            {editRecordId === null
-                                                ? "Cash Payment"
-                                                : "Payment Type"}
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            {editRecordId === null
-                                                ? "Interac Payment"
-                                                : "Payment Amount"}
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Road Test
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            BDE
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Remarks
-                                        </th>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                    >
+                                        #
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Name
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Date
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Start Time
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        End Time
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Duration
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        {editRecordId === null
+                                            ? "Cash Payment"
+                                            : "Payment Type"}
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        {editRecordId === null
+                                            ? "Interac Payment"
+                                            : "Payment Amount"}
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Road Test
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        BDE
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                        Remarks
+                                    </th>
 
-                                        <th
-                                            scope="col"
-                                            className="relative py-3.5 pl-3 pr-4 sm:pr-3"
-                                        ></th>
-                                    </tr>
+                                    <th
+                                        scope="col"
+                                        className="relative py-3.5 pl-3 pr-4 sm:pr-3"
+                                    ></th>
+                                </tr>
                                 </thead>
                                 <tbody className="bg-white">
-                                    {/* @ts-ignore */}
-                                    {displayedRecords.map((record, index) => {
-                                        if (
-                                            contains(
-                                                [
-                                                    record.student.firstName,
-                                                    record.student.lastName,
-                                                ],
-                                                // @ts-ignore
-                                                searchName
-                                            )
+                                {displayedRecords.map((record, index) => {
+                                    if (
+                                        contains(
+                                            [
+                                                record.student.firstName,
+                                                record.student.lastName,
+                                            ],
+                                            searchName
                                         )
-                                            return (
-                                                <tr
-                                                    key={index}
-                                                    className="even:bg-gray-50"
-                                                >
-                                                    {editRecordId ===
-                                                    record.id ? (
-                                                        <Edit
-                                                            record={record}
-                                                            index={index}
-                                                            onEditSave={
-                                                                handleEditSave
+                                    )
+                                        return (
+                                            <tr
+                                                key={index}
+                                                className="even:bg-gray-50"
+                                            >
+                                                {editRecordId ===
+                                                record.id ? (
+                                                    <Edit
+                                                        record={record}
+                                                        index={index}
+                                                        onEditSave={
+                                                            handleEditSave
+                                                        }
+                                                        onCancel={
+                                                            handleEditCancel
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                            {index + 1}
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {
+                                                                record
+                                                                    .student
+                                                                    .firstName
+                                                            }{" "}
+                                                            {
+                                                                record
+                                                                    .student
+                                                                    .lastName
                                                             }
-                                                            onCancel={
-                                                                handleEditCancel
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {record.date}
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {
+                                                                record.startTime
                                                             }
-                                                        />
-                                                    ) : (
-                                                        <>
-                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                                {index + 1}
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {
-                                                                    record
-                                                                        .student
-                                                                        .firstName
-                                                                }{" "}
-                                                                {
-                                                                    record
-                                                                        .student
-                                                                        .lastName
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {record.endTime}
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {
+                                                                record.formattedDuration
+                                                            }
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {record.paymentType ===
+                                                            "Cash"
+                                                                ? `$${record.paymentAmount.toString()}`
+                                                                : ""}
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {record.paymentType ===
+                                                            "Interac"
+                                                                ? `$${record.paymentAmount.toString()}`
+                                                                : ""}
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {
+                                                                record.roadTest
+                                                            }
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            {
+                                                                record
+                                                                    .student
+                                                                    .bde
+                                                            }
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
+                                                            {record.remarks
+                                                                .length >
+                                                            25 ? (
+                                                                <>
+                                                                    {record.remarks.substring(
+                                                                        0,
+                                                                        25
+                                                                    )}
+                                                                    ...{" "}
+                                                                    <button
+                                                                        className="text-indigo-600 hover:text-indigo-900"
+                                                                        onClick={() => {
+                                                                            setModalContent(
+                                                                                record.remarks
+                                                                            );
+                                                                            setIsModalOpen(
+                                                                                true
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        View
+                                                                        More
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                record.remarks
+                                                            )}
+                                                        </td>
+                                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
+                                                            <KebabMenu
+                                                                onDelete={() =>
+                                                                    handleDelete(
+                                                                        record.id,
+                                                                        `/api/${instructorId}/lesson`
+                                                                    )
                                                                 }
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {record.date}
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {
-                                                                    record.startTime
+                                                                onEdit={() =>
+                                                                    handleEdit(
+                                                                        record.id
+                                                                    )
                                                                 }
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {record.endTime}
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {
-                                                                    record.formattedDuration
-                                                                }
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {record.paymentType ===
-                                                                "Cash"
-                                                                    ? `$${record.paymentAmount.toString()}`
-                                                                    : ""}
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {record.paymentType ===
-                                                                "Interac"
-                                                                    ? `$${record.paymentAmount.toString()}`
-                                                                    : ""}
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {
-                                                                    record.roadTest
-                                                                }
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                {
-                                                                    record
-                                                                        .student
-                                                                        .bde
-                                                                }
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
-                                                                {record.remarks
-                                                                    .length >
-                                                                25 ? (
-                                                                    <>
-                                                                        {record.remarks.substring(
-                                                                            0,
-                                                                            25
-                                                                        )}
-                                                                        ...{" "}
-                                                                        <button
-                                                                            className="text-indigo-600 hover:text-indigo-900"
-                                                                            onClick={() => {
-                                                                                setModalContent(
-                                                                                    record.remarks
-                                                                                );
-                                                                                setIsModalOpen(
-                                                                                    true
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            View
-                                                                            More
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    record.remarks
-                                                                )}
-                                                            </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
-                                                                <KebabMenu
-                                                                    onDelete={() =>
-                                                                        handleDelete(
-                                                                            record.id,
-                                                                            `/api/${instructorId}/lesson`
-                                                                        )
-                                                                    }
-                                                                    onEdit={() =>
-                                                                        handleEdit(
-                                                                            record.id
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </>
-                                                    )}
-                                                </tr>
-                                            );
-                                    })}
+                                                            />
+                                                        </td>
+                                                    </>
+                                                )}
+                                            </tr>
+                                        );
+                                })}
                                 </tbody>
                                 <tfoot>
-                                    <tr></tr>
+                                <tr></tr>
                                 </tfoot>
                             </table>
                         </div>

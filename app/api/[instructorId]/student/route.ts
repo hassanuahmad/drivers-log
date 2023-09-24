@@ -1,7 +1,14 @@
 import {NextResponse} from "next/server";
 import {PrismaClient} from "@prisma/client";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime";
 
 const prisma = new PrismaClient();
+
+// A type guard for the PrismaClientKnownRequestError
+function isPrismaClientKnownRequestError(error: any): error is PrismaClientKnownRequestError {
+    return error && typeof error.code === 'string';
+}
+
 
 export async function POST(
     request: Request,
@@ -44,8 +51,7 @@ export async function POST(
             },
         });
     } catch (error) {
-        // @ts-ignore
-        if (error.code === 'P2002') {
+        if (isPrismaClientKnownRequestError(error) && error.code === 'P2002') {
             return new NextResponse("Error creating student record.", {
                 status: 409, // HTTP 409 Conflict is used to indicate conflicts like duplicate entries
             });

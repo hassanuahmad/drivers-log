@@ -1,15 +1,11 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
-import { StudentRecordsContext } from "./studentRecordsContext";
-import {
-    InstructorIdContext,
-    InstructorIdContextType,
-} from "../instructor/layout";
+import {ReactNode, useContext, useEffect, useState} from "react";
+import {StudentRecordsContext} from "./studentRecordsContext";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-// @ts-ignore
-export const StudentProvider = ({ children }) => {
+export const StudentProvider = ({children}: { children: ReactNode }) => {
     const [records, setRecords] = useState([]);
-    const { instructorId }: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     useEffect(() => {

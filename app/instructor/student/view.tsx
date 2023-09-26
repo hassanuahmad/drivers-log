@@ -6,7 +6,7 @@ import {StudentRecordsContext} from "../../context/studentRecordsContext";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {StudentRecordsForUpdate} from "@/app/types/shared/records";
 import {StudentFormValues} from "@/app/types/shared/forms";
-import {DataTable} from "../../components/data-table"
+import {DataTable} from "@/app/components/data-table"
 import {columns} from "@/app/instructor/student/columns";
 
 export default function View() {

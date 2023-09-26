@@ -32,7 +32,7 @@
         "types/*"
       ],
       "@/components/*": [
-        "../components/*"
+        "components/*"
       ]
     }
   },

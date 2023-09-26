@@ -1,7 +1,7 @@
 import {Fragment, useRef, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {ExclamationTriangleIcon} from "@heroicons/react/24/outline";
-import ErrorNotification from "../components/errorNotification";
+import ErrorNotification from "./errorNotification";
 import {DeleteModalProps} from "@/app/types/components/modal";
 
 export default function DeleteModal({

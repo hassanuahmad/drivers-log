@@ -4,7 +4,7 @@ import {CheckIcon, ChevronUpDownIcon} from "@heroicons/react/20/solid";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {calculateTotalDuration, calculateTotalPayment, formatDuration, generateDoc,} from "./utils";
-import RemarksModal from "../../components/remarksModal";
+import RemarksModal from "../../../components/remarksModal";
 import {Combobox} from "@headlessui/react";
 import {LessonRecords, LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
 

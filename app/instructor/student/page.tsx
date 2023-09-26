@@ -1,10 +1,10 @@
 "use client";
 import {useContext, useState} from "react";
-import Notification from "../../components/notification";
+import Notification from "../../../components/notification";
 import {StudentRecordsContext} from "../../context/studentRecordsContext";
-import ErrorNotification from '../../components/errorNotification';
+import ErrorNotification from '../../../components/errorNotification';
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-import SectionHeading from "@/app/components/sectionHeading";
+import SectionHeading from "@/components/sectionHeading";
 import {StudentFormValues} from "@/app/types/shared/forms";
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";

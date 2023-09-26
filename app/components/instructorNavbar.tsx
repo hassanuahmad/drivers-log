@@ -6,7 +6,7 @@ import {XMarkIcon} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import {UserButton} from "@clerk/nextjs";
 import Image from "next/image";
-import logo from "../app/static/logo/logo.png";
+import logo from "../static/logo/logo.png";
 
 const navigation = [
     {name: "Dashboard", href: "/instructor/dashboard"},

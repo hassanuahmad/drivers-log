@@ -2,7 +2,7 @@
 import {useContext, useState} from "react";
 import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
-import Notification from "../../../components/notification";
+import Notification from "@/app/components/notification";
 import {calculateTotalDuration, calculateTotalPayment, formatDuration,} from "./utils";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {CheckIcon, ChevronUpDownIcon} from "@heroicons/react/20/solid";
@@ -10,7 +10,7 @@ import {Combobox} from "@headlessui/react";
 import {LessonFormValues} from "@/app/types/shared/forms";
 import {LessonRecords} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-import SectionHeading from "@/components/sectionHeading";
+import SectionHeading from "@/app/components/sectionHeading";
 
 function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");

@@ -1,7 +1,7 @@
 "use client";
 
 import {useUser} from "@clerk/nextjs";
-import InstructorNavbar from "../../components/instructorNavbar";
+import InstructorNavbar from "@/app/components/instructorNavbar";
 import {useEffect, useState} from "react";
 import {User} from "@/app/types/global";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";

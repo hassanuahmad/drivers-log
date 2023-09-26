@@ -10,11 +10,16 @@ import {
     VisibilityState,
 } from "@tanstack/react-table"
 
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "./ui/table";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/app/components/ui/table";
 
-import {Button} from "./ui/button"
-import {Input} from "./ui/input"
-import {DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger,} from "./ui/dropdown-menu"
+import {Button} from "@/app/components/ui/button"
+import {Input} from "@/app/components/ui/input"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/app/components/ui/dropdown-menu"
 import {useState} from "react";
 
 interface DataTableProps<TData, TValue> {

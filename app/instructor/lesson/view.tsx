@@ -1,13 +1,13 @@
 "use client";
 import {Fragment, useContext, useEffect, useState} from "react";
-import KebabMenu from "../../../components/kebabMenu";
-import DeleteModal from "../../../components/deleteModal";
+import KebabMenu from "@/app/components/kebabMenu";
+import DeleteModal from "@/app/components/deleteModal";
 import Edit from "./edit";
 import {calculateTotalDuration, calculateTotalPayment, downloadCSV, formatDuration,} from "./utils";
 import {Menu, Transition} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
-import RemarksModal from "../../../components/remarksModal";
+import RemarksModal from "@/app/components/remarksModal";
 import {contains} from "@/app/utils/contains";
 import {LessonRecordsForUpdate} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";

@@ -1,18 +1,18 @@
 "use client";
 import {useContext, useState} from "react";
-import Notification from "../../../components/notification";
+import Notification from "@/app/components/notification";
 import {StudentRecordsContext} from "../../context/studentRecordsContext";
-import ErrorNotification from '../../../components/errorNotification';
+import ErrorNotification from '@/app/components/errorNotification';
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-import SectionHeading from "@/components/sectionHeading";
+import SectionHeading from "@/app/components/sectionHeading";
 import {StudentFormValues} from "@/app/types/shared/forms";
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import {Button} from "../../../components/ui/button"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "../../../components/ui/form"
-import {Input} from "../../../components/ui/input"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "../../../components/ui/select"
+import {Button} from "@/app/components/ui/button"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/form"
+import {Input} from "@/app/components/ui/input"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/app/components/ui/select"
 import {StudentRecords} from "@/app/types/shared/records";
 
 const validationSchema = z.object({

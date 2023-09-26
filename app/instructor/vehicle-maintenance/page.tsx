@@ -2,7 +2,7 @@
 import {useContext, useState} from "react";
 import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
-import Notification from "../../../components/notification";
+import Notification from "@/app/components/notification";
 import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenanceRecordsContext";
 import {VehicleMaintenanceFormValues} from "../../types/shared/forms";
 import {VehicleMaintenanceRecords} from "../../types/shared/records";

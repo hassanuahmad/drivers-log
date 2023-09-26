@@ -3,21 +3,14 @@
 import {
     ColumnDef,
     ColumnFiltersState,
-    VisibilityState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     useReactTable,
+    VisibilityState,
 } from "@tanstack/react-table"
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"

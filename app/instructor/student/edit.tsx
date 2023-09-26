@@ -7,7 +7,6 @@ import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function Edit({
                                  record,
-                                 index,
                                  onEditSave,
                                  onCancel,
                              }: StudentEditValues) {
@@ -115,8 +114,7 @@ export default function Edit({
                                                                 as="h3"
                                                                 className="text-base font-semibold leading-6 text-gray-900"
                                                             >
-                                                                Edit Student #
-                                                                {index + 1}
+                                                                Edit {initialValues.firstName}'s Record
                                                             </Dialog.Title>
                                                             <div className="mt-2">
                                                                 <div
@@ -488,36 +486,6 @@ export default function Edit({
                                     </div>
                                 </Dialog>
                             </Transition.Root>
-                            {/* END */}
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {index + 1}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.firstName}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.lastName}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.phoneNumber}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.email}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.streetAddress} {initialValues.city}{" "}
-                                {initialValues.province} {initialValues.postalCode}{" "}
-                                {initialValues.country}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.drivingClass}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.bde}
-                            </td>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                {initialValues.remarks}
-                            </td>
                         </>
                     );
                 }}

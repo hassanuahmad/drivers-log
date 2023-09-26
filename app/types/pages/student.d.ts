@@ -2,7 +2,6 @@ import {StudentRecords, StudentRecordsForUpdate} from "@/app/types/shared/record
 
 export interface StudentEditValues {
     record: StudentRecords;
-    index: number;
     onEditSave: (id: number, updatedRecord: StudentRecordsForUpdate) => void;
     onCancel: () => void;
 }

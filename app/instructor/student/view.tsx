@@ -80,7 +80,7 @@ export default function View() {
     return (
         <>
             <div className="py-10">
-                <DataTable columns={tableColumns} data={tableRecords}/>
+                <DataTable columns={tableColumns} data={tableRecords} getColumnName="firstName"/>
             </div>
             {isEditModalOpen && editRecord && (
                 <Edit

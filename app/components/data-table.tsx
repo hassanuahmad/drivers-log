@@ -20,16 +20,20 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    getColumnName: string
+    onFilteredRowsChange?: (rows: TData[]) => void;
 }
 
 export function DataTable<TData, TValue>({
                                              columns,
                                              data,
+                                             getColumnName,
+                                             onFilteredRowsChange
                                          }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
         []
@@ -50,14 +54,28 @@ export function DataTable<TData, TValue>({
         }
     })
 
+    const firstRender = useRef(true);
+
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
+
+        if (onFilteredRowsChange) {
+            const filteredRows = table.getRowModel().rows.map(row => row.original);
+            onFilteredRowsChange(filteredRows);
+        }
+    }, [table.getRowModel().rows, onFilteredRowsChange]);
+
     return (
         <div>
             <div className="flex items-center pb-4">
                 <Input
                     placeholder="Search by First Name..."
-                    value={(table.getColumn("firstName")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn(getColumnName)?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("firstName")?.setFilterValue(event.target.value)
+                        table.getColumn(getColumnName)?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />

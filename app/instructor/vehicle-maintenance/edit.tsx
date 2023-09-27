@@ -6,7 +6,6 @@ import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function Edit({
                                  record,
-                                 index,
                                  onEditSave,
                                  onCancel,
                              }: VehicleMaintenanceEditValues) {
@@ -95,8 +94,7 @@ export default function Edit({
                                                             as="h3"
                                                             className="text-base font-semibold leading-6 text-gray-900"
                                                         >
-                                                            Edit Log #
-                                                            {index + 1}
+                                                            Edit Vehicle Maintenance Record
                                                         </Dialog.Title>
                                                         <div className="mt-2">
                                                             <div
@@ -272,27 +270,6 @@ export default function Edit({
                             </Dialog>
                         </Transition.Root>
                         {/* END */}
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {index + 1}
-                        </td>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {initialValues.date}
-                        </td>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {initialValues.odometer}
-                        </td>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {initialValues.fueling}
-                        </td>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {initialValues.gas}
-                        </td>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {initialValues.maintenance}
-                        </td>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {initialValues.remarks}
-                        </td>
                     </>
                 );
             }}

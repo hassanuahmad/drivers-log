@@ -2,7 +2,6 @@ import {VehicleMaintenanceRecordForUpdate, VehicleMaintenanceRecords} from "@/ap
 
 export interface VehicleMaintenanceEditValues {
     record: VehicleMaintenanceRecords;
-    index: number;
     onEditSave: (id: number, updatedRecord: VehicleMaintenanceRecordForUpdate) => void;
     onCancel: () => void;
 }

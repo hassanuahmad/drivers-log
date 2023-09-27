@@ -7,6 +7,7 @@ import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenance
 import {VehicleMaintenanceFormValues} from "../../types/shared/forms";
 import {VehicleMaintenanceRecords} from "../../types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import SectionHeading from "@/app/components/sectionHeading";
 
 
 const validationSchema = Yup.object({
@@ -47,7 +48,9 @@ export default function Page() {
 
     const handleSubmit = async (
         values: typeof initialValues,
-        {resetForm}: { resetForm: () => void }
+        {resetForm}: {
+            resetForm: () => void
+        }
     ) => {
         try {
             const response = await fetch(
@@ -89,6 +92,7 @@ export default function Page() {
                 text={"Vehicle Maintenance"}
                 onClose={() => setShowNotification(false)}
             />
+            <SectionHeading title={"Vehicle Maintenance"} description={"Add vehicle maintenance record to keep track of your vehicle."}/>
             <Formik
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
@@ -97,10 +101,6 @@ export default function Page() {
                 <Form>
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12">
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                Vehicle Maintenance
-                            </h2>
-
                             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                 {/* Date */}
                                 <div className="sm:col-span-1">

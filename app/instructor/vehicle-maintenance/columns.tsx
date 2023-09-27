@@ -10,68 +10,43 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
-import {LessonRecords} from "@/app/types/shared/records";
+import {VehicleMaintenanceFormValues} from "@/app/types/shared/forms";
 
 export const columns = (
     handleEdit: (id: number | undefined) => void,
     handleDelete: (id: number | undefined, endpoint: string) => void,
     instructorId: number | null,
-): ColumnDef<LessonRecords>[] => [
+): ColumnDef<VehicleMaintenanceFormValues>[] => [
     {
         header: "#",
         cell: (context) => context.row.index + 1,
     }, {
-        accessorKey: "name",
-        header: "Name",
-    }, {
         accessorKey: "date",
         header: "Date",
     }, {
-        accessorKey: "startTime",
-        header: "Start Time",
+        accessorKey: "odometer",
+        header: "Odometer",
     }, {
-        accessorKey: "endTime",
-        header: "End Time",
+        accessorKey: "fueling",
+        header: "Fueling",
     }, {
-        accessorKey: "formattedDuration",
-        header: "Duration",
-    }, {
-        accessorKey: "cashAmount",
-        header: "Cash Payment",
+        accessorKey: "gas",
+        header: "Gas",
         cell: (context) => {
             const data = context.row.original;
-            if (data.paymentType === "Cash") {
-                return "$" + data.paymentAmount;
-            } else {
-                return "";
-            }
+            return "$" + data.gas;
         }
     }, {
-        accessorKey: "interacAmount",
-        header: "Interac Payment",
+        accessorKey: "maintenance",
+        header: "Maintenance",
         cell: (context) => {
             const data = context.row.original;
-            if (data.paymentType === "Interac") {
-                return "$" + data.paymentAmount;
-            } else {
-                return "";
-            }
-        }
-    }, {
-        accessorKey: "roadTest",
-        header: "Road Test",
-    }, {
-        accessorKey: "bde",
-        header: "BDE",
-        cell: (context) => {
-            const data = context.row.original.student;
-            return data.bde;
+            return "$" + data.maintenance;
         }
     }, {
         accessorKey: "remarks",
         header: "Remarks",
-    },
-    {
+    }, {
         id: "actions",
         cell: ({row}) => {
             const record = row.original;
@@ -90,7 +65,7 @@ export const columns = (
                             Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            onClick={() => handleDelete(record.id, `/api/${instructorId}/lesson`)}>
+                            onClick={() => handleDelete(record.id, `/api/${instructorId}/vehicle-maintenance`)}>
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>

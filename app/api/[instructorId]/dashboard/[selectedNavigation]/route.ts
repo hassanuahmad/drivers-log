@@ -1,14 +1,13 @@
-// @ts-nocheck
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET(
     request: Request,
-    { params }: { params: { instructorId: string; selectedNavigation: string } }
+    {params}: { params: { instructorId: string; selectedNavigation: string } }
 ) {
-    const { instructorId, selectedNavigation } = params;
+    const {instructorId, selectedNavigation} = params;
 
     if (!instructorId) {
         return NextResponse.json({
@@ -44,5 +43,12 @@ export async function GET(
         },
     });
 
-    return NextResponse.json({ lessonRecords });
+    // Getting the instructor name here because this is where we use this endpoint in the same component.
+    const instructorName = await prisma.instructor.findUnique({
+        where: {
+            id: Number(instructorId),
+        }
+    });
+
+    return NextResponse.json({lessonRecords, instructorName});
 }

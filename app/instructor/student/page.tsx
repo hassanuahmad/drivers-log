@@ -1,50 +1,49 @@
 "use client";
-import { useContext, useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import Notification from "../../components/notification";
-import { InstructorIdContext, InstructorIdContextType } from "../layout";
-import { StudentRecordsContext } from "../../context/studentRecordsContext";
+import {useContext, useState} from "react";
+import Notification from "@/app/components/notification";
+import {StudentRecordsContext} from "../../context/studentRecordsContext";
+import ErrorNotification from '@/app/components/errorNotification';
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import SectionHeading from "@/app/components/sectionHeading";
+import {StudentFormValues} from "@/app/types/shared/forms";
+import * as z from "zod"
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {Button} from "@/app/components/ui/button"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/form"
+import {Input} from "@/app/components/ui/input"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/app/components/ui/select"
+import {StudentRecords} from "@/app/types/shared/records";
 
-interface StudentFormValues {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    drivingClass: string;
-    bde: string;
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    province: string;
-    country: string;
-    remarks: string;
-}
-
-const validationSchema = Yup.object({
-    firstName: Yup.string().required("Required"),
-    lastName: Yup.string().required("Required"),
-    phoneNumber: Yup.string()
-        .matches(/^[0-9]{10}$/, "Must be exactly 10 digits")
-        .required("Required"),
-    email: Yup.string().email("Invalid email address"),
-    drivingClass: Yup.string().required("Required"),
-    bde: Yup.string().required("Required"),
-    streetAddress: Yup.string().required("Required"),
-    postalCode: Yup.string().required("Required"),
-    city: Yup.string().required("Required"),
-    province: Yup.string().required("Required"),
-    country: Yup.string().required("Required"),
-    remarks: Yup.string(),
+const validationSchema = z.object({
+    firstName: z.string().nonempty("Required"),
+    lastName: z.string().nonempty("Required"),
+    phoneNumber: z.string()
+        .length(10, "Must be exactly 10 digits")
+        .refine(value => /^[0-9]{10}$/.test(value), "Must be exactly 10 digits"),
+    email: z.string().email().optional().or(z.literal("")),
+    drivingClass: z.string().nonempty("Required"),
+    bde: z.string().nonempty("Required"),
+    streetAddress: z.string().nonempty("Required"),
+    postalCode: z.string().nonempty("Required"),
+    city: z.string().nonempty("Required"),
+    province: z.string().nonempty("Required"),
+    country: z.string().nonempty("Required"),
+    remarks: z.string().optional(),
 });
 
 export default function Page() {
-    // @ts-ignore
-    const { setRecords } = useContext(StudentRecordsContext);
-    const { instructorId }: InstructorIdContextType =
+    const contextValue = useContext(StudentRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
+    const {setRecords} = contextValue;
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const [showNotification, setShowNotification] = useState(false);
+    const [showErrorNotification, setShowErrorNotification] = useState(false);
 
     const initialValues: StudentFormValues = {
         firstName: "",
@@ -59,12 +58,14 @@ export default function Page() {
         province: "ON",
         country: "Canada",
         remarks: "",
-    };
+    }
 
-    const handleSubmit = async (
-        values: typeof initialValues,
-        { resetForm }: { resetForm: () => void }
-    ) => {
+    const form = useForm<z.infer<typeof validationSchema>>({
+        resolver: zodResolver(validationSchema),
+        defaultValues: initialValues,
+    })
+
+    async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
             const response = await fetch(`/api/${instructorId}/student`, {
                 method: "POST",
@@ -73,356 +74,236 @@ export default function Page() {
                 },
                 body: JSON.stringify(values),
             });
-            if (response.ok) {
+            // Unique constraint error
+            if (response.status === 409) {
+                setShowErrorNotification(true);
+                setTimeout(() => {
+                    setShowErrorNotification(false);
+                }, 3000);
+                form.reset(initialValues);
+            } else if (response.ok) {
                 const newRecord = await response.json();
-                // @ts-ignore
-                setRecords((prevRecords) => [
+                setRecords((prevRecords: StudentRecords[]) => [
                     ...prevRecords,
-                    { student: newRecord.record },
+                    {student: newRecord.record},
                 ]);
                 setShowNotification(true);
-                resetForm();
-
+                form.reset(initialValues);
                 setTimeout(() => {
                     setShowNotification(false);
                 }, 3000);
+            } else {
+                // Handle other potential errors
+                console.error('Unknown error occurred');
             }
         } catch (error) {
             console.error(error);
         }
-    };
+    }
 
     return (
         <>
+            <ErrorNotification
+                show={showErrorNotification}
+                text={"Cannot add student. Student already exists."}
+                onClose={() => setShowErrorNotification(false)}
+            />
             <Notification
                 show={showNotification}
                 text={"Student"}
                 onClose={() => setShowNotification(false)}
             />
-            <Formik
-                initialValues={initialValues}
-                onSubmit={handleSubmit}
-                validationSchema={validationSchema}
-            >
-                <Form>
-                    <div className="space-y-12">
-                        <div className="border-b border-gray-900/10 pb-12">
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                Student Information
-                            </h2>
-
-                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                {/* First Name */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="firstName"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        First name
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="firstName"
-                                            id="firstName"
-                                            autoComplete="firstName"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="firstName"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Last Name */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="lastName"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Last name
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="lastName"
-                                            id="lastName"
-                                            autoComplete="lastName"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="lastName"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Phone Number */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="phoneNumber"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Phone number
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            id="phoneNumber"
-                                            name="phoneNumber"
-                                            type="tel"
-                                            autoComplete="tel"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="phoneNumber"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Email */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="email"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Email address
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            id="email"
-                                            name="email"
-                                            type="email"
-                                            autoComplete="email"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="email"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Driving Class */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="drivingClass"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Driving Class
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            component="select"
-                                            id="drivingClass"
-                                            name="drivingClass"
-                                            autoComplete="drivingClass"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                        >
-                                            <option>G2</option>
-                                            <option>G</option>
-                                        </Field>
-                                        <ErrorMessage
-                                            name="drivingClass"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* BDE */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="bde"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        BDE
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            component="select"
-                                            id="bde"
-                                            name="bde"
-                                            autoComplete="bde"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                        >
-                                            <option>No</option>
-                                            <option>Yes</option>
-                                        </Field>
-                                        <ErrorMessage
-                                            name="bde"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Street Address */}
-                                <div className=" sm:col-span-1 sm:col-start-1">
-                                    <label
-                                        htmlFor="streetAddress"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Street address
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="streetAddress"
-                                            id="streetAddress"
-                                            autoComplete="streetAddress"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="streetAddress"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Postal code */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="postalCode"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Postal code / ZIP
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="postalCode"
-                                            id="postalCode"
-                                            autoComplete="postalCode"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="postalCode"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* City */}
-                                <div className="col-span-1">
-                                    <label
-                                        htmlFor="city"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        City
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="city"
-                                            id="city"
-                                            autoComplete="city"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="city"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Province */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="province"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Province / State
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="province"
-                                            id="province"
-                                            autoComplete="province"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="province"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Country */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="country"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Country
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            component="select"
-                                            id="country"
-                                            name="country"
-                                            autoComplete="country"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                        >
-                                            <option>Canada</option>
-                                            <option>United States</option>
-                                            <option>Mexico</option>
-                                        </Field>
-                                        <ErrorMessage
-                                            name="country"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Remarks */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="remarks"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Remarks
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="remarks"
-                                            id="remarks"
-                                            autoComplete="remarks"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="remarks"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <SectionHeading title="Student Information" description="Add student information so that they can be assigned to a lesson and also they can be
+                    viewed below in the table."/>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <div className="my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-6">
+                        <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>First Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Last Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="phoneNumber"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Phone Number</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="drivingClass"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Driving Class</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="G2">G2</SelectItem>
+                                            <SelectItem value="G">G</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="bde"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>BDE</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="No">No</SelectItem>
+                                            <SelectItem value="Yes">Yes</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="streetAddress"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Street Address</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="postalCode"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Postal Code</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="city"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>City</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="province"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Province</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="country"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Country</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Canada">Canada</SelectItem>
+                                            <SelectItem value="United States">United States</SelectItem>
+                                            <SelectItem value="Mexico">Mexico</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="remarks"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Remarks</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit">Save Student</Button>
                     </div>
-
-                    <div className="mt-6 flex items-center justify-end gap-x-6">
-                        <button
-                            type="submit"
-                            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        >
-                            Save
-                        </button>
-                    </div>
-                </Form>
-            </Formik>
+                    <div className="border-b border-gray-200"/>
+                </form>
+            </Form>
         </>
     );
 }

@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    {params}: { params: { id: string } }
 ) {
-    const { id } = params;
+    const {id} = params;
 
     const record = await prisma.vehicleMaintenance.delete({
         where: {
@@ -15,14 +15,14 @@ export async function DELETE(
         },
     });
 
-    return NextResponse.json({ message: "Vehicle maintenance deleted." });
+    return NextResponse.json({message: "Vehicle maintenance deleted."});
 }
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    {params}: { params: { id: string } }
 ) {
-    const { id } = params;
+    const {id} = params;
 
     const record = await prisma.vehicleMaintenance.update({
         where: {
@@ -31,5 +31,5 @@ export async function PUT(
         data: await request.json(),
     });
 
-    return NextResponse.json({ message: "Vehicle maintenance updated." });
+    return NextResponse.json({message: "Vehicle maintenance updated."});
 }

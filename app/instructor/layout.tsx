@@ -1,27 +1,18 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
-import InstructorNavbar from "../components/instructorNavbar";
-import { Dispatch, SetStateAction, createContext, useState } from "react";
-import { User } from "./dashboard/page";
-
-export interface InstructorIdContextType {
-    instructorId: number | null;
-    setInstructorId: Dispatch<SetStateAction<null>> | null;
-}
-
-export const InstructorIdContext = createContext<InstructorIdContextType>({
-    instructorId: null,
-    setInstructorId: null,
-});
+import {useUser} from "@clerk/nextjs";
+import InstructorNavbar from "@/app/components/instructorNavbar";
+import {useEffect, useState} from "react";
+import {User} from "@/app/types/global";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function VehicleMaintenanceLayout({
-    children, // will be a page or nested layout
-}: {
+                                                     children, // will be a page or nested layout
+                                                 }: {
     children: React.ReactNode;
 }) {
     const [instructorId, setInstructorId] = useState(null);
-    const { isSignedIn, user } = useUser();
+    const {isSignedIn, user} = useUser();
 
     let userInfo: User = {
         googleId: user?.id,
@@ -51,7 +42,7 @@ export default function VehicleMaintenanceLayout({
                     }
                 );
                 if (response.ok) {
-                    const { id } = await response.json();
+                    const {id} = await response.json();
                     if (setInstructorId) setInstructorId(id);
                 }
             }
@@ -60,14 +51,17 @@ export default function VehicleMaintenanceLayout({
         }
     };
 
-    if (isSignedIn) {
-        getUserInfo(userInfo);
-    }
+    useEffect(() => {
+        if (isSignedIn) {
+            getUserInfo(userInfo).then();
+        }
+    }, [isSignedIn]);
+
 
     return (
-        <InstructorIdContext.Provider value={{ instructorId, setInstructorId }}>
+        <InstructorIdContext.Provider value={{instructorId, setInstructorId}}>
             <section>
-                <InstructorNavbar />
+                <InstructorNavbar/>
                 <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                     {children}
                 </div>

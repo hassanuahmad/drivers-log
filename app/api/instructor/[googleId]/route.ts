@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET(
     request: Request,
-    { params }: { params: { googleId: string } }
+    {params}: { params: { googleId: string } }
 ) {
-    const { googleId } = params;
+    const {googleId} = params;
 
     const record = await prisma.instructor.findFirst({
         where: {
@@ -16,6 +16,6 @@ export async function GET(
     });
 
     if (record) {
-        return NextResponse.json({ id: record.id });
+        return NextResponse.json({id: record.id});
     }
 }

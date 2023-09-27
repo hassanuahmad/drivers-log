@@ -1,19 +1,13 @@
 "use client";
-import { useContext, useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import {useContext, useState} from "react";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
-import Notification from "../../components/notification";
-import { InstructorIdContext, InstructorIdContextType } from "../layout";
-import { VehicleMaintenanceRecordsContext } from "../../context/recordsContext";
+import Notification from "@/app/components/notification";
+import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenanceRecordsContext";
+import {VehicleMaintenanceFormValues} from "../../types/shared/forms";
+import {VehicleMaintenanceRecords} from "../../types/shared/records";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-interface VehicleMaintenanceFormValues {
-    date: string;
-    odometer: number;
-    fueling: number;
-    gas: number;
-    maintenance: number;
-    remarks: string;
-}
 
 const validationSchema = Yup.object({
     date: Yup.date().required("Required"),
@@ -25,11 +19,14 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
-    // @ts-ignore
-    const { setRecords, setTotalGas, setTotalMaintenance } = useContext(
-        VehicleMaintenanceRecordsContext
-    );
-    const { instructorId }: InstructorIdContextType =
+    const contextValue = useContext(VehicleMaintenanceRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
+    const {setRecords, setTotalGas, setTotalMaintenance} = contextValue;
+
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const today = new Date();
@@ -50,7 +47,7 @@ export default function Page() {
 
     const handleSubmit = async (
         values: typeof initialValues,
-        { resetForm }: { resetForm: () => void }
+        {resetForm}: { resetForm: () => void }
     ) => {
         try {
             const response = await fetch(
@@ -65,15 +62,12 @@ export default function Page() {
             );
             if (response.ok) {
                 const newRecord = await response.json();
-                // @ts-ignore
-                setRecords((prevRecords) => [...prevRecords, newRecord.record]);
+                setRecords((prevRecords: VehicleMaintenanceRecords[]) => [...prevRecords, newRecord.record]);
                 setTotalGas(
-                    // @ts-ignore
-                    (prevTotalGas) => prevTotalGas + newRecord.record.gas
+                    (prevTotalGas: number) => prevTotalGas + newRecord.record.gas
                 );
                 setTotalMaintenance(
-                    // @ts-ignore
-                    (prevTotalMaintenance) =>
+                    (prevTotalMaintenance: number) =>
                         prevTotalMaintenance + newRecord.record.maintenance
                 );
                 setShowNotification(true);

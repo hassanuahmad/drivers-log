@@ -1,32 +1,19 @@
-// @ts-nocheck
 "use client";
-import { useContext, useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import {useContext, useState} from "react";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
-import Notification from "../../components/notification";
-import {
-    formatDuration,
-    calculateTotalDuration,
-    calculateTotalPayment,
-} from "./utils";
-import { InstructorIdContextType, InstructorIdContext } from "../layout";
-import { LessonRecordsContext } from "../../context/lessonRecordsContext";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Combobox } from "@headlessui/react";
+import Notification from "@/app/components/notification";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration,} from "./utils";
+import {LessonRecordsContext} from "../../context/lessonRecordsContext";
+import {CheckIcon, ChevronUpDownIcon} from "@heroicons/react/20/solid";
+import {Combobox} from "@headlessui/react";
+import {LessonFormValues} from "@/app/types/shared/forms";
+import {LessonRecords} from "@/app/types/shared/records";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import SectionHeading from "@/app/components/sectionHeading";
 
-function classNames(...classes) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
-}
-
-interface LessonFormValues {
-    selectStudent: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    paymentType: string;
-    paymentAmount: Number;
-    roadTest: string;
-    remarks: string;
 }
 
 const validationSchema = Yup.object({
@@ -41,7 +28,11 @@ const validationSchema = Yup.object({
 });
 
 export default function Page() {
-    // @ts-ignore
+    const contextValue = useContext(LessonRecordsContext);
+    if (!contextValue) {
+        // Handle the null context appropriately, maybe return null or some fallback UI
+        return null;
+    }
     const {
         studentRecords,
         records,
@@ -49,8 +40,8 @@ export default function Page() {
         setTotalDuration,
         setTotalCash,
         setTotalInterac,
-    } = useContext(LessonRecordsContext);
-    const { instructorId }: InstructorIdContextType =
+    } = contextValue;
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const today = new Date();
@@ -65,10 +56,10 @@ export default function Page() {
         query === ""
             ? studentRecords
             : studentRecords.filter((record) => {
-                  return record.student.firstName
-                      .toLowerCase()
-                      .includes(query.toLowerCase());
-              });
+                return record.student.firstName
+                    .toLowerCase()
+                    .includes(query.toLowerCase());
+            });
 
     const initialValues: LessonFormValues = {
         selectStudent: "",
@@ -83,7 +74,7 @@ export default function Page() {
 
     const handleSubmit = async (
         values: typeof initialValues,
-        { resetForm }: { resetForm: () => void }
+        {resetForm}: { resetForm: () => void }
     ) => {
         try {
             const response = await fetch(`/api/${instructorId}/lesson`, {
@@ -112,7 +103,7 @@ export default function Page() {
                     };
                 }
 
-                setRecords((prevRecords) => {
+                setRecords((prevRecords: LessonRecords[]) => {
                     const newRecords = [...prevRecords, newRecord.record];
 
                     newRecords.sort((a, b) => {
@@ -172,13 +163,13 @@ export default function Page() {
                 onSubmit={handleSubmit}
                 validationSchema={validationSchema}
             >
-                {({ values, setFieldValue, errors, touched }) => (
+                {({values, setFieldValue, errors, touched}) => (
+
                     <Form>
                         <div className="space-y-12">
                             <div className="border-b border-gray-900/10 pb-12">
-                                <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                    Lesson Information
-                                </h2>
+
+                                <SectionHeading title={"Lesson Information"} description={"Select student and add a lesson. If you have no students, please first add a student in the Students tab."}/>
 
                                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                     <Combobox
@@ -207,14 +198,15 @@ export default function Page() {
                                                             (record) =>
                                                                 record.student
                                                                     .id ===
-                                                                values.selectStudent
+                                                                Number(values.selectStudent)
                                                         );
                                                     return selectedStudent
                                                         ? `${selectedStudent.student.firstName} ${selectedStudent.student.lastName}`
                                                         : "";
                                                 }}
                                             />
-                                            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                                            <Combobox.Button
+                                                className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                                                 <ChevronUpDownIcon
                                                     className="h-5 w-5 text-gray-400"
                                                     aria-hidden="true"
@@ -222,7 +214,8 @@ export default function Page() {
                                             </Combobox.Button>
 
                                             {filteredPeople.length > 0 && (
-                                                <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                                <Combobox.Options
+                                                    className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                                     {filteredPeople.map(
                                                         (record) => (
                                                             <Combobox.Option
@@ -237,8 +230,8 @@ export default function Page() {
                                                                         .id
                                                                 }
                                                                 className={({
-                                                                    active,
-                                                                }) =>
+                                                                                active,
+                                                                            }) =>
                                                                     classNames(
                                                                         "relative cursor-default select-none py-2 pl-3 pr-9",
                                                                         active
@@ -248,15 +241,15 @@ export default function Page() {
                                                                 }
                                                             >
                                                                 {({
-                                                                    active,
-                                                                    selected,
-                                                                }) => (
+                                                                      active,
+                                                                      selected,
+                                                                  }) => (
                                                                     <>
                                                                         <span
                                                                             className={classNames(
                                                                                 "block truncate",
                                                                                 selected &&
-                                                                                    "font-semibold"
+                                                                                "font-semibold"
                                                                             )}
                                                                         >
                                                                             {
@@ -485,12 +478,13 @@ export default function Page() {
                                 type="submit"
                                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
-                                Save
+                                Save Lesson
                             </button>
                         </div>
                     </Form>
                 )}
             </Formik>
         </>
-    );
+    )
+        ;
 }

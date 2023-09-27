@@ -1,13 +1,19 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime";
 
 const prisma = new PrismaClient();
 
+// A type guard for the PrismaClientKnownRequestError
+function isPrismaClientKnownRequestError(error: any): error is PrismaClientKnownRequestError {
+    return error && typeof error.code === 'string';
+}
+
 export async function DELETE(
     request: Request,
-    { params }: { params: { instructorId: string; id: string } }
+    {params}: { params: { instructorId: string; id: string } }
 ) {
-    const { instructorId, id } = params;
+    const {instructorId, id} = params;
 
     try {
         const lessons = await prisma.lesson.findMany({
@@ -58,12 +64,12 @@ export async function DELETE(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    {params}: { params: { id: string } }
 ) {
-    const { id } = params;
+    const {id} = params;
 
     try {
-        const record = await prisma.student.update({
+        await prisma.student.update({
             where: {
                 id: Number(id),
             },
@@ -75,10 +81,14 @@ export async function PUT(
             status: "success",
         });
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({
-            message: "Error updating student.",
-            status: "error",
-        });
+        if (isPrismaClientKnownRequestError(error) && error.code === 'P2002') {
+            return new NextResponse("Error updating student, duplicate", {
+                status: 409,
+            });
+        } else {
+            return new NextResponse("Error updating student.", {
+                status: 400,
+            });
+        }
     }
 }

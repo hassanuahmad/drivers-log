@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    {params}: { params: { id: string } }
 ) {
-    const { id } = params;
+    const {id} = params;
 
     const record = await prisma.lesson.delete({
         where: {
@@ -15,14 +15,14 @@ export async function DELETE(
         },
     });
 
-    return NextResponse.json({ message: "Lesson deleted." });
+    return NextResponse.json({message: "Lesson deleted."});
 }
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    {params}: { params: { id: string } }
 ) {
-    const { id } = params;
+    const {id} = params;
 
     const {
         date,
@@ -57,5 +57,5 @@ export async function PUT(
         },
     });
 
-    return NextResponse.json({ message: "Lesson updated." });
+    return NextResponse.json({message: "Lesson updated."});
 }

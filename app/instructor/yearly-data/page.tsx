@@ -1,16 +1,11 @@
 "use client";
-import { Fragment, useContext, useEffect, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { InstructorIdContextType, InstructorIdContext } from "../layout";
-import {
-    getTotalHours,
-    getTotalPaymentAmount,
-    getPassRoadTestCount,
-    calculateTotalGasAndMaintenance,
-} from "./utils";
+import {Fragment, useContext, useEffect, useState} from "react";
+import {Menu, Transition} from "@headlessui/react";
+import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import {calculateTotalGasAndMaintenance, getPassRoadTestCount, getTotalHours, getTotalPaymentAmount,} from "./utils";
 
-function classNames(...classes: any) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
@@ -20,10 +15,10 @@ export default function Page() {
     const [vehicleMaintenanceRecords, setVehicleMaintenanceRecords] = useState(
         []
     );
-    const { totalGas, totalMaintenance } = calculateTotalGasAndMaintenance(
+    const {totalGas, totalMaintenance} = calculateTotalGasAndMaintenance(
         vehicleMaintenanceRecords
     );
-    const { instructorId }: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const stats = [
@@ -82,7 +77,7 @@ export default function Page() {
             <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
                 <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div className="ml-4 mt-2">
-                        <h3 className="text-base font-semibold leading-6 text-gray-900">
+                        <h3 className="text-xl font-medium leading-7 text-gray-900">
                             {selectedYear} Annual Summary
                         </h3>
                     </div>
@@ -92,7 +87,8 @@ export default function Page() {
                             className="relative inline-block text-left"
                         >
                             <div>
-                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                <Menu.Button
+                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                     {selectedYear}
                                     <ChevronDownIcon
                                         className="-mr-1 h-5 w-5 text-gray-400"
@@ -110,11 +106,12 @@ export default function Page() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Items
+                                    className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
                                         {years.map((year, index) => (
                                             <Menu.Item key={index}>
-                                                {({ active }) => (
+                                                {({active}) => (
                                                     <a
                                                         href="#"
                                                         className={classNames(
@@ -152,7 +149,6 @@ export default function Page() {
                             {stat.name}
                         </dt>
                         <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                            {/* @ts-ignore */}
                             {stat.value}
                         </dd>
                     </div>

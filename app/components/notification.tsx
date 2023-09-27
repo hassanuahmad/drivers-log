@@ -1,19 +1,15 @@
-import { Fragment } from "react";
-import { Transition } from "@headlessui/react";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import {Fragment} from "react";
+import {Transition} from "@headlessui/react";
+import {CheckCircleIcon} from "@heroicons/react/24/outline";
+import {XMarkIcon} from "@heroicons/react/20/solid";
+import {NotificationProps} from "@/app/types/components/notification";
 
-type NotificationProps = {
-    show: boolean;
-    text: string;
-    onClose: () => void;
-};
 
 export default function Notification({
-    show,
-    text,
-    onClose,
-}: NotificationProps) {
+                                         show,
+                                         text,
+                                         onClose,
+                                     }: NotificationProps) {
     return (
         <>
             {/* Global notification live region, render this permanently at the end of the document */}
@@ -33,7 +29,8 @@ export default function Notification({
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                        <div
+                            className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                             <div className="p-4">
                                 <div className="flex items-start">
                                     <div className="flex-shrink-0">

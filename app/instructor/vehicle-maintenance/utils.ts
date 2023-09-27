@@ -1,13 +1,6 @@
-type Record = {
-    date: string;
-    odometer: number;
-    fueling: number;
-    gas: number;
-    maintenance: number;
-    remarks: string;
-};
+import {VehicleMaintenanceRecords} from "@/app/types/shared/records";
 
-export function calculateTotals(records: Record[]) {
+export function calculateTotals(records: VehicleMaintenanceRecords[]) {
     let totalGas = 0;
     let totalMaintenance = 0;
 
@@ -16,5 +9,5 @@ export function calculateTotals(records: Record[]) {
         totalMaintenance += record.maintenance;
     }
 
-    return { totalGas, totalMaintenance };
+    return {totalGas, totalMaintenance};
 }

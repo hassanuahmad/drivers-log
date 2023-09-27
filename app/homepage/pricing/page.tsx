@@ -1,20 +1,24 @@
 "use client";
-import { useState } from "react";
-import { Disclosure, RadioGroup } from "@headlessui/react";
-import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/24/outline";
-import { CheckIcon } from "@heroicons/react/20/solid";
+import {useState} from "react";
+import {Disclosure, RadioGroup} from "@headlessui/react";
+import {MinusSmallIcon, PlusSmallIcon} from "@heroicons/react/24/outline";
+import {CheckIcon} from "@heroicons/react/20/solid";
+import {Tier} from "@/app/types/pages/pricing";
 
-const pricing = {
+const pricing: {
+    frequencies: { value: string; label: string; priceSuffix: string } [];
+    tiers: Tier[]
+} = {
     frequencies: [
-        { value: "monthly", label: "Monthly", priceSuffix: "/month" },
-        { value: "annually", label: "Annually", priceSuffix: "/year" },
+        {value: "monthly", label: "Monthly", priceSuffix: "/month"},
+        {value: "annually", label: "Annually", priceSuffix: "/year"},
     ],
     tiers: [
         {
             name: "Free",
             id: "tier-free",
             href: "#",
-            price: { monthly: "$0", annually: "$0" },
+            price: {monthly: "$0", annually: "$0"},
             description: "Ideal for personal use",
             features: [
                 "100 data entries",
@@ -27,7 +31,7 @@ const pricing = {
             name: "Individual",
             id: "tier-individual",
             href: "#",
-            price: { monthly: "$10", annually: "$110" },
+            price: {monthly: "$10", annually: "$110"},
             description:
                 "Ideal for individuals in the early stages of their driving instructor schools.",
             features: [
@@ -42,13 +46,13 @@ const pricing = {
             name: "Enterprise",
             id: "tier-enterprise",
             href: "#",
-            price: { monthly: "Get in touch", annually: "Get in touch" },
+            price: {monthly: "Get in touch", annually: "Get in touch"},
             description:
                 "Dedicated support and infrastructure for your company.",
             features: [
                 "Everything in Individual, plus:",
                 "1-on-1 training sessions",
-                "Proirity support",
+                "Priority support",
                 "Custom reporting tools",
             ],
             mostPopular: false,
@@ -74,8 +78,7 @@ const faqs = [
     },
 ];
 
-// @ts-ignore
-function classNames(...classes) {
+function classNames(...classes: (string | false | null | undefined)[]): string {
     return classes.filter(Boolean).join(" ");
 }
 
@@ -110,7 +113,7 @@ export default function Pricing() {
                             <RadioGroup.Option
                                 key={option.value}
                                 value={option}
-                                className={({ checked }) =>
+                                className={({checked}) =>
                                     classNames(
                                         checked
                                             ? "bg-indigo-600 text-white"
@@ -124,7 +127,8 @@ export default function Pricing() {
                         ))}
                     </RadioGroup>
                 </div>
-                <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 sm:grid-cols-1 md:max-w-4xl md:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3">
+                <div
+                    className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 sm:grid-cols-1 md:max-w-4xl md:grid-cols-3 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3">
                     {pricing.tiers.map((tier) => (
                         <div
                             key={tier.id}
@@ -151,8 +155,7 @@ export default function Pricing() {
                             </p>
                             <p className="mt-6 flex items-baseline gap-x-1">
                                 <span className="text-4xl font-bold tracking-tight text-gray-900">
-                                    {/* @ts-ignore */}
-                                    {tier.price[frequency.value]}
+                                    {tier.price[frequency.value as keyof typeof tier.price]}
                                 </span>
                                 {tier.id === "tier-individual" ? (
                                     <span className="text-sm font-semibold leading-6 text-gray-600">
@@ -173,8 +176,8 @@ export default function Pricing() {
                                 {tier.id === "tier-individual"
                                     ? "Try for free"
                                     : tier.id === "tier-enterprise"
-                                    ? "Book a demo"
-                                    : "Get started"}
+                                        ? "Book a demo"
+                                        : "Get started"}
                             </a>
                             <ul
                                 role="list"
@@ -208,10 +211,11 @@ export default function Pricing() {
                                 key={faq.question}
                                 className="pt-6"
                             >
-                                {({ open }) => (
+                                {({open}) => (
                                     <>
                                         <dt>
-                                            <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                                            <Disclosure.Button
+                                                className="flex w-full items-start justify-between text-left text-gray-900">
                                                 <span className="text-base font-semibold leading-7">
                                                     {faq.question}
                                                 </span>

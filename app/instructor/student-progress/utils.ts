@@ -1,25 +1,21 @@
-// @ts-ignore
-import { saveAs } from "file-saver";
+import {saveAs} from "file-saver";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
+import {LessonRecords, LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
+import {DocxTemplateError} from "@/app/types/pages/studentProgress";
 
-export function formatDuration(minutes: number): string {
+export function formatDuration(minutes: number) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     return `${hours}hr ${remainingMinutes}m`;
 }
 
-// @ts-ignore
-export function calculateTotalDuration(lessons: Lesson[]): string {
+export function calculateTotalDuration(lessons: LessonRecordsPreFormattedDuration[]) {
     const totalMinutes = lessons.reduce((acc, curr) => acc + curr.duration, 0);
     return formatDuration(totalMinutes);
 }
 
-export function calculateTotalPayment(
-    // @ts-ignore
-    lessons: Lesson[],
-    paymentType: string
-): number {
+export function calculateTotalPayment(lessons: LessonRecordsPreFormattedDuration[], paymentType: string) {
     return lessons.reduce((total, lesson) => {
         if (lesson.paymentType === paymentType) {
             return total + Number(lesson.paymentAmount);
@@ -29,8 +25,7 @@ export function calculateTotalPayment(
 }
 
 // !!! THIS IS ONLY FOR MY FATHER CURRENTLY !!!
-// @ts-ignore
-export const generateDoc = async (records, instructorId) => {
+export const generateDoc = async (records: LessonRecords[], instructorId: number) => {
     try {
         // the template is in the public folder!
         const response = await fetch("/bde-report.docx");
@@ -42,16 +37,11 @@ export const generateDoc = async (records, instructorId) => {
         const doc = new Docxtemplater().loadZip(zip);
 
         // Prepare your records, filling in with '-' if less than 10
-        // @ts-ignore
         const preparedRecords = records.slice(0, 10).map((record, index) => ({
             i: index + 1,
-            // @ts-ignore
             de: record.date || "-",
-            // @ts-ignore
             ti: record.startTime || "-",
-            // @ts-ignore
             to: record.endTime || "-",
-            // @ts-ignore
             tt: record.formattedDuration || "-",
         }));
 
@@ -92,23 +82,16 @@ export const generateDoc = async (records, instructorId) => {
 
         // Set the template variables
         doc.setData({
-            // @ts-ignore
             firstName: records[0].student.firstName.toUpperCase(),
-            // @ts-ignore
             lastName: records[0].student.lastName.toUpperCase(),
             address:
-                // @ts-ignore
                 records[0].student.streetAddress +
                 " " +
-                // @ts-ignore
                 records[0].student.city +
                 ", " +
-                // @ts-ignore
                 records[0].student.province +
                 " " +
-                // @ts-ignore
                 records[0].student.postalCode,
-            // @ts-ignore
             phoneNumber: records[0].student.phoneNumber,
             r: preparedRecords,
             iName,
@@ -121,8 +104,8 @@ export const generateDoc = async (records, instructorId) => {
             // Apply the data to the template
             doc.render();
         } catch (error) {
-            // @ts-ignore
-            console.error("Template Errors:", error.properties.errors);
+            const typedError = error as { properties: { errors: DocxTemplateError } };
+            console.error("Template Errors:", typedError.properties.errors);
         }
 
         const out = doc.getZip().generate({
@@ -134,7 +117,6 @@ export const generateDoc = async (records, instructorId) => {
         // Output the document using FileSaver.js
         saveAs(
             out,
-            // @ts-ignore
             `${records[0].student.firstName} ${records[0].student.lastName} BDE Report.docx`
         );
     } catch (error) {

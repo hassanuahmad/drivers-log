@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {NextResponse} from "next/server";
+import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function POST(
     request: Request,
-    { params }: { params: { instructorId: string } }
+    {params}: { params: { instructorId: string } }
 ) {
     const {
         date,
@@ -18,7 +18,7 @@ export async function POST(
         selectStudent,
     } = await request.json();
 
-    const { instructorId } = params;
+    const {instructorId} = params;
 
     // Parse the startTime and endTime strings to Date objects
     const start = new Date(`1970-01-01T${startTime}:00`); // Adding ":00" for seconds
@@ -42,5 +42,5 @@ export async function POST(
         },
     });
 
-    return NextResponse.json({ message: "Lesson added.", record });
+    return NextResponse.json({message: "Lesson added.", record});
 }

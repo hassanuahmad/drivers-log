@@ -1,12 +1,9 @@
 "use client";
-import { useState } from "react";
-import { Dialog } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const stats = [
-    { label: "Transactions every 24 hours", value: "44 million" },
-    { label: "Assets under holding", value: "$119 trillion" },
-    { label: "New users annually", value: "46,000" },
+    {label: "Transactions every 24 hours", value: "44 million"},
+    {label: "Assets under holding", value: "$119 trillion"},
+    {label: "New users annually", value: "46,000"},
 ];
 const values = [
     {
@@ -80,7 +77,7 @@ export default function AboutUs() {
                             y={-1}
                             patternUnits="userSpaceOnUse"
                         >
-                            <path d="M.5 200V.5H200" fill="none" />
+                            <path d="M.5 200V.5H200" fill="none"/>
                         </pattern>
                     </defs>
                     <svg
@@ -130,15 +127,18 @@ export default function AboutUs() {
                                     occaecat aliqua.
                                 </p>
                             </div>
-                            <div className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">
-                                <div className="ml-auto w-44 flex-none space-y-8 pt-32 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80">
+                            <div
+                                className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">
+                                <div
+                                    className="ml-auto w-44 flex-none space-y-8 pt-32 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80">
                                     <div className="relative">
                                         <img
                                             src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&h=528&q=80"
                                             alt=""
                                             className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                                         />
-                                        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                                        <div
+                                            className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10"/>
                                     </div>
                                 </div>
                                 <div className="mr-auto w-44 flex-none space-y-8 sm:mr-0 sm:pt-52 lg:pt-36">
@@ -148,7 +148,8 @@ export default function AboutUs() {
                                             alt=""
                                             className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                                         />
-                                        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                                        <div
+                                            className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10"/>
                                     </div>
                                     <div className="relative">
                                         <img
@@ -156,7 +157,8 @@ export default function AboutUs() {
                                             alt=""
                                             className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                                         />
-                                        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                                        <div
+                                            className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10"/>
                                     </div>
                                 </div>
                                 <div className="w-44 flex-none space-y-8 pt-32 sm:pt-0">
@@ -166,7 +168,8 @@ export default function AboutUs() {
                                             alt=""
                                             className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                                         />
-                                        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                                        <div
+                                            className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10"/>
                                     </div>
                                     <div className="relative">
                                         <img
@@ -174,7 +177,8 @@ export default function AboutUs() {
                                             alt=""
                                             className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                                         />
-                                        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                                        <div
+                                            className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10"/>
                                     </div>
                                 </div>
                             </div>

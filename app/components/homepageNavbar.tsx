@@ -1,17 +1,17 @@
 "use client";
-import { useState } from "react";
-import { Dialog } from "@headlessui/react";
-import { Bars3Icon } from "@heroicons/react/20/solid";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {useState} from "react";
+import {Dialog} from "@headlessui/react";
+import {Bars3Icon} from "@heroicons/react/20/solid";
+import {XMarkIcon} from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/nextjs";
 import Image from "next/image";
 import logo from "../static/logo/logo.png";
 
 const navigation = [
-    { name: "Home", href: "/homepage/home" },
-    { name: "Pricing", href: "/homepage/pricing" },
-    { name: "About Us", href: "/homepage/about-us" },
+    {name: "Home", href: "/homepage/home"},
+    {name: "Pricing", href: "/homepage/pricing"},
+    {name: "About Us", href: "/homepage/about-us"},
 ];
 
 export default function Example() {
@@ -34,10 +34,11 @@ export default function Example() {
                             />
                         </button>
                         <Link href="/homepage/home">
-                            <Image src={logo} alt="logo" width={175} />
+                            <Image src={logo} alt="logo" width={175}/>
                         </Link>
                     </div>
-                    <nav className="hidden md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
+                    <nav
+                        className="hidden md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
                             <Link key={itemIdx} href={item.href}>
                                 {item.name}
@@ -53,7 +54,7 @@ export default function Example() {
                                 Dashboard
                             </Link>
                             {/* Mount the UserButton component */}
-                            <UserButton afterSignOutUrl="/" />
+                            <UserButton afterSignOutUrl="/"/>
                         </SignedIn>
                         <SignedOut>
                             {/* Signed out users get sign in button */}
@@ -69,8 +70,9 @@ export default function Example() {
                     open={mobileMenuOpen}
                     onClose={setMobileMenuOpen}
                 >
-                    <div className="fixed inset-0 z-50" />
-                    <Dialog.Panel className="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto bg-white px-4 pb-6 sm:max-w-sm sm:px-6 sm:ring-1 sm:ring-gray-900/10">
+                    <div className="fixed inset-0 z-50"/>
+                    <Dialog.Panel
+                        className="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto bg-white px-4 pb-6 sm:max-w-sm sm:px-6 sm:ring-1 sm:ring-gray-900/10">
                         <div className="-ml-0.5 flex h-16 items-center gap-x-6">
                             <button
                                 type="button"
@@ -84,7 +86,7 @@ export default function Example() {
                                 />
                             </button>
                             <Link href="/homepage/home" className="-ml-0.5">
-                                <Image src={logo} alt="logo" width={175} />
+                                <Image src={logo} alt="logo" width={175}/>
                             </Link>
                         </div>
                         <div className="mt-2 space-y-2">

@@ -1,31 +1,27 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
-import { VehicleMaintenanceRecordsContext } from "./recordsContext";
-import { calculateTotals } from "../instructor/vehicle-maintenance/utils";
-import {
-    InstructorIdContext,
-    InstructorIdContextType,
-} from "../instructor/layout";
+import {ReactNode, useContext, useEffect, useState} from "react";
+import {VehicleMaintenanceRecordsContext} from "./vehicleMaintenanceRecordsContext";
+import {calculateTotals} from "../instructor/vehicle-maintenance/utils";
+import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-// @ts-ignore
-export const VehicleMaintenanceProvider = ({ children }) => {
+export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) => {
     const [records, setRecords] = useState([]);
-    const { instructorId }: InstructorIdContextType =
+    const {instructorId} =
         useContext(InstructorIdContext);
 
     const monthOptions = [
-        { label: "Jan", value: "01" },
-        { label: "Feb", value: "02" },
-        { label: "Mar", value: "03" },
-        { label: "Apr", value: "04" },
-        { label: "May", value: "05" },
-        { label: "Jun", value: "06" },
-        { label: "Jul", value: "07" },
-        { label: "Aug", value: "08" },
-        { label: "Sep", value: "09" },
-        { label: "Oct", value: "10" },
-        { label: "Nov", value: "11" },
-        { label: "Dec", value: "12" },
+        {label: "Jan", value: "01"},
+        {label: "Feb", value: "02"},
+        {label: "Mar", value: "03"},
+        {label: "Apr", value: "04"},
+        {label: "May", value: "05"},
+        {label: "Jun", value: "06"},
+        {label: "Jul", value: "07"},
+        {label: "Aug", value: "08"},
+        {label: "Sep", value: "09"},
+        {label: "Oct", value: "10"},
+        {label: "Nov", value: "11"},
+        {label: "Dec", value: "12"},
     ];
 
     const [selectedMonth, setSelectedMonth] = useState(

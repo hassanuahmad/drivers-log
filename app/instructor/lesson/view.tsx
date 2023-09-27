@@ -1,20 +1,15 @@
 "use client";
-import {Fragment, useContext, useEffect, useState} from "react";
-import KebabMenu from "@/app/components/kebabMenu";
+import {useCallback, useContext, useEffect, useState} from "react";
 import DeleteModal from "@/app/components/deleteModal";
 import Edit from "./edit";
-import {calculateTotalDuration, calculateTotalPayment, downloadCSV, formatDuration,} from "./utils";
-import {Menu, Transition} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import {calculateTotalDuration, calculateTotalPayment, debounce, downloadCSV, formatDuration, isEqual} from "./utils";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
-import RemarksModal from "@/app/components/remarksModal";
-import {contains} from "@/app/utils/contains";
-import {LessonRecordsForUpdate} from "@/app/types/shared/records";
+import {LessonRecords, LessonRecordsForUpdate} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-
-function classNames(...classes: (string | false | null | undefined)[]): string {
-    return classes.filter(Boolean).join(" ");
-}
+import {DataTable} from "@/app/components/data-table";
+import {columns} from "@/app/instructor/lesson/columns";
+import {Button} from "@/app/components/ui/button";
+import {Select, SelectContent, SelectItem, SelectTrigger,} from "@/app/components/ui/select"
 
 export default function View() {
     const [deleteRecord, setDeleteRecord] = useState<{
@@ -23,12 +18,8 @@ export default function View() {
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
-    const {instructorId} =
-        useContext(InstructorIdContext);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalContent, setModalContent] = useState("");
-    const [searchName, setSearchName] = useState<string>("");
-
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
+    const {instructorId} = useContext(InstructorIdContext);
     const contextValue = useContext(LessonRecordsContext);
     if (!contextValue) {
         // Handle the null context appropriately, maybe return null or some fallback UI
@@ -49,50 +40,33 @@ export default function View() {
         setTotalInterac,
     } = contextValue;
 
-    const [displayedRecords, setDisplayedRecords] = useState(records);
-
-    useEffect(() => {
-        // Filter the records based on the search term
-        const filteredRecords = records.filter((record) =>
-            contains(
-                [record.student.firstName, record.student.lastName],
-                searchName
-            )
-        );
-
-        // Set the displayed records
-        setDisplayedRecords(filteredRecords);
-
-        // Calculate and set the totals
-        const total = calculateTotalDuration(filteredRecords);
-        setTotalDuration(total);
-        setTotalCash(calculateTotalPayment(filteredRecords, "Cash"));
-        setTotalInterac(calculateTotalPayment(filteredRecords, "Interac"));
-    }, [records, searchName]);
-
     const monthOptions = [
-        {label: "Jan", value: "01"},
-        {label: "Feb", value: "02"},
-        {label: "Mar", value: "03"},
-        {label: "Apr", value: "04"},
+        {label: "January", value: "01"},
+        {label: "February", value: "02"},
+        {label: "March", value: "03"},
+        {label: "April", value: "04"},
         {label: "May", value: "05"},
-        {label: "Jun", value: "06"},
-        {label: "Jul", value: "07"},
-        {label: "Aug", value: "08"},
-        {label: "Sep", value: "09"},
-        {label: "Oct", value: "10"},
-        {label: "Nov", value: "11"},
-        {label: "Dec", value: "12"},
+        {label: "June", value: "06"},
+        {label: "July", value: "07"},
+        {label: "August", value: "08"},
+        {label: "September", value: "09"},
+        {label: "October", value: "10"},
+        {label: "November", value: "11"},
+        {label: "December", value: "12"},
     ];
 
     const years = [
         2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030,
     ];
 
-    const handleDelete = (id: number, endpoint: string) => {
-        setDeleteRecord({id, endpoint});
-        setDeleteModalOpen(true);
-    };
+    const handleDelete = (id: number | undefined, endpoint: string) => {
+        if (id !== undefined) {
+            setDeleteRecord({id, endpoint});
+            setDeleteModalOpen(true);
+        } else {
+            console.warn("Attempted to delete a record without a valid id.");
+        }
+    }
 
     const handleDeleteConfirmed = () => {
         if (deleteRecord) {
@@ -108,8 +82,9 @@ export default function View() {
         }
     };
 
-    const handleEdit = (id: number) => {
-        setEditRecordId(id);
+    const handleEdit = (id: number | undefined) => {
+        setEditRecordId(id ?? null);
+        setEditModalOpen(true);
     };
 
     const handleEditSave = (id: number, updatedRecord: LessonRecordsForUpdate) => {
@@ -154,379 +129,83 @@ export default function View() {
         setTotalCash(calculateTotalPayment(updatedRecords, "Cash"));
         setTotalInterac(calculateTotalPayment(updatedRecords, "Interac"));
         setDeleteModalOpen(false);
+        setEditModalOpen(false);
         setEditRecordId(null);
     };
 
     const handleEditCancel = () => {
+        setEditModalOpen(false);
         setEditRecordId(null);
     };
+
+    const tableColumns = columns(handleEdit, handleDelete, instructorId);
+    const editRecord = records.find((r) => r.id === editRecordId);
+    const [filteredRecords, setFilteredRecords] = useState<LessonRecords[]>([]);
+
+    // Debounce the filtered records update to avoid unnecessary re-renders
+    const setFilteredRecordsDebounced = debounce(setFilteredRecords, 300);
+
+    const handleFilteredRowsChange = useCallback((newRecords: LessonRecords[]) => {
+        // Checking if there's a real change in the data
+        if (!isEqual(newRecords, filteredRecords)) {
+            setFilteredRecordsDebounced(newRecords);
+        }
+    }, [filteredRecords, setFilteredRecordsDebounced]);
+
+    useEffect(() => {
+        const total = calculateTotalDuration(filteredRecords);
+        setTotalDuration(total);
+        setTotalCash(calculateTotalPayment(filteredRecords, "Cash"));
+        setTotalInterac(calculateTotalPayment(filteredRecords, "Interac"));
+    }, [filteredRecords]);
+
+    const processedRecords = records.map(record => ({
+        ...record,
+        name: `${record.student.firstName} ${record.student.lastName}`
+    }));
 
     return (
         <>
             {/* Dropdowns Start */}
-            <div className="flex justify-between mt-6">
-                <div className="relative w-full sm:w-6/12 lg:w-1/4 flex items-center">
-                    <input
-                        type="text"
-                        name="search"
-                        id="search"
-                        className="block w-full rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder="Quick Search..."
-                        onChange={(e) => setSearchName(e.target.value)}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
-                        <kbd
-                            className="inline-flex items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
-                            ⌘K
-                        </kbd>
-                    </div>
-                </div>
-                <div className="flex">
-                    <div className="mr-4">
-                        <Menu
-                            as="div"
-                            className="relative inline-block text-left"
-                        >
-                            <div>
-                                <Menu.Button
-                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                    {
-                                        monthOptions.find(
-                                            (monthOption) =>
-                                                monthOption.value ===
-                                                selectedMonth
-                                        )?.label
-                                    }
-                                    <ChevronDownIcon
-                                        className="-mr-1 h-5 w-5 text-gray-400"
-                                        aria-hidden="true"
-                                    />
-                                </Menu.Button>
-                            </div>
+            <div className={"flex pb-4"}>
+                <Select onValueChange={(value) => setSelectedMonth(value)}>
+                    <SelectTrigger className="w-[180px]">
+                        {
+                            monthOptions.find(
+                                (monthOption) => monthOption.value === selectedMonth
+                            )?.label || "Month"
+                        }
+                    </SelectTrigger>
+                    <SelectContent>
+                        {monthOptions.map((monthOption, index) => (
+                            <SelectItem key={index} value={monthOption.value}>
+                                {monthOption.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <div className={"ml-6"}>
+                    <Select onValueChange={(value) => setSelectedYear(value)}>
+                        <SelectTrigger className="w-[180px]">
+                            {selectedYear || "Year"}
+                        </SelectTrigger>
+                        <SelectContent>
+                            {years.map((yearOption, index) => (
+                                <SelectItem key={index} value={yearOption.toString()}>
+                                    {yearOption}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                            <Transition
-                                as={Fragment}
-                                enter="transition ease-out duration-100"
-                                enterFrom="transform opacity-0 scale-95"
-                                enterTo="transform opacity-100 scale-100"
-                                leave="transition ease-in duration-75"
-                                leaveFrom="transform opacity-100 scale-100"
-                                leaveTo="transform opacity-0 scale-95"
-                            >
-                                <Menu.Items
-                                    className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                    <div className="py-1">
-                                        {monthOptions.map(
-                                            (monthOption, index) => (
-                                                <Menu.Item key={index}>
-                                                    {({active}) => (
-                                                        <a
-                                                            className={classNames(
-                                                                active
-                                                                    ? "bg-gray-100 text-gray-900"
-                                                                    : "text-gray-700",
-                                                                "block px-4 py-2 text-sm"
-                                                            )}
-                                                            onClick={() =>
-                                                                setSelectedMonth(
-                                                                    monthOption.value
-                                                                )
-                                                            }
-                                                        >
-                                                            {monthOption.label}
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                            )
-                                        )}
-                                    </div>
-                                </Menu.Items>
-                            </Transition>
-                        </Menu>
-                    </div>
-                    <div>
-                        <Menu
-                            as="div"
-                            className="relative inline-block text-left"
-                        >
-                            <div>
-                                <Menu.Button
-                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                    {selectedYear}
-                                    <ChevronDownIcon
-                                        className="-mr-1 h-5 w-5 text-gray-400"
-                                        aria-hidden="true"
-                                    />
-                                </Menu.Button>
-                            </div>
-
-                            <Transition
-                                as={Fragment}
-                                enter="transition ease-out duration-100"
-                                enterFrom="transform opacity-0 scale-95"
-                                enterTo="transform opacity-100 scale-100"
-                                leave="transition ease-in duration-75"
-                                leaveFrom="transform opacity-100 scale-100"
-                                leaveTo="transform opacity-0 scale-95"
-                            >
-                                <Menu.Items
-                                    className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                    <div className="py-1">
-                                        {years.map((yearOption, index) => (
-                                            <Menu.Item key={index}>
-                                                {({active}) => (
-                                                    <a
-                                                        className={classNames(
-                                                            active
-                                                                ? "bg-gray-100 text-gray-900"
-                                                                : "text-gray-700",
-                                                            "block px-4 py-2 text-sm"
-                                                        )}
-                                                        onClick={() =>
-                                                            setSelectedYear(
-                                                                yearOption
-                                                            )
-                                                        }
-                                                    >
-                                                        {yearOption}
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                        ))}
-                                    </div>
-                                </Menu.Items>
-                            </Transition>
-                        </Menu>
-                    </div>
                 </div>
+
+
             </div>
             {/* Dropdowns End */}
-            <div className="px-4 sm:px-6 lg:px-8">
-                <div className="mt-8 flow-root">
-                    <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div className="inline-block min-w-full py-2 align-middle ">
-                            <table className="min-w-full divide-y divide-gray-300">
-                                <thead>
-                                <tr>
-                                    <th
-                                        scope="col"
-                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                    >
-                                        #
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        Name
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        Date
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        Start Time
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        End Time
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        Duration
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        {editRecordId === null
-                                            ? "Cash Payment"
-                                            : "Payment Type"}
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        {editRecordId === null
-                                            ? "Interac Payment"
-                                            : "Payment Amount"}
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        Road Test
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        BDE
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                    >
-                                        Remarks
-                                    </th>
-
-                                    <th
-                                        scope="col"
-                                        className="relative py-3.5 pl-3 pr-4 sm:pr-3"
-                                    ></th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-white">
-                                {displayedRecords.map((record, index) => {
-                                    if (
-                                        contains(
-                                            [
-                                                record.student.firstName,
-                                                record.student.lastName,
-                                            ],
-                                            searchName
-                                        )
-                                    )
-                                        return (
-                                            <tr
-                                                key={index}
-                                                className="even:bg-gray-50"
-                                            >
-                                                {editRecordId ===
-                                                record.id ? (
-                                                    <Edit
-                                                        record={record}
-                                                        index={index}
-                                                        onEditSave={
-                                                            handleEditSave
-                                                        }
-                                                        onCancel={
-                                                            handleEditCancel
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <>
-                                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                            {index + 1}
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {
-                                                                record
-                                                                    .student
-                                                                    .firstName
-                                                            }{" "}
-                                                            {
-                                                                record
-                                                                    .student
-                                                                    .lastName
-                                                            }
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {record.date}
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {
-                                                                record.startTime
-                                                            }
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {record.endTime}
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {
-                                                                record.formattedDuration
-                                                            }
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {record.paymentType ===
-                                                            "Cash"
-                                                                ? `$${record.paymentAmount.toString()}`
-                                                                : ""}
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {record.paymentType ===
-                                                            "Interac"
-                                                                ? `$${record.paymentAmount.toString()}`
-                                                                : ""}
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {
-                                                                record.roadTest
-                                                            }
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {
-                                                                record
-                                                                    .student
-                                                                    .bde
-                                                            }
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 max-w-[20rem] overflow-ellipsis overflow-hidden">
-                                                            {record.remarks
-                                                                .length >
-                                                            25 ? (
-                                                                <>
-                                                                    {record.remarks.substring(
-                                                                        0,
-                                                                        25
-                                                                    )}
-                                                                    ...{" "}
-                                                                    <button
-                                                                        className="text-indigo-600 hover:text-indigo-900"
-                                                                        onClick={() => {
-                                                                            setModalContent(
-                                                                                record.remarks
-                                                                            );
-                                                                            setIsModalOpen(
-                                                                                true
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        View
-                                                                        More
-                                                                    </button>
-                                                                </>
-                                                            ) : (
-                                                                record.remarks
-                                                            )}
-                                                        </td>
-                                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-3">
-                                                            <KebabMenu
-                                                                onDelete={() =>
-                                                                    handleDelete(
-                                                                        record.id,
-                                                                        `/api/${instructorId}/lesson`
-                                                                    )
-                                                                }
-                                                                onEdit={() =>
-                                                                    handleEdit(
-                                                                        record.id
-                                                                    )
-                                                                }
-                                                            />
-                                                        </td>
-                                                    </>
-                                                )}
-                                            </tr>
-                                        );
-                                })}
-                                </tbody>
-                                <tfoot>
-                                <tr></tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <DataTable data={processedRecords} columns={tableColumns} getColumnName="name"
+                           onFilteredRowsChange={handleFilteredRowsChange}/>
             </div>
             {/* Lesson Stats */}
             <div className="flex justify-end">
@@ -553,8 +232,16 @@ export default function View() {
                     </span>
                 </div>
             </div>
+            {/* Edit Modal */}
+            {isEditModalOpen && editRecord && (
+                <Edit
+                    record={editRecord}
+                    onEditSave={handleEditSave}
+                    onCancel={handleEditCancel}
+                />
+            )}
             {/* Delete Modal */}
-            {deleteRecord && (
+            {isDeleteModalOpen && deleteRecord && (
                 <DeleteModal
                     isOpen={isDeleteModalOpen}
                     onCancel={() => setDeleteModalOpen(false)}
@@ -563,27 +250,13 @@ export default function View() {
                     endpoint={deleteRecord.endpoint}
                 />
             )}
-            {/* Remarks Modal */}
-            {isModalOpen && (
-                <RemarksModal
-                    open={isModalOpen}
-                    setOpen={setIsModalOpen}
-                    modalContent={modalContent}
-                />
-            )}
             <div className="flex justify-end">
-                <button
-                    type="button"
-                    className="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    onClick={() =>
-                        downloadCSV(
-                            records,
-                            `${selectedMonth}-${selectedYear}-lessons.csv`
-                        )
-                    }
-                >
-                    Download CSV
-                </button>
+                <Button variant={"outline"} onClick={() =>
+                    downloadCSV(
+                        records,
+                        `${selectedMonth}-${selectedYear}-lessons.csv`
+                    )
+                }>Download CSV</Button>
             </div>
         </>
     );

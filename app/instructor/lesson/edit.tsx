@@ -7,10 +7,10 @@ import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function Edit({
                                  record,
-                                 index,
                                  onEditSave,
                                  onCancel,
                              }: LessonEditValues) {
+    console.log('record: ', record);
     const initialValues = {
         date: record.date,
         startTime: record.startTime,
@@ -97,8 +97,7 @@ export default function Edit({
                                                             as="h3"
                                                             className="text-base font-semibold leading-6 text-gray-900"
                                                         >
-                                                            Edit Lesson #
-                                                            {index + 1}
+                                                            Edit {record.student.firstName}'s Lesson
                                                         </Dialog.Title>
                                                         <div className="mt-2">
                                                             <div
@@ -318,49 +317,6 @@ export default function Edit({
                                 </div>
                             </Dialog>
                         </Transition.Root>
-                        {/* END */}
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                            {index + 1}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.student.firstName} {record.student.lastName}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.date}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.startTime}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.endTime}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.duration}
-                        </td>
-                        {record.paymentType === "Cash" ? (
-                            <>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {record.paymentAmount}
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
-                            </>
-                        ) : (
-                            <>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {record.paymentAmount}
-                                </td>
-                            </>
-                        )}
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.roadTest}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.student.bde}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.remarks}
-                        </td>
                     </>
                 );
             }}

@@ -1,30 +1,42 @@
 "use client";
 import {useContext, useState} from "react";
-import {ErrorMessage, Field, Form, Formik} from "formik";
-import * as Yup from "yup";
 import Notification from "@/app/components/notification";
 import {calculateTotalDuration, calculateTotalPayment, formatDuration,} from "./utils";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
-import {CheckIcon, ChevronUpDownIcon} from "@heroicons/react/20/solid";
-import {Combobox} from "@headlessui/react";
 import {LessonFormValues} from "@/app/types/shared/forms";
 import {LessonRecords} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import SectionHeading from "@/app/components/sectionHeading";
+import * as z from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {Button} from "@/app/components/ui/button"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/form"
+import {CalendarIcon, Check, ChevronsUpDown} from "lucide-react";
+import {cn} from "@/app/lib/utils";
+import {Popover, PopoverContent, PopoverTrigger,} from "@/app/components/ui/popover"
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem,} from "@/app/components/ui/command"
+import {Input} from "@/app/components/ui/input";
+import {adjustForTimezone, isDateValid} from "@/app/instructor/vehicle-maintenance/utils";
+import {format} from "date-fns";
+import {Calendar} from "@/app/components/ui/calendar";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/app/components/ui/select";
+import {log} from "next/dist/server/typescript/utils";
 
-function classNames(...classes: (string | false | null | undefined)[]): string {
-    return classes.filter(Boolean).join(" ");
-}
-
-const validationSchema = Yup.object({
-    selectStudent: Yup.string().required("Required"),
-    date: Yup.date().required("Required"),
-    startTime: Yup.string().required("Required"),
-    endTime: Yup.string().required("Required"),
-    paymentType: Yup.string().required("Required"),
-    paymentAmount: Yup.number().required("Required"),
-    roadTest: Yup.string().required("Required"),
-    remarks: Yup.string(),
+const validationSchema = z.object({
+    selectStudent: z.string().nonempty("Required"),
+    date: z.string().nonempty("Required").refine(date => {
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        return regex.test(date);
+    }, {
+        message: "Date format should be 'YYYY-MM-DD'"
+    }),
+    startTime: z.string().nonempty("Required"),
+    endTime: z.string().nonempty("Required"),
+    paymentType: z.string().nonempty("Required"),
+    paymentAmount: z.coerce.number(),
+    roadTest: z.string().nonempty("Required"),
+    remarks: z.string().optional(),
 });
 
 export default function Page() {
@@ -41,8 +53,7 @@ export default function Page() {
         setTotalCash,
         setTotalInterac,
     } = contextValue;
-    const {instructorId} =
-        useContext(InstructorIdContext);
+    const {instructorId} = useContext(InstructorIdContext);
 
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
@@ -50,16 +61,8 @@ export default function Page() {
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     const [showNotification, setShowNotification] = useState(false);
-    const [query, setQuery] = useState("");
-
-    const filteredPeople =
-        query === ""
-            ? studentRecords
-            : studentRecords.filter((record) => {
-                return record.student.firstName
-                    .toLowerCase()
-                    .includes(query.toLowerCase());
-            });
+    const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
+    const [isDateOpen, setIsDateOpen] = useState(false);
 
     const initialValues: LessonFormValues = {
         selectStudent: "",
@@ -72,10 +75,12 @@ export default function Page() {
         remarks: "",
     };
 
-    const handleSubmit = async (
-        values: typeof initialValues,
-        {resetForm}: { resetForm: () => void }
-    ) => {
+    const form = useForm<z.infer<typeof validationSchema>>({
+        resolver: zodResolver(validationSchema),
+        defaultValues: initialValues,
+    })
+
+    async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
             const response = await fetch(`/api/${instructorId}/lesson`, {
                 method: "POST",
@@ -140,7 +145,7 @@ export default function Page() {
                 );
 
                 setShowNotification(true);
-                resetForm();
+                form.reset(initialValues);
 
                 setTimeout(() => {
                     setShowNotification(false);
@@ -149,7 +154,7 @@ export default function Page() {
         } catch (error) {
             console.error(error);
         }
-    };
+    }
 
     return (
         <>
@@ -158,333 +163,222 @@ export default function Page() {
                 text={"Lesson"}
                 onClose={() => setShowNotification(false)}
             />
-            <Formik
-                initialValues={initialValues}
-                onSubmit={handleSubmit}
-                validationSchema={validationSchema}
-            >
-                {({values, setFieldValue, errors, touched}) => (
-
-                    <Form>
-                        <div className="space-y-12">
-                            <div className="border-b border-gray-900/10 pb-12">
-
-                                <SectionHeading title={"Lesson Information"} description={"Select student and add a lesson. If you have no students, please first add a student in the Students tab."}/>
-
-                                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                    <Combobox
-                                        as="div"
-                                        className="sm:col-span-1"
-                                        value={values.selectStudent}
-                                        onChange={(selectedId) => {
-                                            setFieldValue(
-                                                "selectStudent",
-                                                selectedId
-                                            );
-                                        }}
-                                    >
-                                        <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
-                                            Select Student
-                                        </Combobox.Label>
-                                        <div className="relative mt-2">
-                                            <Combobox.Input
-                                                className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                onChange={(event) =>
-                                                    setQuery(event.target.value)
-                                                }
-                                                displayValue={() => {
-                                                    const selectedStudent =
-                                                        studentRecords.find(
-                                                            (record) =>
-                                                                record.student
-                                                                    .id ===
-                                                                Number(values.selectStudent)
-                                                        );
-                                                    return selectedStudent
-                                                        ? `${selectedStudent.student.firstName} ${selectedStudent.student.lastName}`
-                                                        : "";
-                                                }}
-                                            />
-                                            <Combobox.Button
-                                                className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                                                <ChevronUpDownIcon
-                                                    className="h-5 w-5 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
-                                            </Combobox.Button>
-
-                                            {filteredPeople.length > 0 && (
-                                                <Combobox.Options
-                                                    className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                                    {filteredPeople.map(
-                                                        (record) => (
-                                                            <Combobox.Option
-                                                                key={
-                                                                    record
-                                                                        .student
-                                                                        .id
-                                                                }
-                                                                value={
-                                                                    record
-                                                                        .student
-                                                                        .id
-                                                                }
-                                                                className={({
-                                                                                active,
-                                                                            }) =>
-                                                                    classNames(
-                                                                        "relative cursor-default select-none py-2 pl-3 pr-9",
-                                                                        active
-                                                                            ? "bg-indigo-600 text-white"
-                                                                            : "text-gray-900"
-                                                                    )
-                                                                }
-                                                            >
-                                                                {({
-                                                                      active,
-                                                                      selected,
-                                                                  }) => (
-                                                                    <>
-                                                                        <span
-                                                                            className={classNames(
-                                                                                "block truncate",
-                                                                                selected &&
-                                                                                "font-semibold"
-                                                                            )}
-                                                                        >
-                                                                            {
-                                                                                record
-                                                                                    .student
-                                                                                    .firstName
-                                                                            }{" "}
-                                                                            {
-                                                                                record
-                                                                                    .student
-                                                                                    .lastName
-                                                                            }
-                                                                        </span>
-
-                                                                        {selected && (
-                                                                            <span
-                                                                                className={classNames(
-                                                                                    "absolute inset-y-0 right-0 flex items-center pr-4",
-                                                                                    active
-                                                                                        ? "text-white"
-                                                                                        : "text-indigo-600"
-                                                                                )}
-                                                                            >
-                                                                                <CheckIcon
-                                                                                    className="h-5 w-5"
-                                                                                    aria-hidden="true"
-                                                                                />
-                                                                            </span>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                            </Combobox.Option>
-                                                        )
+            <SectionHeading title={"Lesson Information"}
+                            description={"Select student and add a lesson. If you have no students, please first add a student in the Students tab."}/>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <div className={"my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6"}>
+                        <FormField
+                            control={form.control}
+                            name="selectStudent"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col justify-end">
+                                    <FormLabel>Select Student</FormLabel>
+                                    <Popover open={isSelectStudentOpen} onOpenChange={setIsSelectStudentOpen}>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    className={cn(
+                                                        "justify-between",
+                                                        !field.value && "text-muted-foreground"
                                                     )}
-                                                </Combobox.Options>
-                                            )}
-                                        </div>
-                                    </Combobox>
-                                    {errors.selectStudent &&
-                                    touched.selectStudent ? (
-                                        <div className="text-red-500 mt-2 text-sm">
-                                            {errors.selectStudent}
-                                        </div>
-                                    ) : null}
-
-                                    {/* Date */}
-                                    <div className="sm:col-span-1">
-                                        <label
-                                            htmlFor="date"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            Date
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                type="date"
-                                                name="date"
-                                                id="date"
-                                                autoComplete="date"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                >
+                                                    {field.value
+                                                        ? `${studentRecords.find(
+                                                            (studentRecord) => studentRecord.studentId === Number(field.value)
+                                                        )?.student.firstName} ${studentRecords.find(
+                                                            (studentRecord) => studentRecord.studentId === Number(field.value)
+                                                        )?.student.lastName}`
+                                                        : "Select Student"}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[200px] p-0">
+                                            <Command>
+                                                <CommandInput className="focus:border-none focus:ring-0"
+                                                              placeholder="Search student..."/>
+                                                <CommandEmpty>No student found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {studentRecords.map((studentRecord) => (
+                                                        <CommandItem
+                                                            value={studentRecord.student.firstName}
+                                                            key={studentRecord.studentId}
+                                                            onSelect={() => {
+                                                                form.setValue("selectStudent", String(studentRecord.studentId));
+                                                                setIsSelectStudentOpen(false);
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    studentRecord.studentId === Number(field.value)
+                                                                        ? "opacity-100"
+                                                                        : "opacity-0"
+                                                                )}
+                                                            />
+                                                            {studentRecord.student.firstName} {studentRecord.student.lastName}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="date"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col justify-end sm:h-[72px]">
+                                    <FormLabel>Date</FormLabel>
+                                    <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                        "pl-3 text-left font-normal",
+                                                        !field.value && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    {isDateValid(field.value) ? (
+                                                        format(adjustForTimezone(field.value), "PPP")
+                                                    ) : (
+                                                        <span>Pick a date</span>
+                                                    )}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={isDateValid(field.value) ? adjustForTimezone(field.value) : undefined}
+                                                onSelect={(selectedDate) => {
+                                                    if (selectedDate) {
+                                                        const formattedDate = format(selectedDate, "yyyy-MM-dd");
+                                                        field.onChange(formattedDate);
+                                                        setIsDateOpen(false);
+                                                    }
+                                                }}
+                                                disabled={(date) =>
+                                                    date > new Date() || date < new Date("1900-01-01")
+                                                }
+                                                initialFocus
                                             />
-                                            <ErrorMessage
-                                                name="date"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Start Time */}
-                                    <div className="sm:col-span-1">
-                                        <label
-                                            htmlFor="startTime"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            Start Time
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                type="time"
-                                                name="startTime"
-                                                id="startTime"
-                                                autoComplete="startTime"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                            <ErrorMessage
-                                                name="startTime"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* End Time */}
-                                    <div className="sm:col-span-1">
-                                        <label
-                                            htmlFor="endTime"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            End Time
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                type="time"
-                                                name="endTime"
-                                                id="endTime"
-                                                autoComplete="endTime"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                            <ErrorMessage
-                                                name="endTime"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Payment Type */}
-                                    <div className="sm:col-span-1">
-                                        <label
-                                            htmlFor="paymentType"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            Payment Type
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                component="select"
-                                                id="paymentType"
-                                                name="paymentType"
-                                                autoComplete="paymentType"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                            >
-                                                <option>Interac</option>
-                                                <option>Cash</option>
-                                            </Field>
-                                            <ErrorMessage
-                                                name="paymentType"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Payment Amount */}
-                                    <div className="sm:col-span-1">
-                                        <label
-                                            htmlFor="paymentAmount"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            Payment Amount
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                type="number"
-                                                name="paymentAmount"
-                                                id="paymentAmount"
-                                                autoComplete="paymentAmount"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                            <ErrorMessage
-                                                name="paymentAmount"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Road Test */}
-                                    <div className="sm:col-span-1">
-                                        <label
-                                            htmlFor="roadTest"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            Road Test
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                component="select"
-                                                id="roadTest"
-                                                name="roadTest"
-                                                autoComplete="roadTest"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                            >
-                                                <option>No</option>
-                                                <option>Pass</option>
-                                                <option>Fail</option>
-                                            </Field>
-                                            <ErrorMessage
-                                                name="roadTest"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Remarks */}
-                                    <div className="sm:col-span-5">
-                                        <label
-                                            htmlFor="remarks"
-                                            className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                            Remarks
-                                        </label>
-                                        <div className="mt-2">
-                                            <Field
-                                                type="text"
-                                                name="remarks"
-                                                id="remarks"
-                                                autoComplete="remarks"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                            <ErrorMessage
-                                                name="remarks"
-                                                component="div"
-                                                className="text-red-500"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="startTime"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Start Time</FormLabel>
+                                    <FormControl>
+                                        <Input type={"time"} {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="endTime"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>End Time</FormLabel>
+                                    <FormControl>
+                                        <Input type={"time"} {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="paymentType"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Payment Type</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Interac">Interac</SelectItem>
+                                            <SelectItem value="Cash">Cash</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="paymentAmount"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Payment Amount</FormLabel>
+                                    <FormControl>
+                                        <Input type={"number"} {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="roadTest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Road Test</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="No">No</SelectItem>
+                                            <SelectItem value="Pass">Pass</SelectItem>
+                                            <SelectItem value="Fail">Fail</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <div className={"sm:col-span-2 lg:col-span-5"}>
+                            <FormField
+                                control={form.control}
+                                name="remarks"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Remarks</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-
-                        <div className="mt-6 flex items-center justify-end gap-x-6">
-                            <button
-                                type="submit"
-                                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                Save Lesson
-                            </button>
-                        </div>
-                    </Form>
-                )}
-            </Formik>
+                        <Button type="submit">Submit</Button>
+                    </div>
+                    <div className="border-b border-gray-200"/>
+                </form>
+            </Form>
         </>
-    )
-        ;
+    );
 }

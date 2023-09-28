@@ -166,27 +166,27 @@ export default function View() {
 
     return (
         <>
-            {/* Dropdowns Start */}
-            <div className={"flex pb-4"}>
-                <Select onValueChange={(value) => setSelectedMonth(value)}>
-                    <SelectTrigger className="w-[180px]">
-                        {
-                            monthOptions.find(
-                                (monthOption) => monthOption.value === selectedMonth
-                            )?.label || "Month"
-                        }
-                    </SelectTrigger>
-                    <SelectContent>
-                        {monthOptions.map((monthOption, index) => (
-                            <SelectItem key={index} value={monthOption.value}>
-                                {monthOption.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <div className={"ml-6"}>
+            <div className={"pt-10"}>
+                {/* Dropdowns Start */}
+                <div className={"flex pb-4 flex-1 sm:flex-0"}>
+                    <Select onValueChange={(value) => setSelectedMonth(value)}>
+                        <SelectTrigger className="sm:w-[184px]">
+                            {
+                                monthOptions.find(
+                                    (monthOption) => monthOption.value === selectedMonth
+                                )?.label || "Month"
+                            }
+                        </SelectTrigger>
+                        <SelectContent>
+                            {monthOptions.map((monthOption, index) => (
+                                <SelectItem key={index} value={monthOption.value}>
+                                    {monthOption.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <Select onValueChange={(value) => setSelectedYear(value)}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="sm:w-[184px] ml-4">
                             {selectedYear || "Year"}
                         </SelectTrigger>
                         <SelectContent>
@@ -197,40 +197,44 @@ export default function View() {
                             ))}
                         </SelectContent>
                     </Select>
-
                 </div>
+                {/* Dropdowns End */}
 
-
-            </div>
-            {/* Dropdowns End */}
-            <div>
                 <DataTable data={processedRecords} columns={tableColumns} getColumnName="name"
                            onFilteredRowsChange={handleFilteredRowsChange}/>
             </div>
             {/* Lesson Stats */}
-            <div className="flex justify-end">
+            <div className="flex justify-end py-6">
                 <div className="flex flex-col">
-                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-6 ">
+                    <span className="text-right text-sm font-bold text-gray-500">
                         Total Hours:
                     </span>
-                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-4">
+                    <span className="text-right text-sm font-bold text-gray-500 py-4">
                         Total Interac:
                     </span>
-                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-4 pb-6 ">
+                    <span className="text-right text-sm font-bold text-gray-500">
                         Total Cash:
                     </span>
                 </div>
                 <div className="flex flex-col ml-3">
-                    <span className="text-sm text-gray-500 pr-3 pt-6 text-right">
+                    <span className="text-sm text-gray-500 text-right">
                         {totalDuration}
                     </span>
-                    <span className="text-sm text-gray-500 pr-3 pt-4 text-right">
+                    <span className="text-sm text-gray-500 py-4 text-right">
                         ${totalInterac}
                     </span>
-                    <span className="text-sm text-gray-500 pr-3 pt-4 pb-6 text-right">
+                    <span className="text-sm text-gray-500 text-right">
                         ${totalCash}
                     </span>
                 </div>
+            </div>
+            <div className="flex justify-end pb-6">
+                <Button variant={"outline"} onClick={() =>
+                    downloadCSV(
+                        records,
+                        `${selectedMonth}-${selectedYear}-lessons.csv`
+                    )
+                }>Download CSV</Button>
             </div>
             {/* Edit Modal */}
             {isEditModalOpen && editRecord && (
@@ -250,14 +254,6 @@ export default function View() {
                     endpoint={deleteRecord.endpoint}
                 />
             )}
-            <div className="flex justify-end">
-                <Button variant={"outline"} onClick={() =>
-                    downloadCSV(
-                        records,
-                        `${selectedMonth}-${selectedYear}-lessons.csv`
-                    )
-                }>Download CSV</Button>
-            </div>
         </>
     );
 }

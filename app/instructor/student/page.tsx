@@ -176,7 +176,7 @@ export default function Page() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Driving Class</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue/>
@@ -197,7 +197,7 @@ export default function Page() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>BDE</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue/>
@@ -270,7 +270,7 @@ export default function Page() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Country</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue/>

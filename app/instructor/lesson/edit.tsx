@@ -10,7 +10,6 @@ export default function Edit({
                                  onEditSave,
                                  onCancel,
                              }: LessonEditValues) {
-    console.log('record: ', record);
     const initialValues = {
         date: record.date,
         startTime: record.startTime,

@@ -1,22 +1,36 @@
 "use client";
 import {useContext, useState} from "react";
-import {ErrorMessage, Field, Form, Formik} from "formik";
-import * as Yup from "yup";
 import Notification from "@/app/components/notification";
 import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenanceRecordsContext";
 import {VehicleMaintenanceFormValues} from "../../types/shared/forms";
 import {VehicleMaintenanceRecords} from "../../types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import SectionHeading from "@/app/components/sectionHeading";
+import * as z from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {Button} from "@/app/components/ui/button"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/form"
+import {Input} from "@/app/components/ui/input"
+import {format} from "date-fns";
+import {CalendarIcon} from "lucide-react";
+import {cn} from "@/app/lib/utils";
+import {Calendar} from "@/app/components/ui/calendar";
+import {Popover, PopoverContent, PopoverTrigger,} from "@/app/components/ui/popover"
+import {adjustForTimezone, isDateValid} from "@/app/instructor/vehicle-maintenance/utils";
 
-
-const validationSchema = Yup.object({
-    date: Yup.date().required("Required"),
-    odometer: Yup.number().integer(),
-    fueling: Yup.number().integer(),
-    gas: Yup.number().integer(),
-    maintenance: Yup.number().integer(),
-    remarks: Yup.string(),
+const validationSchema = z.object({
+    date: z.string().refine(date => {
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        return regex.test(date);
+    }, {
+        message: "Date format should be 'YYYY-MM-DD'"
+    }),
+    odometer: z.coerce.number(),
+    fueling: z.coerce.number(),
+    gas: z.coerce.number(),
+    maintenance: z.coerce.number(),
+    remarks: z.string().optional(),
 });
 
 export default function Page() {
@@ -26,16 +40,13 @@ export default function Page() {
         return null;
     }
     const {setRecords, setTotalGas, setTotalMaintenance} = contextValue;
-
-    const {instructorId} =
-        useContext(InstructorIdContext);
+    const {instructorId} = useContext(InstructorIdContext);
+    const [showNotification, setShowNotification] = useState(false);
 
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
         today.getMonth() + 1
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-    const [showNotification, setShowNotification] = useState(false);
 
     const initialValues: VehicleMaintenanceFormValues = {
         date: formattedToday,
@@ -46,12 +57,12 @@ export default function Page() {
         remarks: "",
     };
 
-    const handleSubmit = async (
-        values: typeof initialValues,
-        {resetForm}: {
-            resetForm: () => void
-        }
-    ) => {
+    const form = useForm<z.infer<typeof validationSchema>>({
+        resolver: zodResolver(validationSchema),
+        defaultValues: initialValues,
+    })
+
+    async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
             const response = await fetch(
                 `/api/${instructorId}/vehicle-maintenance`,
@@ -65,7 +76,11 @@ export default function Page() {
             );
             if (response.ok) {
                 const newRecord = await response.json();
-                setRecords((prevRecords: VehicleMaintenanceRecords[]) => [...prevRecords, newRecord.record]);
+                setRecords((prevRecords: VehicleMaintenanceRecords[]) => {
+                    const updatedRecords = [...prevRecords, newRecord.record];
+                    updatedRecords.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                    return updatedRecords;
+                });
                 setTotalGas(
                     (prevTotalGas: number) => prevTotalGas + newRecord.record.gas
                 );
@@ -74,16 +89,17 @@ export default function Page() {
                         prevTotalMaintenance + newRecord.record.maintenance
                 );
                 setShowNotification(true);
-                resetForm();
+                form.reset(initialValues);
 
                 setTimeout(() => {
                     setShowNotification(false);
                 }, 3000);
             }
-        } catch (error) {
+        } catch
+            (error) {
             console.error(error);
         }
-    };
+    }
 
     return (
         <>
@@ -92,173 +108,127 @@ export default function Page() {
                 text={"Vehicle Maintenance"}
                 onClose={() => setShowNotification(false)}
             />
-            <SectionHeading title={"Vehicle Maintenance"} description={"Add vehicle maintenance record to keep track of your vehicle."}/>
-            <Formik
-                initialValues={initialValues}
-                onSubmit={handleSubmit}
-                validationSchema={validationSchema}
-            >
-                <Form>
-                    <div className="space-y-12">
-                        <div className="border-b border-gray-900/10 pb-12">
-                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                {/* Date */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="date"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Date
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="date"
-                                            name="date"
-                                            id="date"
-                                            autoComplete="date"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="date"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Odometer */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="odometer"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Odometer
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="number"
-                                            name="odometer"
-                                            id="odometer"
-                                            autoComplete="odometer"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="odometer"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Fueling */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="fueling"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Fueling
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="number"
-                                            name="fueling"
-                                            id="fueling"
-                                            autoComplete="fueling"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="fueling"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Gas */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="gas"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Gas
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="number"
-                                            name="gas"
-                                            id="gas"
-                                            autoComplete="gas"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="gas"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Maintenance */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="maintenance"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Maintenance
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="number"
-                                            name="maintenance"
-                                            id="maintenance"
-                                            autoComplete="maintenance"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="maintenance"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Remarks */}
-                                <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="remarks"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Remarks
-                                    </label>
-                                    <div className="mt-2">
-                                        <Field
-                                            type="text"
-                                            name="remarks"
-                                            id="remarks"
-                                            autoComplete="remarks"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                        <ErrorMessage
-                                            name="remarks"
-                                            component="div"
-                                            className="text-red-500"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <SectionHeading title={"Vehicle Maintenance"}
+                            description={"Add vehicle maintenance record to keep track of your vehicle."}/>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <div className={"my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6"}>
+                        <FormField
+                            control={form.control}
+                            name="date"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col justify-end">
+                                    <FormLabel>Date</FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                        "pl-3 text-left font-normal",
+                                                        !field.value && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    {isDateValid(field.value) ? (
+                                                        format(adjustForTimezone(field.value), "PPP")
+                                                    ) : (
+                                                        <span>Pick a date</span>
+                                                    )}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={isDateValid(field.value) ? adjustForTimezone(field.value) : undefined}
+                                                onSelect={(selectedDate) => {
+                                                    if (selectedDate) {
+                                                        const formattedDate = format(selectedDate, "yyyy-MM-dd");
+                                                        field.onChange(formattedDate);
+                                                    }
+                                                }}
+                                                disabled={(date) =>
+                                                    date > new Date() || date < new Date("1900-01-01")
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="odometer"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Odometer</FormLabel>
+                                    <FormControl>
+                                        <Input type={"number"} {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="fueling"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Fueling</FormLabel>
+                                    <FormControl>
+                                        <Input type={"number"} {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="gas"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Gas</FormLabel>
+                                    <FormControl>
+                                        <Input type={"number"} {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="maintenance"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Maintenance</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="remarks"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Remarks</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit">Submit</Button>
                     </div>
-
-                    <div className="mt-6 flex items-center justify-end gap-x-6">
-                        <button
-                            type="submit"
-                            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        >
-                            Save
-                        </button>
-                    </div>
-                </Form>
-            </Formik>
+                    <div className="border-b border-gray-200"/>
+                </form>
+            </Form>
         </>
     );
 }

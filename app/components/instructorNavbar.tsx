@@ -7,6 +7,7 @@ import Link from "next/link";
 import {UserButton} from "@clerk/nextjs";
 import Image from "next/image";
 import logo from "../static/logo/logo.png";
+import {Button} from "@/app/components/ui/button";
 
 const navigation = [
     {name: "Dashboard", href: "/instructor/dashboard"},
@@ -48,10 +49,10 @@ export default function InstructorNavbar() {
                         </Link>
                     </div>
                     <nav
-                        className="hidden md:flex items-center md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
+                        className="hidden md:flex items-center md:gap-x-2 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
                             <Link key={itemIdx} href={item.href}>
-                                {item.name}
+                                <Button variant="ghost">{item.name}</Button>
                             </Link>
                         ))}
                         {/* Dropdown Start */}
@@ -93,10 +94,10 @@ export default function InstructorNavbar() {
                                                                 active
                                                                     ? "bg-gray-100 text-gray-900"
                                                                     : "text-gray-700",
-                                                                "block px-4 py-2 text-sm"
+                                                                "block text-sm"
                                                             )}
                                                         >
-                                                            {item.name}
+                                                            <Button variant={"ghost"}>{item.name}</Button>
                                                         </Link>
                                                     )}
                                                 </Menu.Item>

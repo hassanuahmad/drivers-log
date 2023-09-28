@@ -7,6 +7,7 @@ import Link from "next/link";
 import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/nextjs";
 import Image from "next/image";
 import logo from "../static/logo/logo.png";
+import {Button} from "@/app/components/ui/button";
 
 const navigation = [
     {name: "Home", href: "/homepage/home"},
@@ -38,10 +39,10 @@ export default function Example() {
                         </Link>
                     </div>
                     <nav
-                        className="hidden md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
+                        className="hidden md:flex md:gap-x-2 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
                             <Link key={itemIdx} href={item.href}>
-                                {item.name}
+                                <Button variant="ghost">{item.name}</Button>
                             </Link>
                         ))}
                     </nav>
@@ -51,7 +52,7 @@ export default function Example() {
                                 className="btn md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700"
                                 href="/instructor/dashboard"
                             >
-                                Dashboard
+                                <Button variant={"link"}>Dashboard</Button>
                             </Link>
                             {/* Mount the UserButton component */}
                             <UserButton afterSignOutUrl="/"/>

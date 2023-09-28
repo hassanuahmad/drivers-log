@@ -2,6 +2,8 @@
 import {useContext, useEffect, useState} from "react";
 import {LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import Link from "next/link";
+import {Button} from "@/app/components/ui/button";
 
 export default function RecentActivity() {
     const {instructorId} =
@@ -151,12 +153,11 @@ export default function RecentActivity() {
                                                         {record.student.bde}
                                                     </td>
                                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                                        <a
-                                                            href="/instructor/lesson"
-                                                            className="text-indigo-600 hover:text-indigo-900"
-                                                        >
-                                                            View More
-                                                        </a>
+                                                        <Link href="/instructor/lesson">
+                                                            <Button variant="link">
+                                                                View More
+                                                            </Button>
+                                                        </Link>
                                                     </td>
                                                 </tr>
                                             )

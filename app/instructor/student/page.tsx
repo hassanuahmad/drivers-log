@@ -117,7 +117,7 @@ export default function Page() {
                     viewed below in the table."/>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <div className="my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-6">
+                    <div className="my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
                         <FormField
                             control={form.control}
                             name="firstName"

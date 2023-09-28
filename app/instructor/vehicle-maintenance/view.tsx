@@ -105,63 +105,61 @@ export default function View() {
 
     return (
         <>
-            {/* Dropdowns Start */}
-            <div className={"flex items-center"}>
-
-
-                <div className={"flex pb-4"}>
-                    <Select onValueChange={(value) => setSelectedMonth(value)}>
-                        <SelectTrigger className="w-[180px]">
-                            {
-                                monthOptions.find(
-                                    (monthOption) => monthOption.value === selectedMonth
-                                )?.label || "Month"
-                            }
-                        </SelectTrigger>
-                        <SelectContent>
-                            {monthOptions.map((monthOption, index) => (
-                                <SelectItem key={index} value={monthOption.value}>
-                                    {monthOption.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <div className={"ml-6"}>
-                        <Select onValueChange={(value) => setSelectedYear(value)}>
+            <div className={"pt-10"}>
+                {/* Dropdowns Start */}
+                <div className={"flex items-center"}>
+                    <div className={"flex pb-4"}>
+                        <Select onValueChange={(value) => setSelectedMonth(value)}>
                             <SelectTrigger className="w-[180px]">
-                                {selectedYear || "Year"}
+                                {
+                                    monthOptions.find(
+                                        (monthOption) => monthOption.value === selectedMonth
+                                    )?.label || "Month"
+                                }
                             </SelectTrigger>
                             <SelectContent>
-                                {years.map((yearOption, index) => (
-                                    <SelectItem key={index} value={yearOption.toString()}>
-                                        {yearOption}
+                                {monthOptions.map((monthOption, index) => (
+                                    <SelectItem key={index} value={monthOption.value}>
+                                        {monthOption.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
+                        <div className={"ml-6"}>
+                            <Select onValueChange={(value) => setSelectedYear(value)}>
+                                <SelectTrigger className="w-[180px]">
+                                    {selectedYear || "Year"}
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {years.map((yearOption, index) => (
+                                        <SelectItem key={index} value={yearOption.toString()}>
+                                            {yearOption}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {/* Dropdowns End */}
-            <div>
+                {/* Dropdowns End */}
                 <DataTable columns={tableColumns} data={records}/>
             </div>
 
             {/* Lesson Stats */}
-            <div className="flex justify-end">
+            <div className="flex justify-end py-6">
                 <div className="flex flex-col">
-                            <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-6 ">
+                            <span className="text-right text-sm font-bold text-gray-500">
                                 Gas:
                             </span>
-                    <span className="text-right text-sm font-bold text-gray-500 pr-3 pt-4 pb-6 ">
+                    <span className="text-right text-sm font-bold text-gray-500 pt-4">
                                 Maintenance:
                              </span>
                 </div>
                 <div className="flex flex-col ml-3">
-                            <span className="text-sm text-gray-500 pr-3 pt-6 text-right">
+                            <span className="text-sm text-gray-500 text-right">
                                 ${totalGas}
                             </span>
-                    <span className="text-sm text-gray-500 pr-3 pt-4 pb-6 text-right">
+                    <span className="text-sm text-gray-500 pt-4 text-right">
                             ${totalMaintenance}
                         </span>
                 </div>

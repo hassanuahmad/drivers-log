@@ -39,8 +39,8 @@ export default function Page() {
         // Handle the null context appropriately, maybe return null or some fallback UI
         return null;
     }
-    const {instructorId} = useContext(InstructorIdContext);
     const {setRecords, setTotalGas, setTotalMaintenance} = contextValue;
+    const {instructorId} = useContext(InstructorIdContext);
     const [showNotification, setShowNotification] = useState(false);
 
     const today = new Date();

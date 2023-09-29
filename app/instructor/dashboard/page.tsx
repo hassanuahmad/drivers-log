@@ -1,13 +1,7 @@
 "use client";
 import {useContext, useEffect, useState} from "react";
-import {
-    filterLessonRecordsByNavigation,
-    getPassRoadTestCount,
-    getTotalHours,
-    getTotalPaymentAmount,
-    isToday,
-    useNavigation,
-} from "./utils";
+import {filterLessonRecordsByNavigation, isToday, useNavigation,} from "./utils";
+import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount} from "@/app/utils/utils";
 import {LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {Card, CardContent, CardHeader, CardTitle} from "@/app/components/ui/card";

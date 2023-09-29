@@ -1,30 +1,7 @@
-import {LessonRecordsDbRow, LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
+import {LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
 import {DateTime} from 'luxon';
 import {useState} from "react";
-import {formatDuration} from "@/app/utils/utils";
 import {NavigationItem} from "@/app/types/pages/dashboard";
-
-export function getTotalHours(yearlyData: LessonRecordsDbRow[]) {
-    const totalMinutes = yearlyData.reduce(
-        (acc, lesson) => acc + lesson.duration,
-        0
-    );
-    return formatDuration(totalMinutes);
-}
-
-export function getTotalPaymentAmount(yearlyData: LessonRecordsDbRow[]) {
-    return yearlyData.reduce(
-        (acc, lesson) => acc + lesson.paymentAmount,
-        0
-    );
-}
-
-export function getPassRoadTestCount(yearlyData: LessonRecordsDbRow[]) {
-    const passLessons = yearlyData.filter(
-        (lesson) => lesson.roadTest === "Pass"
-    );
-    return passLessons.length;
-}
 
 export const filterLessonRecordsByNavigation = (records: LessonRecordsPreFormattedDuration[], navigation: string) => {
     const currentDate = DateTime.now();

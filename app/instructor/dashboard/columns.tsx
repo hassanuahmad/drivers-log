@@ -67,7 +67,7 @@ export const columns = (): ColumnDef<LessonRecordsPreFormattedDuration>[] => [
         }
     }, {
         id: "actions",
-        cell: ({row}) => {
+        cell: () => {
             return (
                 <Link href="/instructor/lesson">
                     <Button variant={"link"}>View More</Button>

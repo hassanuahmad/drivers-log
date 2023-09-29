@@ -2,7 +2,8 @@
 import {useCallback, useContext, useEffect, useState} from "react";
 import DeleteModal from "@/app/components/deleteModal";
 import Edit from "./edit";
-import {calculateTotalDuration, calculateTotalPayment, debounce, downloadCSV, formatDuration, isEqual} from "./utils";
+import {debounce, downloadCSV, isEqual} from "./utils";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration, monthOptions} from "@/app/utils/utils";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {LessonRecords, LessonRecordsForUpdate} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
@@ -39,21 +40,6 @@ export default function View() {
         totalInterac,
         setTotalInterac,
     } = contextValue;
-
-    const monthOptions = [
-        {label: "January", value: "01"},
-        {label: "February", value: "02"},
-        {label: "March", value: "03"},
-        {label: "April", value: "04"},
-        {label: "May", value: "05"},
-        {label: "June", value: "06"},
-        {label: "July", value: "07"},
-        {label: "August", value: "08"},
-        {label: "September", value: "09"},
-        {label: "October", value: "10"},
-        {label: "November", value: "11"},
-        {label: "December", value: "12"},
-    ];
 
     const years = [
         2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030,

@@ -1,7 +1,7 @@
 "use client";
 import {useContext, useState} from "react";
 import Notification from "@/app/components/notification";
-import {calculateTotalDuration, calculateTotalPayment, formatDuration,} from "./utils";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration} from "@/app/utils/utils";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {LessonFormValues} from "@/app/types/shared/forms";
 import {LessonRecords} from "@/app/types/shared/records";
@@ -21,7 +21,6 @@ import {adjustForTimezone, isDateValid} from "@/app/instructor/vehicle-maintenan
 import {format} from "date-fns";
 import {Calendar} from "@/app/components/ui/calendar";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/app/components/ui/select";
-import {log} from "next/dist/server/typescript/utils";
 
 const validationSchema = z.object({
     selectStudent: z.string().nonempty("Required"),

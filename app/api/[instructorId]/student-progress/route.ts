@@ -27,5 +27,17 @@ export async function GET(
         },
     });
 
+    records.sort((a, b) => {
+        // Compare dates
+        const dateComparison = a.date.localeCompare(b.date);
+        if (dateComparison !== 0) {
+            // If dates are different, return the comparison result
+            return dateComparison;
+        } else {
+            // If dates are the same, compare times
+            return a.startTime.localeCompare(b.startTime);
+        }
+    });
+
     return NextResponse.json({records});
 }

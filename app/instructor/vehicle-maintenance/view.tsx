@@ -9,6 +9,7 @@ import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {Select, SelectContent, SelectItem, SelectTrigger} from "@/app/components/ui/select";
 import {DataTable} from "@/app/components/barebone-data-table";
 import {columns} from "@/app/instructor/vehicle-maintenance/columns";
+import {monthOptions} from "@/app/utils/utils";
 
 export default function View() {
     const [deleteRecord, setDeleteRecord] = useState<{
@@ -37,21 +38,6 @@ export default function View() {
         totalMaintenance,
         setTotalMaintenance,
     } = contextValue;
-
-    const monthOptions = [
-        {label: "January", value: "01"},
-        {label: "February", value: "02"},
-        {label: "March", value: "03"},
-        {label: "April", value: "04"},
-        {label: "May", value: "05"},
-        {label: "June", value: "06"},
-        {label: "July", value: "07"},
-        {label: "August", value: "08"},
-        {label: "September", value: "09"},
-        {label: "October", value: "10"},
-        {label: "November", value: "11"},
-        {label: "December", value: "12"},
-    ];
 
     const years = [
         2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030,

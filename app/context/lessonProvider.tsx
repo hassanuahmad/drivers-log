@@ -1,7 +1,7 @@
 "use client";
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {LessonRecordsContext} from "./lessonRecordsContext";
-import {calculateTotalDuration, calculateTotalPayment, formatDuration,} from "../instructor/lesson/utils";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration, monthOptions} from "@/app/utils/utils";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
 
@@ -10,21 +10,6 @@ export const LessonProvider = ({children}: { children: ReactNode }) => {
     const [studentRecords, setStudentRecords] = useState([]);
     const {instructorId} =
         useContext(InstructorIdContext);
-
-    const monthOptions = [
-        {label: "Jan", value: "01"},
-        {label: "Feb", value: "02"},
-        {label: "Mar", value: "03"},
-        {label: "Apr", value: "04"},
-        {label: "May", value: "05"},
-        {label: "Jun", value: "06"},
-        {label: "Jul", value: "07"},
-        {label: "Aug", value: "08"},
-        {label: "Sep", value: "09"},
-        {label: "Oct", value: "10"},
-        {label: "Nov", value: "11"},
-        {label: "Dec", value: "12"},
-    ];
 
     const [selectedMonth, setSelectedMonth] = useState(
         monthOptions[new Date().getMonth()].value

@@ -1,7 +1,8 @@
 "use client";
 import {useContext, useEffect, useState} from "react";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-import {calculateTotalGasAndMaintenance, getPassRoadTestCount, getTotalHours, getTotalPaymentAmount,} from "./utils";
+import {calculateTotalGasAndMaintenance} from "./utils";
+import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount} from "@/app/utils/utils";
 import SectionHeading from "@/app/components/sectionHeading";
 import {Card, CardContent, CardHeader, CardTitle,} from "@/app/components/ui/card"
 import {Select, SelectContent, SelectItem, SelectTrigger,} from "@/app/components/ui/select"

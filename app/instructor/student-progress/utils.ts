@@ -1,28 +1,8 @@
 import {saveAs} from "file-saver";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
-import {LessonRecords, LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
+import {LessonRecords} from "@/app/types/shared/records";
 import {DocxTemplateError} from "@/app/types/pages/studentProgress";
-
-export function formatDuration(minutes: number) {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}hr ${remainingMinutes}m`;
-}
-
-export function calculateTotalDuration(lessons: LessonRecordsPreFormattedDuration[]) {
-    const totalMinutes = lessons.reduce((acc, curr) => acc + curr.duration, 0);
-    return formatDuration(totalMinutes);
-}
-
-export function calculateTotalPayment(lessons: LessonRecordsPreFormattedDuration[], paymentType: string) {
-    return lessons.reduce((total, lesson) => {
-        if (lesson.paymentType === paymentType) {
-            return total + Number(lesson.paymentAmount);
-        }
-        return total;
-    }, 0);
-}
 
 // !!! THIS IS ONLY FOR MY FATHER CURRENTLY !!!
 export const generateDoc = async (records: LessonRecords[], instructorId: number) => {

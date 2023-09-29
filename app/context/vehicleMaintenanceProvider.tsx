@@ -3,26 +3,12 @@ import {ReactNode, useContext, useEffect, useState} from "react";
 import {VehicleMaintenanceRecordsContext} from "./vehicleMaintenanceRecordsContext";
 import {calculateTotals} from "../instructor/vehicle-maintenance/utils";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import {monthOptions} from "@/app/utils/utils";
 
 export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) => {
     const [records, setRecords] = useState([]);
     const {instructorId} =
         useContext(InstructorIdContext);
-
-    const monthOptions = [
-        {label: "Jan", value: "01"},
-        {label: "Feb", value: "02"},
-        {label: "Mar", value: "03"},
-        {label: "Apr", value: "04"},
-        {label: "May", value: "05"},
-        {label: "Jun", value: "06"},
-        {label: "Jul", value: "07"},
-        {label: "Aug", value: "08"},
-        {label: "Sep", value: "09"},
-        {label: "Oct", value: "10"},
-        {label: "Nov", value: "11"},
-        {label: "Dec", value: "12"},
-    ];
 
     const [selectedMonth, setSelectedMonth] = useState(
         monthOptions[new Date().getMonth()].value
@@ -32,19 +18,21 @@ export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) 
     const [totalMaintenance, setTotalMaintenance] = useState<number>(0);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(
-                    `/api/${instructorId}/vehicle-maintenance/${selectedMonth}/${selectedYear}`
-                );
-                const data = await response.json();
-                setRecords(data.records);
-                const totals = calculateTotals(data.records);
-                setTotalGas(totals.totalGas);
-                setTotalMaintenance(totals.totalMaintenance);
-            } catch (error) {
-                console.error(error);
-            }
+        const fetchData = () => {
+            fetch(`/api/${instructorId}/vehicle-maintenance/${selectedMonth}/${selectedYear}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    setRecords(data.records);
+                    const totals = calculateTotals(data.records);
+                    setTotalGas(totals.totalGas);
+                    setTotalMaintenance(totals.totalMaintenance);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         };
 
         fetchData();

@@ -2,7 +2,8 @@
 import {useContext, useEffect, useState} from "react";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-import {calculateTotalDuration, calculateTotalPayment, formatDuration, generateDoc,} from "./utils";
+import {generateDoc} from "./utils";
+import {calculateTotalDuration, calculateTotalPayment, formatDuration} from "@/app/utils/utils";
 import {LessonRecords, LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
 import SectionHeading from "@/app/components/sectionHeading";
 import {DataTable} from "@/app/components/barebone-data-table";
@@ -76,7 +77,7 @@ export default function Page() {
                                     {studentRecords.map((record) => (
                                         <CommandItem
                                             key={record.student.id}
-                                            onSelect={(currentValue) => {
+                                            onSelect={() => {
                                                 setSelectedStudent(record);
                                                 setIsSelectStudentOpen(false)
                                             }}

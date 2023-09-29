@@ -5,22 +5,22 @@ const prisma = new PrismaClient();
 
 export async function GET(
     request: Request,
-    {params}: { params: { instructorId: string; id: string } }
+    {params}: { params: { instructorId: string } }
 ) {
-    // id -> studentId
-    const {instructorId, id} = params;
+    const {instructorId} = params;
+    const url = new URL(request.url);
+    const recordId = url.searchParams.get("id");
 
     if (!instructorId) {
-        return NextResponse.json({
+        return new NextResponse("Missing instructorId.", {
             status: 400,
-            message: "Missing instructorId.",
         });
     }
 
     const records = await prisma.lesson.findMany({
         where: {
             instructorId: Number(instructorId),
-            studentId: Number(id),
+            studentId: Number(recordId),
         },
         include: {
             student: true,

@@ -32,7 +32,12 @@ export default function Edit({
 
     const handleSubmit = async (values: typeof initialValues) => {
         try {
-            const response = await fetch(`/api/${instructorId}/student/${record.student.id}`, {
+            let params = new URLSearchParams();
+            const id = record.student?.id?.toString();
+            if (id) {
+                params.append("id", id);
+            }
+            const response = await fetch(`/api/${instructorId}/student?${params.toString()}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

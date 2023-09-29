@@ -18,8 +18,10 @@ export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) 
     const [totalMaintenance, setTotalMaintenance] = useState<number>(0);
 
     useEffect(() => {
+        if (!instructorId) return;
         const fetchData = () => {
-            fetch(`/api/${instructorId}/vehicle-maintenance/${selectedMonth}/${selectedYear}`)
+            const params = new URLSearchParams({month: selectedMonth, year: selectedYear.toString()});
+            fetch(`/api/${instructorId}/vehicle-maintenance?${params.toString()}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();

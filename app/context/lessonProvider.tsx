@@ -21,7 +21,8 @@ export const LessonProvider = ({children}: { children: ReactNode }) => {
 
     useEffect(() => {
         if (!instructorId) return;
-        fetch(`/api/${instructorId}/lesson/${selectedMonth}/${selectedYear}`)
+        const params = new URLSearchParams({month: selectedMonth, year: selectedYear.toString()});
+        fetch(`/api/${instructorId}/lesson?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
                 const formattedRecords = data.records.map((record: LessonRecordsPreFormattedDuration) => ({

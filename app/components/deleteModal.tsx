@@ -1,34 +1,31 @@
-import {Fragment, useRef, useState} from "react";
+import {Fragment, useRef} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {ExclamationTriangleIcon} from "@heroicons/react/24/outline";
-import ErrorNotification from "./errorNotification";
 import {DeleteModalProps} from "@/app/types/components/modal";
 
 export default function DeleteModal({
                                         isOpen,
+                                        showDeleteErrorMessage,
                                         onCancel,
                                         onDeleteConfirm,
                                         id,
                                         endpoint,
                                     }: DeleteModalProps) {
-    const [showErrorNotification, setShowErrorNotification] = useState(false);
-
     const handleDeleteConfirm = async () => {
         try {
-            const response = await fetch(`${endpoint}/${id}`, {
+            const params = new URLSearchParams({id: id.toString()});
+            const response = await fetch(`${endpoint}?${params.toString()}`, {
                 method: "DELETE",
             });
 
             if (!response.ok) {
-                onCancel();
-
-                // Display a notification based on the URL
-                if (endpoint.includes("student")) {
-                    setShowErrorNotification(true);
-
-                    setTimeout(() => {
-                        setShowErrorNotification(false);
-                    }, 3000);
+                if (response.status === 300) {
+                    onCancel();
+                    if (showDeleteErrorMessage) {
+                        showDeleteErrorMessage();
+                    }
+                } else {
+                    onCancel();
                 }
             } else {
                 onDeleteConfirm();
@@ -42,11 +39,6 @@ export default function DeleteModal({
 
     return (
         <>
-            <ErrorNotification
-                show={showErrorNotification}
-                text={"Cannot delete student. Associated lessons exist."}
-                onClose={() => setShowErrorNotification(false)}
-            />
             <Transition.Root show={isOpen} as={Fragment}>
                 <Dialog
                     as="div"

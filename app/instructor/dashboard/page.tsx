@@ -1,12 +1,19 @@
 "use client";
 import {useContext, useEffect, useState} from "react";
-import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount,} from "./utils";
-import {LessonRecordsDbRow} from "@/app/types/shared/records";
+import {
+    filterLessonRecordsByNavigation,
+    getPassRoadTestCount,
+    getTotalHours,
+    getTotalPaymentAmount,
+    isToday,
+    useNavigation,
+} from "./utils";
+import {LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-
-function classNames(...classes: (string | false | null | undefined)[]): string {
-    return classes.filter(Boolean).join(" ");
-}
+import {Card, CardContent, CardHeader, CardTitle} from "@/app/components/ui/card";
+import {Tabs, TabsList, TabsTrigger} from "@/app/components/ui/tabs"
+import {DataTable} from "@/app/components/barebone-data-table";
+import {columns} from "@/app/instructor/dashboard/columns";
 
 export default function Dashboard() {
     const [secondaryNavigation, setSecondaryNavigation] = useState([
@@ -14,111 +21,84 @@ export default function Dashboard() {
         {name: "Last 7 days", id: "last-7-days", current: false},
         {name: "Last 30 days", id: "last-30-days", current: false},
     ]);
-
-    const {instructorId} =
-        useContext(InstructorIdContext);
-    const [selectedNavigation, setSelectedNavigation] = useState(
-        secondaryNavigation[0].id
-    );
-    const [lessonRecords, setLessonRecords] = useState<LessonRecordsDbRow[]>([]);
+    const {instructorId} = useContext(InstructorIdContext);
+    const [lessonRecords, setLessonRecords] = useState<LessonRecordsPreFormattedDuration[]>([]);
+    const [todayLessonRecords, setTodayLessonRecords] = useState<LessonRecordsPreFormattedDuration[]>([]);
     const [instructorName, setInstructorName] = useState<string>("");
+    const defaultTab = secondaryNavigation.find(item => item.current)?.id || "";
+    const {navigation, selectedNavigation, handleNavigationClick} = useNavigation(secondaryNavigation);
+    const displayedLessonRecords = filterLessonRecordsByNavigation(lessonRecords, selectedNavigation);
 
     const stats = [
         {
             name: "Lessons",
-            value: lessonRecords.length,
+            value: displayedLessonRecords.length,
         },
         {
             name: "Total Hours",
-            value: getTotalHours(lessonRecords),
+            value: getTotalHours(displayedLessonRecords),
         },
         {
             name: "Total Revenue",
-            value: "$" + getTotalPaymentAmount(lessonRecords),
+            value: "$" + getTotalPaymentAmount(displayedLessonRecords),
         },
         {
             name: "Passed Students",
-            value: getPassRoadTestCount(lessonRecords),
+            value: getPassRoadTestCount(displayedLessonRecords),
         },
     ];
 
     useEffect(() => {
         if (!instructorId) return;
-        fetch(`/api/${instructorId}/dashboard/${selectedNavigation}`)
+        const timezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+        fetch(`/api/${instructorId}/dashboard?${timezone}`)
             .then((res) => res.json())
             .then((data) => {
+                const todayRecords = data.lessonRecords.filter((record: LessonRecordsPreFormattedDuration) => isToday(record.date));
                 setInstructorName(data.instructorName.firstName);
                 setLessonRecords(data.lessonRecords);
+                setTodayLessonRecords(todayRecords);
             })
             .catch((err) => console.log(err));
-    }, [instructorId, selectedNavigation]);
-
-    const handleNavigationClick = (name: string) => {
-        setSelectedNavigation(name);
-        setSecondaryNavigation((prevNavigation) =>
-            prevNavigation.map((item) =>
-                item.id === name
-                    ? {...item, current: true}
-                    : {...item, current: false}
-            )
-        );
-    };
+    }, [instructorId]);
 
     return (
         <main>
-            <div className="relative isolate overflow-hidden">
-                {/* Secondary navigation */}
-                <header className="pb-4 pt-6 sm:pb-6 flex justify-between">
-                    <div>
-                        <h1 className="text-xl font-medium leading-7 text-gray-900 sm:truncate sm:tracking-tight">Welcome {instructorName}!</h1>
+            <header className="py-6 border-b border-gray-200 ">
+                <div className="flex justify-between pb-4">
+                    <div className="max-w-xs flex items-center mr-4">
+                        <p className="text-lg font-semibold leading-6 text-gray-900">Welcome {instructorName}!</p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-6 sm:flex-nowrap">
-                        <div
-                            className="order-last flex w-full gap-x-8 text-sm font-semibold leading-6 sm:order-none sm:w-auto sm:pl-6 sm:leading-7">
-                            {secondaryNavigation.map((item) => (
-                                <a
-                                    key={item.id}
-                                    href="#"
-                                    className={
-                                        item.current
-                                            ? "text-indigo-600"
-                                            : "text-gray-700"
-                                    }
-                                    onClick={() =>
-                                        handleNavigationClick(item.id)
-                                    }
-                                >
-                                    {item.name}
-                                </a>
+                    <Tabs defaultValue={defaultTab} onValueChange={handleNavigationClick} className="space-y-4">
+                        <TabsList>
+                            {secondaryNavigation.map(item => (
+                                <TabsTrigger key={item.id} value={item.id}>{item.name}</TabsTrigger>
                             ))}
-                        </div>
-                    </div>
-                </header>
-            </div>
-
-            <div className="border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5">
-                <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
-                    {stats.map((stat, statIdx) => (
-                        <div
-                            key={stat.name}
-                            className={classNames(
-                                statIdx % 2 === 1
-                                    ? "sm:border-l"
-                                    : statIdx === 2
-                                        ? "lg:border-l"
-                                        : "",
-                                "flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8"
-                            )}
-                        >
-                            <dt className="text-sm font-medium leading-6 text-gray-500">
-                                {stat.name}
-                            </dt>
-                            <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                {stat.value}
-                            </dd>
+                        </TabsList>
+                    </Tabs>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {stats.map((stat) => (
+                        <div key={stat.name}>
+                            <Card className="w-full h-full flex flex-col justify-between">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        {stat.name}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex-grow">
+                                    <div className="text-2xl font-bold">{stat.value}</div>
+                                </CardContent>
+                            </Card>
                         </div>
                     ))}
-                </dl>
+                </div>
+            </header>
+            <div className="py-10">
+                <div>
+                    <h2 className="pb-4 text-base font-semibold leading-6 text-gray-900">Today's Lessons</h2>
+                    <DataTable columns={columns()} data={todayLessonRecords}/>
+                </div>
             </div>
         </main>
     );

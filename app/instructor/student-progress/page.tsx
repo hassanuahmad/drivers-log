@@ -5,7 +5,7 @@ import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {calculateTotalDuration, calculateTotalPayment, formatDuration, generateDoc,} from "./utils";
 import {LessonRecords, LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
 import SectionHeading from "@/app/components/sectionHeading";
-import {DataTable} from "@/app/instructor/student-progress/data-table";
+import {DataTable} from "@/app/components/barebone-data-table";
 import {columns} from "@/app/instructor/student-progress/columns";
 import {Check, ChevronsUpDown} from "lucide-react"
 import {Button} from "@/app/components/ui/button"

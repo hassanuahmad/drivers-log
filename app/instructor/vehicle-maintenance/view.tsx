@@ -7,7 +7,7 @@ import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenance
 import {VehicleMaintenanceRecordForUpdate} from "@/app/types/shared/records";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {Select, SelectContent, SelectItem, SelectTrigger} from "@/app/components/ui/select";
-import {DataTable} from "@/app/instructor/vehicle-maintenance/vm-data-table";
+import {DataTable} from "@/app/components/barebone-data-table";
 import {columns} from "@/app/instructor/vehicle-maintenance/columns";
 
 export default function View() {

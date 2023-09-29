@@ -1,4 +1,3 @@
-import RecentActivity from "./recentActivity";
 import {Metadata} from "next";
 
 export const metadata: Metadata = {
@@ -13,7 +12,6 @@ export default function InstructorDashboardLayout({
     return (
         <section>
             {children}
-            <RecentActivity/>
         </section>
     );
 }

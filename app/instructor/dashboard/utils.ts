@@ -1,10 +1,8 @@
-import {LessonRecordsDbRow} from "@/app/types/shared/records";
-
-export function formatDuration(minutes: number) {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}hr ${remainingMinutes}m`;
-}
+import {LessonRecordsDbRow, LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
+import {DateTime} from 'luxon';
+import {useState} from "react";
+import {formatDuration} from "@/app/utils/utils";
+import {NavigationItem} from "@/app/types/pages/dashboard";
 
 export function getTotalHours(yearlyData: LessonRecordsDbRow[]) {
     const totalMinutes = yearlyData.reduce(
@@ -26,4 +24,53 @@ export function getPassRoadTestCount(yearlyData: LessonRecordsDbRow[]) {
         (lesson) => lesson.roadTest === "Pass"
     );
     return passLessons.length;
+}
+
+export const filterLessonRecordsByNavigation = (records: LessonRecordsPreFormattedDuration[], navigation: string) => {
+    const currentDate = DateTime.now();
+
+    switch (navigation) {
+        case 'today':
+            return records.filter(record => record.date === (currentDate.toISODate() || ''));
+
+        case 'last-7-days':
+            const sevenDaysAgo = currentDate.minus({days: 6}).toISODate() || '';
+            return records.filter(record => record.date >= sevenDaysAgo && record.date <= (currentDate.toISODate() || ''));
+
+        case 'last-30-days':
+            const thirtyDaysAgo = currentDate.minus({days: 29}).toISODate() || '';
+            return records.filter(record => record.date >= thirtyDaysAgo && record.date <= (currentDate.toISODate() || ''));
+
+        default:
+            return records;
+    }
+};
+
+export const useNavigation = (initialNavigation: NavigationItem[]) => {
+    const [navigation, setNavigation] = useState(initialNavigation);
+    const [selectedNavigation, setSelectedNavigation] = useState(navigation.find(item => item.current)?.id || "");
+
+    const handleNavigationClick = (name: string) => {
+        setSelectedNavigation(name);
+        setNavigation((prevNavigation) =>
+            prevNavigation.map((item) =>
+                item.id === name
+                    ? {...item, current: true}
+                    : {...item, current: false}
+            )
+        );
+    };
+
+    return {
+        navigation,
+        selectedNavigation,
+        handleNavigationClick,
+    };
+};
+
+export function isToday(dateString: string): boolean {
+    const today = DateTime.local().toISODate();
+    const recordDate = DateTime.fromISO(dateString).toISODate();
+
+    return today === recordDate;
 }

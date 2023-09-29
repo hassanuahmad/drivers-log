@@ -1,12 +1,14 @@
 "use client";
 import {useContext, useEffect, useState} from "react";
 import {InstructorIdContext} from "@/app/context/instructorIdContext";
-import {calculateTotalGasAndMaintenance} from "./utils";
+import {calculateMonthlyStats, calculateTotalGasAndMaintenance} from "./utils";
 import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount} from "@/app/utils/utils";
 import SectionHeading from "@/app/components/sectionHeading";
 import {Card, CardContent, CardHeader, CardTitle,} from "@/app/components/ui/card"
 import {Select, SelectContent, SelectItem, SelectTrigger,} from "@/app/components/ui/select"
 import {Label} from "@/app/components/ui/label"
+import {MonthlyStat} from "@/app/types/pages/yearly-data";
+import DataBarChart from "@/app/components/dataBarChart";
 
 export default function Page() {
     const [lessonRecords, setLessonRecords] = useState([]);
@@ -14,6 +16,7 @@ export default function Page() {
     const [vehicleMaintenanceRecords, setVehicleMaintenanceRecords] = useState([]);
     const {totalGas, totalMaintenance} = calculateTotalGasAndMaintenance(vehicleMaintenanceRecords);
     const {instructorId} = useContext(InstructorIdContext);
+    const [monthlyStats, setMonthlyStats] = useState<MonthlyStat[]>([]);
 
     const stats = [
         {
@@ -61,9 +64,41 @@ export default function Page() {
                 setLessonRecords(data.lessonRecords);
                 setStudentRecords(data.studentRecords);
                 setVehicleMaintenanceRecords(data.vehicleMaintenanceRecords);
+                const stats = calculateMonthlyStats(data.lessonRecords);
+                setMonthlyStats(stats);
             })
             .catch((err) => console.log(err));
+
     }, [instructorId, selectedYear]);
+
+    const revenueData = [
+        {name: "Jan", total: monthlyStats[0]?.paymentAmount || 0},
+        {name: "Feb", total: monthlyStats[1]?.paymentAmount || 0},
+        {name: "Mar", total: monthlyStats[2]?.paymentAmount || 0},
+        {name: "Apr", total: monthlyStats[3]?.paymentAmount || 0},
+        {name: "May", total: monthlyStats[4]?.paymentAmount || 0},
+        {name: "Jun", total: monthlyStats[5]?.paymentAmount || 0},
+        {name: "Jul", total: monthlyStats[6]?.paymentAmount || 0},
+        {name: "Aug", total: monthlyStats[7]?.paymentAmount || 0},
+        {name: "Sep", total: monthlyStats[8]?.paymentAmount || 0},
+        {name: "Oct", total: monthlyStats[9]?.paymentAmount || 0},
+        {name: "Nov", total: monthlyStats[10]?.paymentAmount || 0},
+        {name: "Dec", total: monthlyStats[11]?.paymentAmount || 0},
+    ];
+    const hoursData = [
+        {name: "Jan", total: (monthlyStats[0]?.duration || 0) / 60},
+        {name: "Feb", total: (monthlyStats[1]?.duration || 0) / 60},
+        {name: "Mar", total: (monthlyStats[2]?.duration || 0) / 60},
+        {name: "Apr", total: (monthlyStats[3]?.duration || 0) / 60},
+        {name: "May", total: (monthlyStats[4]?.duration || 0) / 60},
+        {name: "Jun", total: (monthlyStats[5]?.duration || 0) / 60},
+        {name: "Jul", total: (monthlyStats[6]?.duration || 0) / 60},
+        {name: "Aug", total: (monthlyStats[7]?.duration || 0) / 60},
+        {name: "Sep", total: (monthlyStats[8]?.duration || 0) / 60},
+        {name: "Oct", total: (monthlyStats[9]?.duration || 0) / 60},
+        {name: "Nov", total: (monthlyStats[10]?.duration || 0) / 60},
+        {name: "Dec", total: (monthlyStats[11]?.duration || 0) / 60},
+    ];
 
     return (
         <>
@@ -105,6 +140,15 @@ export default function Page() {
                             </Card>
                         </div>
                     ))}
+                </div>
+
+                <div className="grid gap-6 grid-cols-1 lg:grid-cols-8 mt-6">
+                    <div className={"grid-cols-1 lg:col-span-4"}>
+                        <DataBarChart title={"Hours Overview"} data={hoursData} formatter={(value) => `${value}hr`}/>
+                    </div>
+                    <div className={"grid-cols-1 lg:col-span-4"}>
+                        <DataBarChart title={"Revenue Overview"} data={revenueData} formatter={(value) => `$${value}`}/>
+                    </div>
                 </div>
             </div>
         </>

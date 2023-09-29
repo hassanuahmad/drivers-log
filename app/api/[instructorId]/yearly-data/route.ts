@@ -5,9 +5,11 @@ const prisma = new PrismaClient();
 
 export async function GET(
     request: Request,
-    {params}: { params: { instructorId: string; selectedYear: string } }
+    {params}: { params: { instructorId: string } }
 ) {
-    const {instructorId, selectedYear} = params;
+    const {instructorId} = params;
+    const url = new URL(request.url);
+    const selectedYear = url.searchParams.get("year") || undefined;
 
     const lessonRecords = await prisma.lesson.findMany({
         where: {

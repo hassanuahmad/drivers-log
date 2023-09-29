@@ -58,7 +58,8 @@ export default function Page() {
 
     useEffect(() => {
         if (!instructorId) return;
-        fetch(`/api/${instructorId}/yearly-data/${selectedYear}`)
+        const params = new URLSearchParams({year: selectedYear.toString()});
+        fetch(`/api/${instructorId}/yearly-data?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
                 setLessonRecords(data.lessonRecords);

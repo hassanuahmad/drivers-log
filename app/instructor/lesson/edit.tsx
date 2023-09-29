@@ -25,7 +25,8 @@ export default function Edit({
     const [open, setOpen] = useState(true);
 
     const handleSubmit = async (values: typeof initialValues) => {
-        fetch(`/api/${instructorId}/lesson/${record.id}`, {
+        const params = new URLSearchParams({id: record.id.toString()});
+        fetch(`/api/${instructorId}/lesson?${params.toString()}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

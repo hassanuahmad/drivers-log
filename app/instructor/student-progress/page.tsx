@@ -31,8 +31,13 @@ export default function Page() {
 
     useEffect(() => {
         if (!instructorId || !selectedStudent) return;
+        let params = new URLSearchParams();
+        const id = selectedStudent.student.id;
+        if (id) {
+            params.append("id", id.toString());
+        }
         fetch(
-            `/api/${instructorId}/student-progress/${selectedStudent.student.id}`
+            `/api/${instructorId}/student-progress?${params.toString()}`
         )
             .then((res) => res.json())
             .then((data) => {

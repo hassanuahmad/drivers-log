@@ -18,12 +18,12 @@ export default function Edit({
         remarks: record.remarks,
     };
 
-    const {instructorId} =
-        useContext(InstructorIdContext);
+    const {instructorId} = useContext(InstructorIdContext);
     const [open, setOpen] = useState(true);
 
     const handleSubmit = async (values: typeof initialValues) => {
-        fetch(`/api/${instructorId}/vehicle-maintenance/${record.id}`, {
+        const params = new URLSearchParams({id: record.id.toString()});
+        fetch(`/api/${instructorId}/vehicle-maintenance?${params.toString()}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

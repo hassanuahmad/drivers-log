@@ -8,6 +8,7 @@ import {StudentRecordsForUpdate} from "@/app/types/shared/records";
 import {StudentFormValues} from "@/app/types/shared/forms";
 import {DataTable} from "@/app/components/data-table"
 import {columns} from "@/app/instructor/student/columns";
+import ErrorNotification from "@/app/components/errorNotification";
 
 export default function View() {
     const [deleteRecord, setDeleteRecord] = useState<{
@@ -15,6 +16,7 @@ export default function View() {
         endpoint: string;
     } | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [showDeleteErrorMessage, setShowDeleteErrorMessage] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const {instructorId} = useContext(InstructorIdContext);
@@ -74,6 +76,14 @@ export default function View() {
         setEditRecordId(null);
     };
 
+    const showErrorMessage = () => {
+        setShowDeleteErrorMessage(true);
+        setTimeout(() => {
+            setShowDeleteErrorMessage(false);
+        }, 3000);
+    };
+
+
     const tableColumns = columns(handleEdit, handleDelete, instructorId);
     const editRecord = records.find((r) => r.student.id === editRecordId);
 
@@ -82,6 +92,11 @@ export default function View() {
             <div className="py-10">
                 <DataTable columns={tableColumns} data={tableRecords} getColumnName="firstName"/>
             </div>
+            <ErrorNotification
+                show={showDeleteErrorMessage}
+                text={"Cannot delete student. Associated lessons exist."}
+                onClose={() => setShowDeleteErrorMessage(false)}
+            />
             {isEditModalOpen && editRecord && (
                 <Edit
                     record={editRecord}
@@ -92,6 +107,7 @@ export default function View() {
             {isDeleteModalOpen && deleteRecord && (
                 <DeleteModal
                     isOpen={isDeleteModalOpen}
+                    showDeleteErrorMessage={showErrorMessage}
                     onCancel={() => setDeleteModalOpen(false)}
                     onDeleteConfirm={handleDeleteConfirmed}
                     id={deleteRecord.id}

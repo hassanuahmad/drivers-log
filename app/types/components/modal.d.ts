@@ -8,6 +8,7 @@ export interface RemarksModalProps {
 
 export interface DeleteModalProps {
     isOpen: boolean;
+    showDeleteErrorMessage?: () => void;
     onCancel: () => void;
     onDeleteConfirm: () => void;
     id: number;

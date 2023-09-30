@@ -9,7 +9,6 @@ function isPrismaClientKnownRequestError(error: any): error is PrismaClientKnown
     return error && typeof error.code === 'string';
 }
 
-
 export async function POST(
     request: Request,
     {params}: { params: { instructorId: string } }
@@ -31,25 +30,39 @@ export async function POST(
 
     const {instructorId} = params;
 
-    let record;
-
     try {
-        record = await prisma.student.create({
-            data: {
-                firstName: firstName,
-                lastName: lastName,
-                phoneNumber: phoneNumber,
-                email: email,
-                drivingClass: drivingClass,
-                bde: bde,
-                streetAddress: streetAddress,
-                postalCode: postalCode,
-                city: city,
-                province: province,
-                country: country,
-                remarks: remarks,
-            },
+        const record = await prisma.$transaction(async prisma => {
+            // Create the student record
+            const studentRecord = await prisma.student.create({
+                data: {
+                    firstName: firstName,
+                    lastName: lastName,
+                    phoneNumber: phoneNumber,
+                    email: email,
+                    drivingClass: drivingClass,
+                    bde: bde,
+                    streetAddress: streetAddress,
+                    postalCode: postalCode,
+                    city: city,
+                    province: province,
+                    country: country,
+                    remarks: remarks,
+                },
+            });
+
+            // Create the studentInstructor record with the id of the newly created student
+            const studentInstructorRecord = await prisma.studentInstructor.create({
+                data: {
+                    studentId: studentRecord.id,
+                    instructorId: Number(instructorId),
+                },
+            });
+
+            // Return both records as a result
+            return studentRecord
         });
+
+        return NextResponse.json({message: "Student added.", record});
     } catch (error) {
         if (isPrismaClientKnownRequestError(error) && error.code === 'P2002') {
             return new NextResponse("Error creating student record.", {
@@ -61,16 +74,8 @@ export async function POST(
             });
         }
     }
-
-    await prisma.studentInstructor.create({
-        data: {
-            studentId: record.id,
-            instructorId: Number(instructorId),
-        },
-    });
-
-    return NextResponse.json({message: "Student added.", record});
 }
+
 
 export async function GET(
     request: Request,

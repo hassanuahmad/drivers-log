@@ -1,9 +1,8 @@
-import {Fragment, useContext, useState} from "react";
+import {Fragment, useState} from "react";
 import {ErrorMessage, Field, Formik} from "formik";
 import {Dialog, Transition} from "@headlessui/react";
 import {XCircleIcon} from '@heroicons/react/20/solid'
 import {StudentEditValues} from "@/app/types/pages/student";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function Edit({
                                  record,
@@ -24,9 +23,6 @@ export default function Edit({
         country: record.student.country,
         remarks: record.student.remarks,
     };
-
-    const {instructorId} =
-        useContext(InstructorIdContext);
     const [open, setOpen] = useState(true);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
 
@@ -37,7 +33,7 @@ export default function Edit({
             if (id) {
                 params.append("id", id);
             }
-            const response = await fetch(`/api/${instructorId}/student?${params.toString()}`, {
+            const response = await fetch(`/api/instructor/student?${params.toString()}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

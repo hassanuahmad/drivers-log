@@ -1,16 +1,17 @@
 import {NextResponse} from "next/server";
 import {PrismaClient} from "@prisma/client";
+import {auth} from "@clerk/nextjs";
 
 const prisma = new PrismaClient();
 
-export async function POST(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
+export async function POST(request: Request) {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
+
     const {date, odometer, fueling, gas, maintenance, remarks} =
         await request.json();
-
-    const {instructorId} = params;
 
     const record = await prisma.vehicleMaintenance.create({
         data: {
@@ -20,31 +21,27 @@ export async function POST(
             gas: gas,
             maintenance: maintenance,
             remarks: remarks,
-            instructorId: Number(instructorId),
+            instructorId: 0,
+            instructorClerkId: userId,
         },
     });
 
     return NextResponse.json({message: "Vehicle maintenance added.", record});
 }
 
-export async function GET(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
-    const {instructorId} = params;
+export async function GET(request: Request) {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
+
     const url = new URL(request.url);
     const selectedMonth = url.searchParams.get("month");
     const selectedYear = url.searchParams.get("year");
 
-    if (!instructorId) {
-        return new NextResponse("Missing instructorId.", {
-            status: 400,
-        });
-    }
-
     const records = await prisma.vehicleMaintenance.findMany({
         where: {
-            instructorId: Number(instructorId),
+            instructorClerkId: userId,
             date: {
                 startsWith: `${selectedYear}-${selectedMonth}`,
             },

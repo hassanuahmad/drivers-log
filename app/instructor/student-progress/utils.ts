@@ -5,7 +5,7 @@ import {LessonRecords} from "@/app/types/shared/records";
 import {DocxTemplateError} from "@/app/types/pages/studentProgress";
 
 // !!! THIS IS ONLY FOR MY FATHER CURRENTLY !!!
-export const generateDoc = async (records: LessonRecords[], instructorId: number) => {
+export const generateDoc = async (records: LessonRecords[], instructorClerkId: string) => {
     try {
         // the template is in the public folder!
         const response = await fetch("/bde-report.docx");
@@ -41,22 +41,22 @@ export const generateDoc = async (records: LessonRecords[], instructorId: number
         // Get instructor-specific values from environment variables or set them to 'XYZ'
         //instructor name
         const iName =
-            instructorId === 14
+            instructorClerkId === process.env.NEXT_PUBLIC_INSTRUCTOR_CLERK_ID
                 ? process.env.NEXT_PUBLIC_INSTRUCTOR_NAME
                 : "XYZ";
         //instructor licence
         const iLicence =
-            instructorId === 14
+            instructorClerkId === process.env.NEXT_PUBLIC_INSTRUCTOR_CLERK_ID
                 ? process.env.NEXT_PUBLIC_INSTRUCTOR_LICENCE
                 : "XYZ";
         //instructor expiry date
         const iExpiry =
-            instructorId === 14
+            instructorClerkId === process.env.NEXT_PUBLIC_INSTRUCTOR_CLERK_ID
                 ? process.env.NEXT_PUBLIC_INSTRUCTOR_LICENCE_EXPIRY
                 : "XYZ";
         //ontario licence
         const oLicence =
-            instructorId === 14
+            instructorClerkId === process.env.NEXT_PUBLIC_INSTRUCTOR_CLERK_ID
                 ? process.env.NEXT_PUBLIC_ONTARIO_LICENCE
                 : "XYZ";
 

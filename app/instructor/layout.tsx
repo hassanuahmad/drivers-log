@@ -2,20 +2,18 @@
 
 import {useUser} from "@clerk/nextjs";
 import InstructorNavbar from "@/app/components/instructorNavbar";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {User} from "@/app/types/global";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
-export default function VehicleMaintenanceLayout({
-                                                     children, // will be a page or nested layout
-                                                 }: {
+export default function InstructorLayout({
+                                             children, // will be a page or nested layout
+                                         }: {
     children: React.ReactNode;
 }) {
-    const [instructorId, setInstructorId] = useState(null);
     const {isSignedIn, user} = useUser();
 
     let userInfo: User = {
-        googleId: user?.id,
+        instructorClerkId: user?.id,
         firstName: user?.firstName,
         lastName: user?.lastName,
         emailAddress: user?.primaryEmailAddress?.emailAddress,
@@ -30,22 +28,6 @@ export default function VehicleMaintenanceLayout({
                 },
                 body: JSON.stringify(value),
             });
-            if (response.ok) {
-                // If user is created, get user info
-                const response = await fetch(
-                    `/api/instructor/${value.googleId}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                if (response.ok) {
-                    const {id} = await response.json();
-                    if (setInstructorId) setInstructorId(id);
-                }
-            }
         } catch (error) {
             console.log(error);
         }
@@ -59,13 +41,11 @@ export default function VehicleMaintenanceLayout({
 
 
     return (
-        <InstructorIdContext.Provider value={{instructorId, setInstructorId}}>
-            <section>
-                <InstructorNavbar/>
-                <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {children}
-                </div>
-            </section>
-        </InstructorIdContext.Provider>
+        <section>
+            <InstructorNavbar/>
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+                {children}
+            </div>
+        </section>
     );
 }

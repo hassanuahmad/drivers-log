@@ -1,19 +1,21 @@
 import {NextResponse} from "next/server";
 import {PrismaClient} from "@prisma/client";
+import {auth} from "@clerk/nextjs";
 
 const prisma = new PrismaClient();
 
-export async function GET(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
-    const {instructorId} = params;
+export async function GET(request: Request) {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
+
     const url = new URL(request.url);
     const selectedYear = url.searchParams.get("year") || undefined;
 
     const lessonRecords = await prisma.lesson.findMany({
         where: {
-            instructorId: Number(instructorId),
+            instructorClerkId: userId,
             date: {
                 startsWith: selectedYear,
             },
@@ -34,7 +36,7 @@ export async function GET(
 
     const vehicleMaintenanceRecords = await prisma.vehicleMaintenance.findMany({
         where: {
-            instructorId: Number(instructorId),
+            instructorClerkId: userId,
             date: {
                 startsWith: selectedYear,
             },

@@ -1,8 +1,7 @@
-import {Fragment, useContext, useState} from "react";
+import {Fragment, useState} from "react";
 import {ErrorMessage, Field, Formik} from "formik";
 import {Dialog, Transition} from "@headlessui/react";
 import {VehicleMaintenanceEditValues} from "@/app/types/pages/vehicleMaintenance";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export default function Edit({
                                  record,
@@ -18,12 +17,11 @@ export default function Edit({
         remarks: record.remarks,
     };
 
-    const {instructorId} = useContext(InstructorIdContext);
     const [open, setOpen] = useState(true);
 
     const handleSubmit = async (values: typeof initialValues) => {
         const params = new URLSearchParams({id: record.id.toString()});
-        fetch(`/api/${instructorId}/vehicle-maintenance?${params.toString()}`, {
+        fetch(`/api/instructor/vehicle-maintenance?${params.toString()}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

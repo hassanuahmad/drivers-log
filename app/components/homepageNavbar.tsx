@@ -60,7 +60,7 @@ export default function Example() {
                         <SignedOut>
                             {/* Signed out users get sign in button */}
                             <SignInButton mode="modal">
-                                <button className="btn">Sign in</button>
+                                <Button variant={"link"}>Sign in</Button>
                             </SignInButton>
                         </SignedOut>
                     </div>

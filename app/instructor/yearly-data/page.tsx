@@ -1,6 +1,5 @@
 "use client";
-import {useContext, useEffect, useState} from "react";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
+import {useEffect, useState} from "react";
 import {calculateMonthlyStats, calculateTotalGasAndMaintenance} from "./utils";
 import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount} from "@/app/utils/utils";
 import SectionHeading from "@/app/components/sectionHeading";
@@ -15,7 +14,6 @@ export default function Page() {
     const [studentRecords, setStudentRecords] = useState([]);
     const [vehicleMaintenanceRecords, setVehicleMaintenanceRecords] = useState([]);
     const {totalGas, totalMaintenance} = calculateTotalGasAndMaintenance(vehicleMaintenanceRecords);
-    const {instructorId} = useContext(InstructorIdContext);
     const [monthlyStats, setMonthlyStats] = useState<MonthlyStat[]>([]);
 
     const stats = [
@@ -57,9 +55,8 @@ export default function Page() {
     ];
 
     useEffect(() => {
-        if (!instructorId) return;
         const params = new URLSearchParams({year: selectedYear.toString()});
-        fetch(`/api/${instructorId}/yearly-data?${params.toString()}`)
+        fetch(`/api/instructor/yearly-data?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
                 setLessonRecords(data.lessonRecords);
@@ -70,7 +67,7 @@ export default function Page() {
             })
             .catch((err) => console.log(err));
 
-    }, [instructorId, selectedYear]);
+    }, [selectedYear]);
 
     const revenueData = [
         {name: "Jan", total: monthlyStats[0]?.paymentAmount || 0},

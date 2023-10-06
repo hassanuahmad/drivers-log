@@ -15,7 +15,6 @@ import {LessonRecords} from "@/app/types/shared/records";
 export const columns = (
     handleEdit: (id: number | undefined) => void,
     handleDelete: (id: number | undefined, endpoint: string) => void,
-    instructorId: number | null,
 ): ColumnDef<LessonRecords>[] => [
     {
         header: "#",
@@ -90,7 +89,7 @@ export const columns = (
                             Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            onClick={() => handleDelete(record.id, `/api/${instructorId}/lesson`)}>
+                            onClick={() => handleDelete(record.id, `/api/instructor/lesson`)}>
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>

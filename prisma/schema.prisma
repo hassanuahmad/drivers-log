@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider     = "mysql"
   url          = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -13,24 +14,26 @@ model Instructor {
   email               String               @unique
   firstName           String
   lastName            String
+  instructorClerkId   String?              @unique
   googleId            String
   createdAt           DateTime             @default(now())
   vehicleMaintenances VehicleMaintenance[]
   lessons             Lesson[]
   studentInstructors  StudentInstructor[]
 
-  @@index([id])
+  @@index([instructorClerkId])
 }
 
 model StudentInstructor {
   id           Int        @id @default(autoincrement())
   studentId    Int
   instructorId Int
+  instructorClerkId String?
   student      Student    @relation("StudentToStudentInstructor", fields: [studentId], references: [id])
-  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  instructor   Instructor? @relation(fields: [instructorClerkId], references: [instructorClerkId])
 
   @@index([studentId])
-  @@index([instructorId])
+  @@index([instructorClerkId])
 }
 
 model Student {
@@ -65,11 +68,12 @@ model Lesson {
   paymentAmount Int
   remarks       String?
   instructorId  Int
+  instructorClerkId String?
   studentId     Int
-  instructor    Instructor @relation(fields: [instructorId], references: [id])
+  instructor    Instructor? @relation(fields: [instructorClerkId], references: [instructorClerkId])
   student       Student    @relation(fields: [studentId], references: [id])
 
-  @@index([instructorId])
+  @@index([instructorClerkId])
   @@index([studentId])
 }
 
@@ -82,7 +86,8 @@ model VehicleMaintenance {
   maintenance  Int
   remarks      String?
   instructorId Int
-  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  instructorClerkId String?
+  instructor   Instructor? @relation(fields: [instructorClerkId], references: [instructorClerkId])
 
-  @@index([instructorId])
+  @@index([instructorClerkId])
 }

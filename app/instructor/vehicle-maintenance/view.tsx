@@ -5,7 +5,6 @@ import Edit from "./edit";
 import {calculateTotals} from "./utils";
 import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenanceRecordsContext";
 import {VehicleMaintenanceRecordForUpdate} from "@/app/types/shared/records";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {Select, SelectContent, SelectItem, SelectTrigger} from "@/app/components/ui/select";
 import {DataTable} from "@/app/components/barebone-data-table";
 import {columns} from "@/app/instructor/vehicle-maintenance/columns";
@@ -19,7 +18,6 @@ export default function View() {
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
-    const {instructorId} = useContext(InstructorIdContext);
 
     const contextValue = useContext(VehicleMaintenanceRecordsContext);
     if (!contextValue) {
@@ -86,7 +84,7 @@ export default function View() {
         setEditRecordId(null);
     };
 
-    const tableColumns = columns(handleEdit, handleDelete, instructorId);
+    const tableColumns = columns(handleEdit, handleDelete);
     const editRecord = records.find((r) => r.id === editRecordId);
 
     return (

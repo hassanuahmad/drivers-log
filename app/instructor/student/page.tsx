@@ -3,7 +3,6 @@ import {useContext, useState} from "react";
 import Notification from "@/app/components/notification";
 import {StudentRecordsContext} from "../../context/studentRecordsContext";
 import ErrorNotification from '@/app/components/errorNotification';
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import SectionHeading from "@/app/components/sectionHeading";
 import {StudentFormValues} from "@/app/types/shared/forms";
 import * as z from "zod"
@@ -39,9 +38,6 @@ export default function Page() {
         return null;
     }
     const {setRecords} = contextValue;
-    const {instructorId} =
-        useContext(InstructorIdContext);
-
     const [showNotification, setShowNotification] = useState(false);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
 
@@ -67,7 +63,7 @@ export default function Page() {
 
     async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
-            const response = await fetch(`/api/${instructorId}/student`, {
+            const response = await fetch(`/api/instructor/student`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

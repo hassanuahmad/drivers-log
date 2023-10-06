@@ -1,15 +1,11 @@
 "use client";
-import {ReactNode, useContext, useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {VehicleMaintenanceRecordsContext} from "./vehicleMaintenanceRecordsContext";
 import {calculateTotals} from "../instructor/vehicle-maintenance/utils";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {monthOptions} from "@/app/utils/utils";
 
 export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) => {
     const [records, setRecords] = useState([]);
-    const {instructorId} =
-        useContext(InstructorIdContext);
-
     const [selectedMonth, setSelectedMonth] = useState(
         monthOptions[new Date().getMonth()].value
     );
@@ -18,10 +14,9 @@ export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) 
     const [totalMaintenance, setTotalMaintenance] = useState<number>(0);
 
     useEffect(() => {
-        if (!instructorId) return;
         const fetchData = () => {
             const params = new URLSearchParams({month: selectedMonth, year: selectedYear.toString()});
-            fetch(`/api/${instructorId}/vehicle-maintenance?${params.toString()}`)
+            fetch(`/api/instructor/vehicle-maintenance?${params.toString()}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
@@ -38,7 +33,7 @@ export const VehicleMaintenanceProvider = ({children}: { children: ReactNode }) 
         };
 
         fetchData();
-    }, [instructorId, selectedMonth, selectedYear]);
+    }, [selectedMonth, selectedYear]);
 
     const context = {
         records,

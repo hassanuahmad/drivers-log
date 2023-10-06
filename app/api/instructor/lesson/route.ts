@@ -1,12 +1,10 @@
 import {NextResponse} from "next/server";
 import {PrismaClient} from "@prisma/client";
+import {auth} from "@clerk/nextjs";
 
 const prisma = new PrismaClient();
 
-export async function POST(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
+export async function POST(request: Request) {
     const {
         date,
         startTime,
@@ -18,7 +16,10 @@ export async function POST(
         selectStudent,
     } = await request.json();
 
-    const {instructorId} = params;
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
 
     // Parse the startTime and endTime strings to Date objects
     const start = new Date(`1970-01-01T${startTime}:00`); // Adding ":00" for seconds
@@ -37,32 +38,28 @@ export async function POST(
             paymentAmount: paymentAmount,
             roadTest: roadTest,
             remarks: remarks,
+            instructorId: 0,
             studentId: Number(selectStudent),
-            instructorId: Number(instructorId),
+            instructorClerkId: userId,
         },
     });
 
     return NextResponse.json({message: "Lesson added.", record});
 }
 
-export async function GET(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
-    const {instructorId} = params;
+export async function GET(request: Request) {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
+
     const url = new URL(request.url);
     const selectedMonth = url.searchParams.get("month");
     const selectedYear = url.searchParams.get("year");
 
-    if (!instructorId) {
-        return new NextResponse("Missing instructorId.", {
-            status: 400,
-        });
-    }
-
     const records = await prisma.lesson.findMany({
         where: {
-            instructorId: Number(instructorId),
+            instructorClerkId: userId,
             date: {
                 startsWith: `${selectedYear}-${selectedMonth}`,
             },

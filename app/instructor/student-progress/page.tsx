@@ -1,7 +1,6 @@
 "use client";
 import {useContext, useEffect, useState} from "react";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {generateDoc} from "./utils";
 import {calculateTotalDuration, calculateTotalPayment, formatDuration} from "@/app/utils/utils";
 import {LessonRecords, LessonRecordsPreFormattedDuration, StudentRecords} from "@/app/types/shared/records";
@@ -13,6 +12,7 @@ import {Button} from "@/app/components/ui/button"
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem,} from "@/app/components/ui/command"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/app/components/ui/popover"
 import {cn} from "@/app/lib/utils";
+import {useUser} from "@clerk/nextjs";
 
 export default function Page() {
     const contextValue = useContext(LessonRecordsContext);
@@ -22,22 +22,22 @@ export default function Page() {
     }
     const {studentRecords} = contextValue;
     const [selectedStudent, setSelectedStudent] = useState<StudentRecords | null>(null);
-    const {instructorId} = useContext(InstructorIdContext);
     const [records, setRecords] = useState<LessonRecords[]>([]);
     const [totalDuration, setTotalDuration] = useState("0hr 0min");
     const [totalCash, setTotalCash] = useState(0);
     const [totalInterac, setTotalInterac] = useState(0);
     const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
+    const {isSignedIn, user} = useUser();
 
     useEffect(() => {
-        if (!instructorId || !selectedStudent) return;
+        if (!selectedStudent) return;
         let params = new URLSearchParams();
         const id = selectedStudent.student.id;
         if (id) {
             params.append("id", id.toString());
         }
         fetch(
-            `/api/${instructorId}/student-progress?${params.toString()}`
+            `/api/instructor/student-progress?${params.toString()}`
         )
             .then((res) => res.json())
             .then((data) => {
@@ -52,7 +52,7 @@ export default function Page() {
                 setTotalInterac(calculateTotalPayment(data.records, "Interac"));
             })
             .catch((err) => console.log(err));
-    }, [instructorId, selectedStudent]);
+    }, [selectedStudent]);
 
     return (
         <>
@@ -130,13 +130,13 @@ export default function Page() {
                 </div>
             </div>
             {/* !!! THIS IS ONLY FOR MY FATHER CURRENTLY !!! */}
-            {instructorId === 14 ? (
+            {isSignedIn && user.id === process.env.NEXT_PUBLIC_INSTRUCTOR_CLERK_ID ? (
                 <div className="flex justify-end pb-6">
                     <Button
                         variant={"outline"}
                         onClick={async () => {
                             try {
-                                await generateDoc(records, instructorId);
+                                await generateDoc(records, user.id);
                             } catch (error) {
                                 console.error(
                                     "Failed to generate document:",

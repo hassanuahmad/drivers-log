@@ -1,22 +1,18 @@
 "use client";
-import {ReactNode, useContext, useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {StudentRecordsContext} from "./studentRecordsContext";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 export const StudentProvider = ({children}: { children: ReactNode }) => {
     const [records, setRecords] = useState([]);
-    const {instructorId} =
-        useContext(InstructorIdContext);
 
     useEffect(() => {
-        if (!instructorId) return;
-        fetch(`/api/${instructorId}/student`)
+        fetch(`/api/instructor/student`)
             .then((res) => res.json())
             .then((data) => {
                 setRecords(data.records);
             })
             .catch((err) => console.log(err));
-    }, [instructorId]);
+    }, []);
 
     const context = {
         records,

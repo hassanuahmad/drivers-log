@@ -5,7 +5,6 @@ import {calculateTotalDuration, calculateTotalPayment, formatDuration} from "@/a
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {LessonFormValues} from "@/app/types/shared/forms";
 import {LessonRecords} from "@/app/types/shared/records";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import SectionHeading from "@/app/components/sectionHeading";
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -52,8 +51,6 @@ export default function Page() {
         setTotalCash,
         setTotalInterac,
     } = contextValue;
-    const {instructorId} = useContext(InstructorIdContext);
-
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
         today.getMonth() + 1
@@ -81,7 +78,7 @@ export default function Page() {
 
     async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
-            const response = await fetch(`/api/${instructorId}/lesson`, {
+            const response = await fetch(`/api/instructor/lesson`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

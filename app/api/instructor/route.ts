@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     const findUser = await prisma.instructor.findFirst({
         where: {
-            googleId: userInfo.googleId,
+            instructorClerkId: userInfo.instructorClerkId,
         },
     });
 
@@ -19,7 +19,8 @@ export async function POST(request: Request) {
 
     const record = await prisma.instructor.create({
         data: {
-            googleId: userInfo.googleId,
+            instructorClerkId: userInfo.instructorClerkId,
+            googleId: userInfo.instructorClerkId,
             firstName: userInfo.firstName,
             lastName: userInfo.lastName ? userInfo.lastName : "",
             email: userInfo.emailAddress,

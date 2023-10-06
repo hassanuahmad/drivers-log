@@ -15,7 +15,6 @@ import {StudentFormValues} from "@/app/types/shared/forms";
 export const columns = (
     handleEdit: (id: number | undefined) => void,
     handleDelete: (id: number | undefined, endpoint: string) => void,
-    instructorId: number | null,
 ): ColumnDef<StudentFormValues>[] => [
     {
         header: "#",
@@ -68,7 +67,7 @@ export const columns = (
                             Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            onClick={() => handleDelete(record.id, `/api/${instructorId}/student`)}>
+                            onClick={() => handleDelete(record.id, `/api/instructor/student`)}>
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>

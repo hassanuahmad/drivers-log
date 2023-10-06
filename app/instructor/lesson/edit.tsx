@@ -1,8 +1,7 @@
-import {Fragment, useContext, useState} from "react";
+import {Fragment, useState} from "react";
 import {ErrorMessage, Field, Formik} from "formik";
 import {Dialog, Transition} from "@headlessui/react";
 import {LessonEditValues} from "@/app/types/pages/lesson";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 
 
 export default function Edit({
@@ -20,13 +19,11 @@ export default function Edit({
         roadTest: record.roadTest,
         remarks: record.remarks,
     };
-
-    const {instructorId} = useContext(InstructorIdContext);
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(true)
 
     const handleSubmit = async (values: typeof initialValues) => {
         const params = new URLSearchParams({id: record.id.toString()});
-        fetch(`/api/${instructorId}/lesson?${params.toString()}`, {
+        fetch(`/api/instructor/lesson?${params.toString()}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

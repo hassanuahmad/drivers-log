@@ -15,7 +15,6 @@ import {VehicleMaintenanceFormValues} from "@/app/types/shared/forms";
 export const columns = (
     handleEdit: (id: number | undefined) => void,
     handleDelete: (id: number | undefined, endpoint: string) => void,
-    instructorId: number | null,
 ): ColumnDef<VehicleMaintenanceFormValues>[] => [
     {
         header: "#",
@@ -65,7 +64,7 @@ export const columns = (
                             Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            onClick={() => handleDelete(record.id, `/api/${instructorId}/vehicle-maintenance`)}>
+                            onClick={() => handleDelete(record.id, `/api/instructor/vehicle-maintenance`)}>
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>

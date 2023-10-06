@@ -1,9 +1,8 @@
 "use client";
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {filterLessonRecordsByNavigation, isToday, useNavigation,} from "./utils";
 import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount} from "@/app/utils/utils";
 import {LessonRecordsPreFormattedDuration} from "@/app/types/shared/records";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {Card, CardContent, CardHeader, CardTitle} from "@/app/components/ui/card";
 import {Tabs, TabsList, TabsTrigger} from "@/app/components/ui/tabs"
 import {DataTable} from "@/app/components/barebone-data-table";
@@ -15,7 +14,6 @@ export default function Dashboard() {
         {name: "Last 7 days", id: "last-7-days", current: false},
         {name: "Last 30 days", id: "last-30-days", current: false},
     ]);
-    const {instructorId} = useContext(InstructorIdContext);
     const [lessonRecords, setLessonRecords] = useState<LessonRecordsPreFormattedDuration[]>([]);
     const [todayLessonRecords, setTodayLessonRecords] = useState<LessonRecordsPreFormattedDuration[]>([]);
     const [instructorName, setInstructorName] = useState<string>("");
@@ -43,9 +41,8 @@ export default function Dashboard() {
     ];
 
     useEffect(() => {
-        if (!instructorId) return;
         const timezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-        fetch(`/api/${instructorId}/dashboard?${timezone}`)
+        fetch(`/api/instructor/dashboard?${timezone}`)
             .then((res) => res.json())
             .then((data) => {
                 const todayRecords = data.lessonRecords.filter((record: LessonRecordsPreFormattedDuration) => isToday(record.date));
@@ -54,7 +51,7 @@ export default function Dashboard() {
                 setTodayLessonRecords(todayRecords);
             })
             .catch((err) => console.log(err));
-    }, [instructorId]);
+    }, []);
 
     return (
         <main>

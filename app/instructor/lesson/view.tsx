@@ -6,7 +6,6 @@ import {debounce, downloadCSV, isEqual} from "./utils";
 import {calculateTotalDuration, calculateTotalPayment, formatDuration, monthOptions} from "@/app/utils/utils";
 import {LessonRecordsContext} from "../../context/lessonRecordsContext";
 import {LessonRecords, LessonRecordsForUpdate} from "@/app/types/shared/records";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {DataTable} from "@/app/components/data-table";
 import {columns} from "@/app/instructor/lesson/columns";
 import {Button} from "@/app/components/ui/button";
@@ -20,7 +19,6 @@ export default function View() {
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
-    const {instructorId} = useContext(InstructorIdContext);
     const contextValue = useContext(LessonRecordsContext);
     if (!contextValue) {
         // Handle the null context appropriately, maybe return null or some fallback UI
@@ -124,7 +122,7 @@ export default function View() {
         setEditRecordId(null);
     };
 
-    const tableColumns = columns(handleEdit, handleDelete, instructorId);
+    const tableColumns = columns(handleEdit, handleDelete);
     const editRecord = records.find((r) => r.id === editRecordId);
     const [filteredRecords, setFilteredRecords] = useState<LessonRecords[]>([]);
 

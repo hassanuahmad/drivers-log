@@ -4,7 +4,6 @@ import Notification from "@/app/components/notification";
 import {VehicleMaintenanceRecordsContext} from "../../context/vehicleMaintenanceRecordsContext";
 import {VehicleMaintenanceFormValues} from "../../types/shared/forms";
 import {VehicleMaintenanceRecords} from "../../types/shared/records";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import SectionHeading from "@/app/components/sectionHeading";
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -40,7 +39,6 @@ export default function Page() {
         return null;
     }
     const {setRecords, setTotalGas, setTotalMaintenance} = contextValue;
-    const {instructorId} = useContext(InstructorIdContext);
     const [showNotification, setShowNotification] = useState(false);
 
     const today = new Date();
@@ -65,7 +63,7 @@ export default function Page() {
     async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
             const response = await fetch(
-                `/api/${instructorId}/vehicle-maintenance`,
+                `/api/instructor/vehicle-maintenance`,
                 {
                     method: "POST",
                     headers: {

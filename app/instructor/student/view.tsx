@@ -3,7 +3,6 @@ import {useContext, useEffect, useState} from "react";
 import DeleteModal from "@/app/components/deleteModal";
 import Edit from "./edit";
 import {StudentRecordsContext} from "../../context/studentRecordsContext";
-import {InstructorIdContext} from "@/app/context/instructorIdContext";
 import {StudentRecordsForUpdate} from "@/app/types/shared/records";
 import {StudentFormValues} from "@/app/types/shared/forms";
 import {DataTable} from "@/app/components/data-table"
@@ -19,7 +18,6 @@ export default function View() {
     const [showDeleteErrorMessage, setShowDeleteErrorMessage] = useState(false);
     const [editRecordId, setEditRecordId] = useState<number | null>(null);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
-    const {instructorId} = useContext(InstructorIdContext);
     const contextValue = useContext(StudentRecordsContext);
     if (!contextValue) {
         // Handle the null context appropriately, maybe return null or some fallback UI
@@ -84,7 +82,7 @@ export default function View() {
     };
 
 
-    const tableColumns = columns(handleEdit, handleDelete, instructorId);
+    const tableColumns = columns(handleEdit, handleDelete);
     const editRecord = records.find((r) => r.student.id === editRecordId);
 
     return (

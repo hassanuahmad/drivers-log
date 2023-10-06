@@ -1,18 +1,20 @@
 import {NextResponse} from "next/server";
-import {PrismaClient} from "@prisma/client";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime";
+import {Prisma, PrismaClient} from "@prisma/client";
+import {auth} from "@clerk/nextjs";
 
 const prisma = new PrismaClient();
 
 // A type guard for the PrismaClientKnownRequestError
-function isPrismaClientKnownRequestError(error: any): error is PrismaClientKnownRequestError {
+function isPrismaClientKnownRequestError(error: any): error is Prisma.PrismaClientKnownRequestError {
     return error && typeof error.code === 'string';
 }
 
-export async function POST(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
+export async function POST(request: Request) {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
+
     const {
         firstName,
         lastName,
@@ -27,8 +29,6 @@ export async function POST(
         country,
         remarks,
     } = await request.json();
-
-    const {instructorId} = params;
 
     try {
         const record = await prisma.$transaction(async prisma => {
@@ -54,7 +54,8 @@ export async function POST(
             const studentInstructorRecord = await prisma.studentInstructor.create({
                 data: {
                     studentId: studentRecord.id,
-                    instructorId: Number(instructorId),
+                    instructorId: 0,
+                    instructorClerkId: userId,
                 },
             });
 
@@ -76,22 +77,15 @@ export async function POST(
     }
 }
 
-
-export async function GET(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
-    const {instructorId} = params;
-
-    if (!instructorId) {
-        return new NextResponse("Missing instructorId.", {
-            status: 400,
-        });
+export async function GET() {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
     }
 
     const records = await prisma.studentInstructor.findMany({
         where: {
-            instructorId: Number(instructorId),
+            instructorClerkId: userId,
         },
         include: {
             student: true,
@@ -130,11 +124,12 @@ export async function PUT(request: Request) {
     }
 }
 
-export async function DELETE(
-    request: Request,
-    {params}: { params: { instructorId: string } }
-) {
-    const {instructorId} = params;
+export async function DELETE(request: Request) {
+    const {userId}: { userId: string | null } = auth();
+    if (!userId) {
+        return new Response("Unauthorized", {status: 401});
+    }
+
     const url = new URL(request.url);
     const recordId = url.searchParams.get("id");
 
@@ -161,7 +156,7 @@ export async function DELETE(
             await prisma.studentInstructor.deleteMany({
                 where: {
                     studentId: Number(recordId),
-                    instructorId: Number(instructorId),
+                    instructorClerkId: userId,
                 },
             });
 

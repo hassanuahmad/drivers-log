@@ -13,6 +13,10 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@
 import {Input} from "@/app/components/ui/input"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/app/components/ui/select"
 import {StudentRecords} from "@/app/types/shared/records";
+import {Autocomplete, LoadScript, LoadScriptProps} from "@react-google-maps/api";
+
+const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API || '';
+const libraries: LoadScriptProps['libraries'] = ["places"];
 
 const validationSchema = z.object({
     firstName: z.string().nonempty("Required"),
@@ -40,6 +44,7 @@ export default function Page() {
     const {setRecords} = contextValue;
     const [showNotification, setShowNotification] = useState(false);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
+    const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
     const initialValues: StudentFormValues = {
         firstName: "",
@@ -50,9 +55,9 @@ export default function Page() {
         bde: "No",
         streetAddress: "",
         postalCode: "",
-        city: "Windsor",
-        province: "ON",
-        country: "Canada",
+        city: "",
+        province: "",
+        country: "",
         remarks: "",
     }
 
@@ -97,8 +102,59 @@ export default function Page() {
         }
     }
 
+    const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
+        setAutocomplete(autocomplete);
+    };
+
+    const onPlaceChanged = () => {
+        if (autocomplete !== null) {
+            const place = autocomplete.getPlace();
+
+            if (!place || !place.address_components) {
+                console.log("Address components are not loaded yet!");
+                return;
+            }
+
+            // Extract street number and street name from address_components
+            const streetNumberObj = place.address_components.find(
+                (component: { types: string | string[]; }) => component.types.includes("street_number")
+            );
+            const streetNameObj = place.address_components.find(
+                (component: { types: string | string[]; }) => component.types.includes("route")
+            );
+            const streetAddress = streetNumberObj ? `${streetNumberObj.long_name} ` : '';
+            const streetName = streetNameObj ? streetNameObj.long_name : '';
+
+            const postalCodeObj = place.address_components.find(
+                (component: { types: string | string[]; }) => component.types.includes("postal_code")
+            );
+            const cityObj = place.address_components.find(
+                (component: { types: string | string[]; }) => component.types.includes("locality")
+            );
+            const provinceObj = place.address_components.find(
+                (component: { types: string | string[]; }) => component.types.includes("administrative_area_level_1")
+            );
+            const countryObj = place.address_components.find(
+                (component: { types: string | string[]; }) => component.types.includes("country")
+            );
+
+            const postalCode = postalCodeObj ? postalCodeObj.long_name : '';
+            const city = cityObj ? cityObj.long_name : '';
+            const province = provinceObj ? provinceObj.long_name : '';
+            const country = countryObj ? countryObj.long_name : '';
+
+            form.setValue("streetAddress", streetAddress + streetName);
+            form.setValue("postalCode", postalCode);
+            form.setValue("city", city);
+            form.setValue("province", province);
+            form.setValue("country", country);
+        } else {
+            console.log("Autocomplete is not loaded yet!");
+        }
+    };
+
     return (
-        <>
+        <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={libraries}>
             <ErrorNotification
                 show={showErrorNotification}
                 text={"Cannot add student. Student already exists."}
@@ -215,7 +271,12 @@ export default function Page() {
                                 <FormItem>
                                     <FormLabel>Street Address</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Autocomplete
+                                            onLoad={onLoad}
+                                            onPlaceChanged={onPlaceChanged}
+                                        >
+                                            <Input {...field} />
+                                        </Autocomplete>
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -266,18 +327,9 @@ export default function Page() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Country</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue/>
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="Canada">Canada</SelectItem>
-                                            <SelectItem value="United States">United States</SelectItem>
-                                            <SelectItem value="Mexico">Mexico</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -300,6 +352,6 @@ export default function Page() {
                     <div className="border-b border-gray-200"/>
                 </form>
             </Form>
-        </>
+        </LoadScript>
     );
 }

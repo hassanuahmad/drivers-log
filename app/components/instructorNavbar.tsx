@@ -6,7 +6,7 @@ import {XMarkIcon} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import {UserButton} from "@clerk/nextjs";
 import Image from "next/image";
-import logo from "../static/logo/logo.png";
+import logo from "../static/logo/logo.svg";
 import {Button} from "@/app/components/ui/button";
 
 const navigation = [
@@ -45,7 +45,7 @@ export default function InstructorNavbar() {
                             />
                         </button>
                         <Link href="/homepage/home" className="mr-8">
-                            <Image src={logo} alt="logo" width={175}/>
+                            <Image src={logo} alt="logo" width={200}/>
                         </Link>
                     </div>
                     <nav
@@ -135,7 +135,7 @@ export default function InstructorNavbar() {
                                 />
                             </button>
                             <Link href="/homepage/home" className="-ml-0.5">
-                                <Image src={logo} alt="logo" width={175}/>
+                                <Image src={logo} alt="logo" width={200}/>
                             </Link>
                         </div>
                         <div className="mt-2 space-y-2">

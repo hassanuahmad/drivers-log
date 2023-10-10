@@ -72,7 +72,6 @@ export default function Home() {
                                     className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
                                     <img
                                         src="https://cdn.discordapp.com/attachments/1047053555984511036/1159905665645551656/image.png?ex=6532b954&is=65204454&hm=a0fc3e06f3093a54c91b208c59f2676b947dcdb66c63f229a042ad254621f3cf&"
-                                        // src="https://cdn.discordapp.com/attachments/757969943185719311/1133622738079199332/Screenshot_2023-07-26_at_12.50.08_AM.png"
                                         alt="App screenshot"
                                         width={2432}
                                         height={1442}

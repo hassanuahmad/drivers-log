@@ -6,7 +6,7 @@ import {XMarkIcon} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/nextjs";
 import Image from "next/image";
-import logo from "../static/logo/logo.png";
+import logo from '@/app/static/logo/logo.svg';
 import {Button} from "@/app/components/ui/button";
 
 const navigation = [
@@ -35,7 +35,7 @@ export default function Example() {
                             />
                         </button>
                         <Link href="/homepage/home">
-                            <Image src={logo} alt="logo" width={175}/>
+                            <Image src={logo} alt="logo" width={200}/>
                         </Link>
                     </div>
                     <nav
@@ -46,7 +46,7 @@ export default function Example() {
                             </Link>
                         ))}
                     </nav>
-                    <div className="flex flex-1 items-center justify-end gap-x-8">
+                    <div className="flex flex-1 items-center justify-end gap-x-4">
                         <SignedIn>
                             <Link
                                 className="btn md:flex md:gap-x-11 md:text-sm md:font-semibold md:leading-6 md:text-gray-700"
@@ -87,7 +87,7 @@ export default function Example() {
                                 />
                             </button>
                             <Link href="/homepage/home" className="-ml-0.5">
-                                <Image src={logo} alt="logo" width={175}/>
+                                <Image src={logo} alt="logo" width={200}/>
                             </Link>
                         </div>
                         <div className="mt-2 space-y-2">

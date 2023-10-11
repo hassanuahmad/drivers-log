@@ -222,7 +222,7 @@ export default function Page() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit">Save Maintenance</Button>
                     </div>
                     <div className="border-b border-gray-200"/>
                 </form>

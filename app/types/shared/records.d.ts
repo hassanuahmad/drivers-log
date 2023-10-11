@@ -98,6 +98,22 @@ export interface VehicleMaintenanceRecords {
     remarks: string;
 }
 
+export interface IncomeRecordForUpdate {
+    date: string;
+    income: number;
+    incomeMethod: string;
+    remarks: string;
+}
+
+export interface IncomeRecords {
+    date: string;
+    id: number;
+    income: number;
+    incomeMethod: string;
+    instructorClerkId: string;
+    remarks: string;
+}
+
 export interface LessonContextType {
     studentRecords: StudentRecords[];
     setStudentRecords: Dispatch<SetStateAction<StudentRecords[]>>;
@@ -133,3 +149,13 @@ export interface VehicleMaintenanceContextType {
     setTotalMaintenance: Dispatch<SetStateAction<number>>;
 }
 
+export interface IncomeContextType {
+    records: IncomeRecords[];
+    setRecords: Dispatch<SetStateAction<IncomeRecords[]>>;
+    selectedMonth: string;
+    setSelectedMonth: Dispatch<SetStateAction<string>>;
+    selectedYear: number;
+    setSelectedYear: Dispatch<SetStateAction<number>>;
+    totalIncome: number;
+    setTotalIncome: Dispatch<SetStateAction<number>>;
+}

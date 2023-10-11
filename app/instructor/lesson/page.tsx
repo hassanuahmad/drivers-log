@@ -370,7 +370,7 @@ export default function Page() {
                                 )}
                             />
                         </div>
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit">Save Lesson</Button>
                     </div>
                     <div className="border-b border-gray-200"/>
                 </form>

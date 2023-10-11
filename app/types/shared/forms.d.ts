@@ -35,3 +35,11 @@ export interface VehicleMaintenanceFormValues {
     maintenance: number;
     remarks: string;
 }
+
+export interface IncomeFormValues {
+    id?: number;
+    date: string;
+    income: number;
+    incomeMethod: string;
+    remarks: string;
+}

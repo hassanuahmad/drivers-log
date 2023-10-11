@@ -18,6 +18,7 @@ const navigation = [
 const dropdownNavigation = [
     {name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance"},
     {name: "Student Progress", href: "/instructor/student-progress"},
+    {name: "Income Tracker", href: "/instructor/income"},
     {name: "Yearly Data", href: "/instructor/yearly-data"},
 ];
 

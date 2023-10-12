@@ -1,6 +1,6 @@
 "use client";
 import {useEffect, useState} from "react";
-import {calculateMonthlyStats, calculateTotalGasAndMaintenance} from "./utils";
+import {calculateMonthlyStats, calculateTotalGasAndMaintenance, calculateTotalIncome} from "./utils";
 import {getPassRoadTestCount, getTotalHours, getTotalPaymentAmount} from "@/app/utils/utils";
 import SectionHeading from "@/app/components/sectionHeading";
 import {Card, CardContent, CardHeader, CardTitle,} from "@/app/components/ui/card"
@@ -13,6 +13,7 @@ export default function Page() {
     const [lessonRecords, setLessonRecords] = useState([]);
     const [studentRecords, setStudentRecords] = useState([]);
     const [vehicleMaintenanceRecords, setVehicleMaintenanceRecords] = useState([]);
+    const [incomeRecords, setIncomeRecords] = useState([]);
     const {totalGas, totalMaintenance} = calculateTotalGasAndMaintenance(vehicleMaintenanceRecords);
     const [monthlyStats, setMonthlyStats] = useState<MonthlyStat[]>([]);
 
@@ -30,8 +31,16 @@ export default function Page() {
             value: studentRecords.length,
         },
         {
+            name: "Passed Students",
+            value: getPassRoadTestCount(lessonRecords),
+        },
+        {
             name: "Total Revenue",
             value: "$" + getTotalPaymentAmount(lessonRecords),
+        },
+        {
+            name: "Income",
+            value: "$" + calculateTotalIncome(incomeRecords),
         },
         {
             name: "Gas",
@@ -41,10 +50,7 @@ export default function Page() {
             name: "Maintenance",
             value: "$" + totalMaintenance,
         },
-        {
-            name: "Passed Students",
-            value: getPassRoadTestCount(lessonRecords),
-        },
+
     ];
 
     const date = new Date();
@@ -62,6 +68,7 @@ export default function Page() {
                 setLessonRecords(data.lessonRecords);
                 setStudentRecords(data.studentRecords);
                 setVehicleMaintenanceRecords(data.vehicleMaintenanceRecords);
+                setIncomeRecords(data.incomeRecords);
                 const stats = calculateMonthlyStats(data.lessonRecords);
                 setMonthlyStats(stats);
             })

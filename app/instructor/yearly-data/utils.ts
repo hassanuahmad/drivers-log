@@ -1,4 +1,4 @@
-import {LessonRecordsDbRow, VehicleMaintenanceRecords} from "@/app/types/shared/records";
+import {IncomeRecords, LessonRecordsDbRow, VehicleMaintenanceRecords} from "@/app/types/shared/records";
 
 export function calculateTotalGasAndMaintenance(yearlyData: VehicleMaintenanceRecords[]) {
     const totalGas = yearlyData.reduce(
@@ -10,6 +10,13 @@ export function calculateTotalGasAndMaintenance(yearlyData: VehicleMaintenanceRe
         0
     );
     return {totalGas, totalMaintenance};
+}
+
+export function calculateTotalIncome(yearlyData: IncomeRecords[]) {
+    return yearlyData.reduce(
+        (total, income) => total + income.income,
+        0
+    );
 }
 
 export function calculateMonthlyStats(records: LessonRecordsDbRow[]) {

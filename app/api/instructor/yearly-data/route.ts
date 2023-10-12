@@ -43,9 +43,19 @@ export async function GET(request: Request) {
         },
     });
 
+    const incomeRecords = await prisma.income.findMany({
+        where: {
+            instructorClerkId: userId,
+            date: {
+                startsWith: selectedYear,
+            }
+        }
+    });
+
     return NextResponse.json({
         lessonRecords,
         studentRecords,
         vehicleMaintenanceRecords,
+        incomeRecords,
     });
 }

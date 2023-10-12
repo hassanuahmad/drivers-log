@@ -25,13 +25,19 @@ export async function GET(request: Request) {
     const startDate = new Date(Number(selectedYear), 0, 1);
     const endDate = new Date(Number(selectedYear), 11, 31);
 
-    const studentRecords = await prisma.student.findMany({
+    const studentRecords = await prisma.studentInstructor.findMany({
         where: {
-            createdAt: {
-                gte: startDate,
-                lte: endDate,
+            instructorClerkId: userId,
+            student: {
+                createdAt: {
+                    gte: startDate,
+                    lte: endDate,
+                },
             },
         },
+        select: {
+            student: true
+        }
     });
 
     const vehicleMaintenanceRecords = await prisma.vehicleMaintenance.findMany({

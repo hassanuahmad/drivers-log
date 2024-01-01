@@ -50,7 +50,7 @@ NEXT_PUBLIC_INSTRUCTOR_CLERK_ID='clerk-user-id'
 NEXT_PUBLIC_INSTRUCTOR_NAME='instructor-id'
 NEXT_PUBLIC_INSTRUCTOR_LICENCE='instructor-licence-number'
 NEXT_PUBLIC_INSTRUCTOR_LICENCE_EXPIRY='instructor-licence-expiry'
-NEXT_PUBLIC_ONTARIO_LICENCE=''instructor-ontario-licence-number''
+NEXT_PUBLIC_ONTARIO_LICENCE='instructor-ontario-licence-number'
 
 NEXT_PUBLIC_GOOGLE_PLACES_API='your-google-places-api-key'
 NEXT_PUBLIC_GOOGLE_CLIENT_ID='your-google-client-id'

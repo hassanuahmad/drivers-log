@@ -1,7 +1,5 @@
-import {NextResponse} from "next/server";
-import {PrismaClient} from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import prisma from "@/prisma/client";
 
 export async function POST(request: Request) {
     const userInfo = await request.json();
@@ -14,7 +12,7 @@ export async function POST(request: Request) {
 
     if (findUser) {
         // User already exists
-        return NextResponse.json({body: "User exists"});
+        return NextResponse.json({ body: "User exists" });
     }
 
     const record = await prisma.instructor.create({
@@ -27,5 +25,5 @@ export async function POST(request: Request) {
         },
     });
 
-    return NextResponse.json({message: "User added", record});
+    return NextResponse.json({ message: "User added", record });
 }

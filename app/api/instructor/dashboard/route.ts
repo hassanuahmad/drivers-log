@@ -1,20 +1,20 @@
-import {NextResponse} from "next/server";
-import {PrismaClient} from "@prisma/client";
-import {DateTime} from "luxon";
-import {auth} from "@clerk/nextjs";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { DateTime } from "luxon";
+import { auth } from "@clerk/nextjs";
+import prisma from "@/prisma/client";
 
 export async function GET(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const url = new URL(request.url);
-    const timezone = url.searchParams.get('timezone') || 'UTC';
+    const timezone = url.searchParams.get("timezone") || "UTC";
 
-    let currentDate = DateTime.now().setZone(timezone).minus({days: 31}).toISODate() || undefined;
+    let currentDate =
+        DateTime.now().setZone(timezone).minus({ days: 31 }).toISODate() ||
+        undefined;
 
     const lessonRecords = await prisma.lesson.findMany({
         where: {
@@ -40,8 +40,8 @@ export async function GET(request: Request) {
     const instructorName = await prisma.instructor.findUnique({
         where: {
             instructorClerkId: userId,
-        }
+        },
     });
 
-    return NextResponse.json({lessonRecords, instructorName});
+    return NextResponse.json({ lessonRecords, instructorName });
 }

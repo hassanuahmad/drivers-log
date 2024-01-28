@@ -1,34 +1,70 @@
 "use client";
-import {useContext, useState} from "react";
+import { useContext, useState } from "react";
 import Notification from "@/app/components/notification";
-import {calculateTotalDuration, calculateTotalPayment, formatDuration} from "@/app/utils/utils";
-import {LessonRecordsContext} from "../../context/lessonRecordsContext";
-import {LessonFormValues} from "@/app/types/shared/forms";
-import {LessonRecords} from "@/app/types/shared/records";
+import {
+    calculateTotalDuration,
+    calculateTotalPayment,
+    formatDuration,
+} from "@/app/utils/utils";
+import { LessonRecordsContext } from "../../context/lessonRecordsContext";
+import { LessonFormValues } from "@/app/types/shared/forms";
+import { LessonRecords } from "@/app/types/shared/records";
 import SectionHeading from "@/app/components/sectionHeading";
 import * as z from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useForm} from "react-hook-form";
-import {Button} from "@/app/components/ui/button"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/form"
-import {CalendarIcon, Check, ChevronsUpDown} from "lucide-react";
-import {cn} from "@/app/lib/utils";
-import {Popover, PopoverContent, PopoverTrigger,} from "@/app/components/ui/popover"
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem,} from "@/app/components/ui/command"
-import {Input} from "@/app/components/ui/input";
-import {adjustForTimezone, isDateValid} from "@/app/instructor/vehicle-maintenance/utils";
-import {format} from "date-fns";
-import {Calendar} from "@/app/components/ui/calendar";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/app/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/app/components/ui/button";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/app/components/ui/form";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/app/lib/utils";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/app/components/ui/popover";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+} from "@/app/components/ui/command";
+import { Input } from "@/app/components/ui/input";
+import {
+    adjustForTimezone,
+    isDateValid,
+} from "@/app/instructor/vehicle-maintenance/utils";
+import { format } from "date-fns";
+import { Calendar } from "@/app/components/ui/calendar";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/app/components/ui/select";
 
 const validationSchema = z.object({
     selectStudent: z.string().nonempty("Required"),
-    date: z.string().nonempty("Required").refine(date => {
-        const regex = /^\d{4}-\d{2}-\d{2}$/;
-        return regex.test(date);
-    }, {
-        message: "Date format should be 'YYYY-MM-DD'"
-    }),
+    date: z
+        .string()
+        .nonempty("Required")
+        .refine(
+            (date) => {
+                const regex = /^\d{4}-\d{2}-\d{2}$/;
+                return regex.test(date);
+            },
+            {
+                message: "Date format should be 'YYYY-MM-DD'",
+            },
+        ),
     startTime: z.string().nonempty("Required"),
     endTime: z.string().nonempty("Required"),
     paymentType: z.string().nonempty("Required"),
@@ -53,7 +89,7 @@ export default function Page() {
     } = contextValue;
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
-        today.getMonth() + 1
+        today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     const [showNotification, setShowNotification] = useState(false);
@@ -74,7 +110,7 @@ export default function Page() {
     const form = useForm<z.infer<typeof validationSchema>>({
         resolver: zodResolver(validationSchema),
         defaultValues: initialValues,
-    })
+    });
 
     async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
@@ -90,8 +126,7 @@ export default function Page() {
 
                 // Find the student object that matches the studentId from the values
                 let student = studentRecords.find(
-                    (student) =>
-                        student.studentId === newRecord.record.studentId
+                    (student) => student.studentId === newRecord.record.studentId,
                 );
 
                 if (student) {
@@ -99,7 +134,7 @@ export default function Page() {
                         ...newRecord.record,
                         student: student.student,
                         formattedDuration: formatDuration(
-                            Number(newRecord.record.duration)
+                            Number(newRecord.record.duration),
                         ),
                     };
                 }
@@ -122,22 +157,13 @@ export default function Page() {
                     return newRecords;
                 });
 
-                const total = calculateTotalDuration([
-                    ...records,
-                    newRecord.record,
-                ]);
+                const total = calculateTotalDuration([...records, newRecord.record]);
                 setTotalDuration(total);
                 setTotalCash(
-                    calculateTotalPayment(
-                        [...records, newRecord.record],
-                        "Cash"
-                    )
+                    calculateTotalPayment([...records, newRecord.record], "Cash"),
                 );
                 setTotalInterac(
-                    calculateTotalPayment(
-                        [...records, newRecord.record],
-                        "Interac"
-                    )
+                    calculateTotalPayment([...records, newRecord.record], "Interac"),
                 );
 
                 setShowNotification(true);
@@ -159,18 +185,29 @@ export default function Page() {
                 text={"Lesson"}
                 onClose={() => setShowNotification(false)}
             />
-            <SectionHeading title={"Lesson Information"}
-                            description={"Select student and add a lesson. If you have no students, please first add a student in the Students tab."}/>
+            <SectionHeading
+                title={"Lesson Information"}
+                description={
+                    "Select student and add a lesson. If you have no students, please first add a student in the Students tab."
+                }
+            />
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <div className={"my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6"}>
+                    <div
+                        className={
+                            "my-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6"
+                        }
+                    >
                         <FormField
                             control={form.control}
                             name="selectStudent"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem className="flex flex-col justify-end">
                                     <FormLabel>Select Student</FormLabel>
-                                    <Popover open={isSelectStudentOpen} onOpenChange={setIsSelectStudentOpen}>
+                                    <Popover
+                                        open={isSelectStudentOpen}
+                                        onOpenChange={setIsSelectStudentOpen}
+                                    >
                                         <PopoverTrigger asChild>
                                             <FormControl>
                                                 <Button
@@ -178,24 +215,30 @@ export default function Page() {
                                                     role="combobox"
                                                     className={cn(
                                                         "justify-between",
-                                                        !field.value && "text-muted-foreground"
+                                                        !field.value && "text-muted-foreground",
                                                     )}
                                                 >
                                                     {field.value
                                                         ? `${studentRecords.find(
-                                                            (studentRecord) => studentRecord.studentId === Number(field.value)
+                                                            (studentRecord) =>
+                                                                studentRecord.studentId ===
+                                                                Number(field.value),
                                                         )?.student.firstName} ${studentRecords.find(
-                                                            (studentRecord) => studentRecord.studentId === Number(field.value)
+                                                            (studentRecord) =>
+                                                                studentRecord.studentId ===
+                                                                Number(field.value),
                                                         )?.student.lastName}`
                                                         : "Select Student"}
-                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
                                             </FormControl>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-[200px] p-0">
                                             <Command>
-                                                <CommandInput className="focus:border-none focus:ring-0"
-                                                              placeholder="Search student..."/>
+                                                <CommandInput
+                                                    className="focus:border-none focus:ring-0"
+                                                    placeholder="Search student..."
+                                                />
                                                 <CommandEmpty>No student found.</CommandEmpty>
                                                 <CommandGroup>
                                                     {studentRecords.map((studentRecord) => (
@@ -203,33 +246,38 @@ export default function Page() {
                                                             value={studentRecord.student.firstName}
                                                             key={studentRecord.studentId}
                                                             onSelect={() => {
-                                                                form.setValue("selectStudent", String(studentRecord.studentId));
+                                                                form.setValue(
+                                                                    "selectStudent",
+                                                                    String(studentRecord.studentId),
+                                                                );
                                                                 setIsSelectStudentOpen(false);
                                                             }}
                                                         >
                                                             <Check
                                                                 className={cn(
                                                                     "mr-2 h-4 w-4",
-                                                                    studentRecord.studentId === Number(field.value)
+                                                                    studentRecord.studentId ===
+                                                                        Number(field.value)
                                                                         ? "opacity-100"
-                                                                        : "opacity-0"
+                                                                        : "opacity-0",
                                                                 )}
                                                             />
-                                                            {studentRecord.student.firstName} {studentRecord.student.lastName}
+                                                            {studentRecord.student.firstName}{" "}
+                                                            {studentRecord.student.lastName}
                                                         </CommandItem>
                                                     ))}
                                                 </CommandGroup>
                                             </Command>
                                         </PopoverContent>
                                     </Popover>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="date"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem className="flex flex-col justify-end sm:h-[72px]">
                                     <FormLabel>Date</FormLabel>
                                     <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
@@ -239,7 +287,7 @@ export default function Page() {
                                                     variant={"outline"}
                                                     className={cn(
                                                         "pl-3 text-left font-normal",
-                                                        !field.value && "text-muted-foreground"
+                                                        !field.value && "text-muted-foreground",
                                                     )}
                                                 >
                                                     {isDateValid(field.value) ? (
@@ -247,17 +295,24 @@ export default function Page() {
                                                     ) : (
                                                         <span>Pick a date</span>
                                                     )}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                 </Button>
                                             </FormControl>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
                                             <Calendar
                                                 mode="single"
-                                                selected={isDateValid(field.value) ? adjustForTimezone(field.value) : undefined}
+                                                selected={
+                                                    isDateValid(field.value)
+                                                        ? adjustForTimezone(field.value)
+                                                        : undefined
+                                                }
                                                 onSelect={(selectedDate) => {
                                                     if (selectedDate) {
-                                                        const formattedDate = format(selectedDate, "yyyy-MM-dd");
+                                                        const formattedDate = format(
+                                                            selectedDate,
+                                                            "yyyy-MM-dd",
+                                                        );
                                                         field.onChange(formattedDate);
                                                         setIsDateOpen(false);
                                                     }
@@ -269,46 +324,46 @@ export default function Page() {
                                             />
                                         </PopoverContent>
                                     </Popover>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="startTime"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Start Time</FormLabel>
                                     <FormControl>
                                         <Input type={"time"} {...field} />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="endTime"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>End Time</FormLabel>
                                     <FormControl>
                                         <Input type={"time"} {...field} />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="paymentType"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Payment Type</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue/>
+                                                <SelectValue />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
@@ -316,33 +371,33 @@ export default function Page() {
                                             <SelectItem value="Cash">Cash</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="paymentAmount"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Payment Amount</FormLabel>
                                     <FormControl>
                                         <Input type={"number"} {...field} />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="roadTest"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Road Test</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue/>
+                                                <SelectValue />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
@@ -351,7 +406,7 @@ export default function Page() {
                                             <SelectItem value="Fail">Fail</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -359,20 +414,20 @@ export default function Page() {
                             <FormField
                                 control={form.control}
                                 name="remarks"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Remarks</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
                         <Button type="submit">Save Lesson</Button>
                     </div>
-                    <div className="border-b border-gray-200"/>
+                    <div className="border-b border-gray-200" />
                 </form>
             </Form>
         </>

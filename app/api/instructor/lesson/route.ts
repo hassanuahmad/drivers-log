@@ -1,8 +1,6 @@
-import {NextResponse} from "next/server";
-import {PrismaClient} from "@prisma/client";
-import {auth} from "@clerk/nextjs";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import prisma from "@/prisma/client";
 
 export async function POST(request: Request) {
     const {
@@ -16,9 +14,9 @@ export async function POST(request: Request) {
         selectStudent,
     } = await request.json();
 
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     // Parse the startTime and endTime strings to Date objects
@@ -44,13 +42,13 @@ export async function POST(request: Request) {
         },
     });
 
-    return NextResponse.json({message: "Lesson added.", record});
+    return NextResponse.json({ message: "Lesson added.", record });
 }
 
 export async function GET(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const url = new URL(request.url);
@@ -85,7 +83,7 @@ export async function GET(request: Request) {
         }
     });
 
-    return NextResponse.json({records});
+    return NextResponse.json({ records });
 }
 
 export async function PUT(request: Request) {
@@ -123,7 +121,7 @@ export async function PUT(request: Request) {
             remarks: remarks,
         },
     });
-    return NextResponse.json({message: "Lesson updated."});
+    return NextResponse.json({ message: "Lesson updated." });
 }
 
 export async function DELETE(request: Request) {
@@ -134,6 +132,5 @@ export async function DELETE(request: Request) {
             id: Number(recordId),
         },
     });
-    return NextResponse.json({message: "Lesson deleted."});
+    return NextResponse.json({ message: "Lesson deleted." });
 }
-

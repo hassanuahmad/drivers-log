@@ -1,25 +1,26 @@
 "use client";
-import {Fragment, useState} from "react";
-import {Dialog, Menu, Transition} from "@headlessui/react";
-import {Bars3Icon, ChevronDownIcon} from "@heroicons/react/20/solid";
-import {XMarkIcon} from "@heroicons/react/24/outline";
+import { Fragment, useState } from "react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import {UserButton} from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import logo from "../static/logo/logo.svg";
-import {Button} from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 
 const navigation = [
-    {name: "Dashboard", href: "/instructor/dashboard"},
-    {name: "Lessons", href: "/instructor/lesson"},
-    {name: "Students", href: "/instructor/student"},
+    { name: "Dashboard", href: "/instructor/dashboard" },
+    { name: "Lessons", href: "/instructor/lesson" },
+    { name: "Students", href: "/instructor/student" },
 ];
 
 const dropdownNavigation = [
-    {name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance"},
-    {name: "Student Progress", href: "/instructor/student-progress"},
-    {name: "Income Tracker", href: "/instructor/income"},
-    {name: "Yearly Data", href: "/instructor/yearly-data"},
+    { name: "Vehicle Maintenance", href: "/instructor/vehicle-maintenance" },
+    { name: "Road Test", href: "/instructor/road-test" },
+    { name: "Student Progress", href: "/instructor/student-progress" },
+    { name: "Income Tracker", href: "/instructor/income" },
+    { name: "Yearly Data", href: "/instructor/yearly-data" },
 ];
 
 function classNames(...classes: (string | false | null | undefined)[]): string {
@@ -40,30 +41,22 @@ export default function InstructorNavbar() {
                             onClick={() => setMobileMenuOpen(true)}
                         >
                             <span className="sr-only">Open main menu</span>
-                            <Bars3Icon
-                                className="h-5 w-5 text-gray-900"
-                                aria-hidden="true"
-                            />
+                            <Bars3Icon className="h-5 w-5 text-gray-900" aria-hidden="true" />
                         </button>
                         <Link href="/homepage/home" className="mr-8">
-                            <Image src={logo} alt="logo" width={200}/>
+                            <Image src={logo} alt="logo" width={200} />
                         </Link>
                     </div>
-                    <nav
-                        className="hidden md:flex items-center md:gap-x-2 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
+                    <nav className="hidden md:flex items-center md:gap-x-2 md:text-sm md:font-semibold md:leading-6 md:text-gray-700">
                         {navigation.map((item, itemIdx) => (
                             <Link key={itemIdx} href={item.href}>
                                 <Button variant="ghost">{item.name}</Button>
                             </Link>
                         ))}
                         {/* Dropdown Start */}
-                        <Menu
-                            as="div"
-                            className="relative inline-block text-left"
-                        >
+                        <Menu as="div" className="relative inline-block text-left">
                             <div>
-                                <Menu.Button
-                                    className="inline-flex w-full justify-center px-3 py-2 gap-x-1.5 bg-white text-sm rounded-md font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
+                                <Menu.Button className="inline-flex w-full justify-center px-3 py-2 gap-x-1.5 bg-white text-sm rounded-md font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
                                     More
                                     <ChevronDownIcon
                                         className="-mr-1 h-5 w-5 text-gray-400"
@@ -81,29 +74,26 @@ export default function InstructorNavbar() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items
-                                    className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
-                                        {dropdownNavigation.map(
-                                            (item, index) => (
-                                                <Menu.Item key={index}>
-                                                    {({active}) => (
-                                                        <Link
-                                                            key={index}
-                                                            href={item.href}
-                                                            className={classNames(
-                                                                active
-                                                                    ? "bg-gray-100 text-gray-900"
-                                                                    : "text-gray-700",
-                                                                "block text-sm"
-                                                            )}
-                                                        >
-                                                            <Button variant={"ghost"}>{item.name}</Button>
-                                                        </Link>
-                                                    )}
-                                                </Menu.Item>
-                                            )
-                                        )}
+                                        {dropdownNavigation.map((item, index) => (
+                                            <Menu.Item key={index}>
+                                                {({ active }) => (
+                                                    <Link
+                                                        key={index}
+                                                        href={item.href}
+                                                        className={classNames(
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700",
+                                                            "block text-sm",
+                                                        )}
+                                                    >
+                                                        <Button variant={"ghost"}>{item.name}</Button>
+                                                    </Link>
+                                                )}
+                                            </Menu.Item>
+                                        ))}
                                     </div>
                                 </Menu.Items>
                             </Transition>
@@ -111,7 +101,7 @@ export default function InstructorNavbar() {
                         {/* Dropdown End */}
                     </nav>
                     <div className="flex flex-1 items-center justify-end gap-x-8">
-                        <UserButton afterSignOutUrl="/"/>
+                        <UserButton afterSignOutUrl="/" />
                     </div>
                 </div>
                 <Dialog
@@ -120,9 +110,8 @@ export default function InstructorNavbar() {
                     open={mobileMenuOpen}
                     onClose={setMobileMenuOpen}
                 >
-                    <div className="fixed inset-0 z-50"/>
-                    <Dialog.Panel
-                        className="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto bg-white px-4 pb-6 sm:max-w-sm sm:px-6 sm:ring-1 sm:ring-gray-900/10">
+                    <div className="fixed inset-0 z-50" />
+                    <Dialog.Panel className="fixed inset-y-0 left-0 z-50 w-full overflow-y-auto bg-white px-4 pb-6 sm:max-w-sm sm:px-6 sm:ring-1 sm:ring-gray-900/10">
                         <div className="-ml-0.5 flex h-16 items-center gap-x-6">
                             <button
                                 type="button"
@@ -130,13 +119,10 @@ export default function InstructorNavbar() {
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 <span className="sr-only">Close menu</span>
-                                <XMarkIcon
-                                    className="h-6 w-6"
-                                    aria-hidden="true"
-                                />
+                                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                             </button>
                             <Link href="/homepage/home" className="-ml-0.5">
-                                <Image src={logo} alt="logo" width={200}/>
+                                <Image src={logo} alt="logo" width={200} />
                             </Link>
                         </div>
                         <div className="mt-2 space-y-2">

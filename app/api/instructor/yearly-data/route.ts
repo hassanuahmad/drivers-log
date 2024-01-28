@@ -1,13 +1,11 @@
-import {NextResponse} from "next/server";
-import {PrismaClient} from "@prisma/client";
-import {auth} from "@clerk/nextjs";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import prisma from "@/prisma/client";
 
 export async function GET(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const url = new URL(request.url);
@@ -36,8 +34,8 @@ export async function GET(request: Request) {
             },
         },
         select: {
-            student: true
-        }
+            student: true,
+        },
     });
 
     const vehicleMaintenanceRecords = await prisma.vehicleMaintenance.findMany({
@@ -54,8 +52,8 @@ export async function GET(request: Request) {
             instructorClerkId: userId,
             date: {
                 startsWith: selectedYear,
-            }
-        }
+            },
+        },
     });
 
     return NextResponse.json({

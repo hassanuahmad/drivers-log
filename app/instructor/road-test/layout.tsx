@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { LessonProvider } from "../../context/lessonProvider";
+import { RoadTestProvider } from "@/app/context/roadTestProvider";
+import View from "./view";
 
 export const metadata: Metadata = {
     title: "Road Test",
@@ -12,7 +13,10 @@ export default function RoadTestLayout({
 }) {
     return (
         <section>
-            <LessonProvider>{children}</LessonProvider>
+            <RoadTestProvider>
+                {children}
+                <View />
+            </RoadTestProvider>
         </section>
     );
 }

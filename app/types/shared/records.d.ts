@@ -1,4 +1,4 @@
-import {StudentFormValues} from "@/app/types/shared/forms";
+import { StudentFormValues } from "@/app/types/shared/forms";
 
 export interface StudentRecordsForUpdate {
     firstName: string;
@@ -114,6 +114,24 @@ export interface IncomeRecords {
     remarks: string;
 }
 
+export interface RoadTestRecordsForUpdate {
+    date: string;
+    testTime: string;
+    location: string;
+    remarks: string;
+}
+
+export interface RoadTestRecords {
+    date: string;
+    location: string;
+    id: number;
+    instructorId: number;
+    testTime: string;
+    remarks: string;
+    student: StudentFormValues;
+    studentId: number;
+}
+
 export interface LessonContextType {
     studentRecords: StudentRecords[];
     setStudentRecords: Dispatch<SetStateAction<StudentRecords[]>>;
@@ -158,4 +176,15 @@ export interface IncomeContextType {
     setSelectedYear: Dispatch<SetStateAction<number>>;
     totalIncome: number;
     setTotalIncome: Dispatch<SetStateAction<number>>;
+}
+
+export interface RoadTestContextType {
+    studentRecords: StudentRecords[];
+    setStudentRecords: Dispatch<SetStateAction<StudentRecords[]>>;
+    records: RoadTestRecords[];
+    setRecords: Dispatch<SetStateAction<RoadTestRecords[]>>;
+    selectedYear: number;
+    setSelectedYear: Dispatch<SetStateAction<number>>;
+    selectedMonth: string;
+    setSelectedMonth: Dispatch<SetStateAction<string>>;
 }

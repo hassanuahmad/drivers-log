@@ -1,18 +1,19 @@
-import {NextResponse} from "next/server";
-import {Prisma, PrismaClient} from "@prisma/client";
-import {auth} from "@clerk/nextjs";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
+import { auth } from "@clerk/nextjs";
+import prisma from "@/prisma/client";
 
 // A type guard for the PrismaClientKnownRequestError
-function isPrismaClientKnownRequestError(error: any): error is Prisma.PrismaClientKnownRequestError {
-    return error && typeof error.code === 'string';
+function isPrismaClientKnownRequestError(
+    error: any,
+): error is Prisma.PrismaClientKnownRequestError {
+    return error && typeof error.code === "string";
 }
 
 export async function POST(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     } = await request.json();
 
     try {
-        const record = await prisma.$transaction(async prisma => {
+        const record = await prisma.$transaction(async (prisma) => {
             // Create the student record
             const studentRecord = await prisma.student.create({
                 data: {
@@ -60,12 +61,12 @@ export async function POST(request: Request) {
             });
 
             // Return both records as a result
-            return studentRecord
+            return studentRecord;
         });
 
-        return NextResponse.json({message: "Student added.", record});
+        return NextResponse.json({ message: "Student added.", record });
     } catch (error) {
-        if (isPrismaClientKnownRequestError(error) && error.code === 'P2002') {
+        if (isPrismaClientKnownRequestError(error) && error.code === "P2002") {
             return new NextResponse("Error creating student record.", {
                 status: 409, // HTTP 409 Conflict is used to indicate conflicts like duplicate entries
             });
@@ -78,9 +79,9 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const records = await prisma.studentInstructor.findMany({
@@ -92,7 +93,7 @@ export async function GET() {
         },
     });
 
-    return NextResponse.json({records});
+    return NextResponse.json({ records });
 }
 
 export async function PUT(request: Request) {
@@ -112,7 +113,7 @@ export async function PUT(request: Request) {
             status: "success",
         });
     } catch (error) {
-        if (isPrismaClientKnownRequestError(error) && error.code === 'P2002') {
+        if (isPrismaClientKnownRequestError(error) && error.code === "P2002") {
             return new NextResponse("Error updating student, duplicate", {
                 status: 409,
             });
@@ -125,9 +126,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const url = new URL(request.url);
@@ -148,9 +149,8 @@ export async function DELETE(request: Request) {
                 },
                 {
                     status: 300,
-                    statusText:
-                        "student has lesson, please delete the lesson first",
-                }
+                    statusText: "student has lesson, please delete the lesson first",
+                },
             );
         } else {
             await prisma.studentInstructor.deleteMany({

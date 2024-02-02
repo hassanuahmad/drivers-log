@@ -1,16 +1,9 @@
 "use client";
 import { useContext, useState } from "react";
 import Notification from "@/app/components/notification";
-import {
-    calculateTotalDuration,
-    calculateTotalPayment,
-    formatDuration,
-} from "@/app/utils/utils";
-import { LessonRecordsContext } from "../../context/lessonRecordsContext";
-import { LessonFormValues } from "@/app/types/shared/forms";
+import { RoadTestRecordsContext } from "../../context/roadTestRecordsContext";
 import { LessonRecords } from "@/app/types/shared/records";
 import SectionHeading from "@/app/components/sectionHeading";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/app/components/ui/button";
@@ -22,13 +15,22 @@ import {
     FormLabel,
     FormMessage,
 } from "@/app/components/ui/form";
-import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
+import { Input } from "@/app/components/ui/input";
+import { format } from "date-fns";
 import { cn } from "@/app/lib/utils";
+import { Calendar } from "@/app/components/ui/calendar";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/app/components/ui/popover";
+import {
+    adjustForTimezone,
+    isDateValid,
+} from "@/app/instructor/vehicle-maintenance/utils";
+import { validationSchema } from "./formSchema";
+import * as z from "zod";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import {
     Command,
     CommandEmpty,
@@ -36,13 +38,6 @@ import {
     CommandInput,
     CommandItem,
 } from "@/app/components/ui/command";
-import { Input } from "@/app/components/ui/input";
-import {
-    adjustForTimezone,
-    isDateValid,
-} from "@/app/instructor/vehicle-maintenance/utils";
-import { format } from "date-fns";
-import { Calendar } from "@/app/components/ui/calendar";
 import {
     Select,
     SelectContent,
@@ -51,59 +46,26 @@ import {
     SelectValue,
 } from "@/app/components/ui/select";
 
-const validationSchema = z.object({
-    selectStudent: z.string().nonempty("Required"),
-    date: z
-        .string()
-        .nonempty("Required")
-        .refine(
-            (date) => {
-                const regex = /^\d{4}-\d{2}-\d{2}$/;
-                return regex.test(date);
-            },
-            {
-                message: "Date format should be 'YYYY-MM-DD'",
-            },
-        ),
-    startTime: z.string().nonempty("Required"),
-    endTime: z.string().nonempty("Required"),
-    paymentType: z.string().nonempty("Required"),
-    paymentAmount: z.coerce.number(),
-    roadTest: z.string().nonempty("Required"),
-    remarks: z.string().optional(),
-});
-
-export default function Page() {
-    const contextValue = useContext(LessonRecordsContext);
+export default function RoadTest() {
+    const contextValue = useContext(RoadTestRecordsContext);
     if (!contextValue) {
         // Handle the null context appropriately, maybe return null or some fallback UI
         return null;
     }
-    const {
-        studentRecords,
-        records,
-        setRecords,
-        setTotalDuration,
-        setTotalCash,
-        setTotalInterac,
-    } = contextValue;
+    const { setRecords, studentRecords } = contextValue;
+    const [showNotification, setShowNotification] = useState(false);
+    const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
+
     const today = new Date();
     const formattedToday = `${today.getFullYear()}-${String(
         today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-    const [showNotification, setShowNotification] = useState(false);
-    const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
-    const [isDateOpen, setIsDateOpen] = useState(false);
-
-    const initialValues: LessonFormValues = {
+    const initialValues = {
         selectStudent: "",
         date: formattedToday,
-        startTime: "",
-        endTime: "",
-        paymentType: "Interac",
-        paymentAmount: 0,
-        roadTest: "No",
+        location: "Windsor",
+        testTime: "",
         remarks: "",
     };
 
@@ -114,7 +76,7 @@ export default function Page() {
 
     async function onSubmit(values: z.infer<typeof validationSchema>) {
         try {
-            const response = await fetch(`/api/instructor/lesson`, {
+            const response = await fetch(`/api/instructor/road-test`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -133,9 +95,6 @@ export default function Page() {
                     newRecord.record = {
                         ...newRecord.record,
                         student: student.student,
-                        formattedDuration: formatDuration(
-                            Number(newRecord.record.duration),
-                        ),
                     };
                 }
 
@@ -150,21 +109,12 @@ export default function Page() {
                             return dateComparison;
                         } else {
                             // If dates are the same, compare times
-                            return a.startTime.localeCompare(b.startTime);
+                            return a.testTime.localeCompare(b.testTime);
                         }
                     });
 
                     return newRecords;
                 });
-
-                const total = calculateTotalDuration([...records, newRecord.record]);
-                setTotalDuration(total);
-                setTotalCash(
-                    calculateTotalPayment([...records, newRecord.record], "Cash"),
-                );
-                setTotalInterac(
-                    calculateTotalPayment([...records, newRecord.record], "Interac"),
-                );
 
                 setShowNotification(true);
                 form.reset(initialValues);
@@ -182,13 +132,13 @@ export default function Page() {
         <>
             <Notification
                 show={showNotification}
-                text={"Lesson"}
+                text={"Road Test"}
                 onClose={() => setShowNotification(false)}
             />
             <SectionHeading
-                title={"Lesson Information"}
+                title={"Road Test"}
                 description={
-                    "Select student and add a lesson. If you have no students, please first add a student in the Students tab."
+                    "Add student road test records to keep track of your road tests."
                 }
             />
             <Form {...form}>
@@ -223,11 +173,13 @@ export default function Page() {
                                                             (studentRecord) =>
                                                                 studentRecord.studentId ===
                                                                 Number(field.value),
-                                                        )?.student.firstName} ${studentRecords.find(
+                                                        )?.student.firstName
+                                                        } ${studentRecords.find(
                                                             (studentRecord) =>
                                                                 studentRecord.studentId ===
                                                                 Number(field.value),
-                                                        )?.student.lastName}`
+                                                        )?.student.lastName
+                                                        }`
                                                         : "Select Student"}
                                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
@@ -278,9 +230,9 @@ export default function Page() {
                             control={form.control}
                             name="date"
                             render={({ field }) => (
-                                <FormItem className="flex flex-col justify-end sm:h-[72px]">
+                                <FormItem className="flex flex-col justify-end">
                                     <FormLabel>Date</FormLabel>
-                                    <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+                                    <Popover>
                                         <PopoverTrigger asChild>
                                             <FormControl>
                                                 <Button
@@ -314,7 +266,6 @@ export default function Page() {
                                                             "yyyy-MM-dd",
                                                         );
                                                         field.onChange(formattedDate);
-                                                        setIsDateOpen(false);
                                                     }
                                                 }}
                                                 disabled={(date) =>
@@ -330,36 +281,10 @@ export default function Page() {
                         />
                         <FormField
                             control={form.control}
-                            name="startTime"
+                            name="location"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Start Time</FormLabel>
-                                    <FormControl>
-                                        <Input type={"time"} {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="endTime"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>End Time</FormLabel>
-                                    <FormControl>
-                                        <Input type={"time"} {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="paymentType"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Payment Type</FormLabel>
+                                    <FormLabel>Location</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
@@ -367,8 +292,9 @@ export default function Page() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="Interac">Interac</SelectItem>
-                                            <SelectItem value="Cash">Cash</SelectItem>
+                                            <SelectItem value="Windsor">Windsor</SelectItem>
+                                            <SelectItem value="Chatham">Chatham</SelectItem>
+                                            <SelectItem value="Other">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -377,40 +303,18 @@ export default function Page() {
                         />
                         <FormField
                             control={form.control}
-                            name="paymentAmount"
+                            name="testTime"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Payment Amount</FormLabel>
+                                    <FormLabel>Test Time</FormLabel>
                                     <FormControl>
-                                        <Input type={"number"} {...field} />
+                                        <Input type={"time"} {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="roadTest"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Road Test</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="No">No</SelectItem>
-                                            <SelectItem value="Pass">Pass</SelectItem>
-                                            <SelectItem value="Fail">Fail</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className={"sm:col-span-2 lg:col-span-5"}>
+                        <div className={"sm:col-span-2"}>
                             <FormField
                                 control={form.control}
                                 name="remarks"
@@ -425,7 +329,7 @@ export default function Page() {
                                 )}
                             />
                         </div>
-                        <Button type="submit">Save Lesson</Button>
+                        <Button type="submit">Save Road Test</Button>
                     </div>
                     <div className="border-b border-gray-200" />
                 </form>

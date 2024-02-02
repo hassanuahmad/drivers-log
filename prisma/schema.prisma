@@ -21,6 +21,7 @@ model Instructor {
   lessons             Lesson[]
   studentInstructors  StudentInstructor[]
   Income              Income[]
+  RoadTest            RoadTest[]
 
   @@index([instructorClerkId])
 }
@@ -54,6 +55,7 @@ model Student {
   createdAt          DateTime            @default(now())
   lessons            Lesson[]
   studentInstructors StudentInstructor[] @relation("StudentToStudentInstructor")
+  RoadTest           RoadTest[]
 
   @@index([id])
 }
@@ -103,4 +105,19 @@ model Income {
   instructor        Instructor? @relation(fields: [instructorClerkId], references: [instructorClerkId])
 
   @@index([instructorClerkId])
+}
+
+model RoadTest {
+  id                Int         @id @default(autoincrement())
+  date              String
+  testTime          String
+  location          String
+  remarks           String?
+  instructorClerkId String?
+  studentId         Int
+  instructor        Instructor? @relation(fields: [instructorClerkId], references: [instructorClerkId])
+  student           Student     @relation(fields: [studentId], references: [id])
+
+  @@index([instructorClerkId])
+  @@index([studentId])
 }

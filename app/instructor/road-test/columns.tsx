@@ -10,31 +10,31 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-import { IncomeFormValues } from "@/app/types/shared/forms";
+import { RoadTestRecords } from "@/app/types/shared/records";
 
 export const columns = (
     handleEdit: (id: number | undefined) => void,
     handleDelete: (id: number | undefined, endpoint: string) => void,
-): ColumnDef<IncomeFormValues>[] => [
+): ColumnDef<RoadTestRecords>[] => [
         {
             header: "#",
             cell: (context) => context.row.index + 1,
+        },
+        {
+            accessorKey: "name",
+            header: "Name",
         },
         {
             accessorKey: "date",
             header: "Date",
         },
         {
-            accessorKey: "income",
-            header: "Income",
-            cell: (context) => {
-                const data = context.row.original;
-                return "$" + data.income;
-            },
+            accessorKey: "location",
+            header: "Location",
         },
         {
-            accessorKey: "incomeMethod",
-            header: "Income Method",
+            accessorKey: "testTime",
+            header: "Test Time",
         },
         {
             accessorKey: "remarks",
@@ -59,7 +59,9 @@ export const columns = (
                                 Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => handleDelete(record.id, `/api/instructor/income`)}
+                                onClick={() =>
+                                    handleDelete(record.id, `/api/instructor/road-test`)
+                                }
                             >
                                 Delete
                             </DropdownMenuItem>

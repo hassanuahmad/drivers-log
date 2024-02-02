@@ -1,16 +1,14 @@
-import {NextResponse} from "next/server";
-import {PrismaClient} from "@prisma/client";
-import {auth} from "@clerk/nextjs";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import prisma from "@/prisma/client";
 
 export async function POST(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
-    const {date, income, incomeMethod, remarks} = await request.json();
+    const { date, income, incomeMethod, remarks } = await request.json();
 
     const record = await prisma.income.create({
         data: {
@@ -22,13 +20,13 @@ export async function POST(request: Request) {
         },
     });
 
-    return NextResponse.json({message: "Income added.", record});
+    return NextResponse.json({ message: "Income added.", record });
 }
 
 export async function GET(request: Request) {
-    const {userId}: { userId: string | null } = auth();
+    const { userId }: { userId: string | null } = auth();
     if (!userId) {
-        return new Response("Unauthorized", {status: 401});
+        return new Response("Unauthorized", { status: 401 });
     }
 
     const url = new URL(request.url);
@@ -47,7 +45,7 @@ export async function GET(request: Request) {
         },
     });
 
-    return NextResponse.json({records});
+    return NextResponse.json({ records });
 }
 
 export async function PUT(request: Request) {
@@ -59,7 +57,7 @@ export async function PUT(request: Request) {
         },
         data: await request.json(),
     });
-    return NextResponse.json({message: "Income updated."});
+    return NextResponse.json({ message: "Income updated." });
 }
 
 export async function DELETE(request: Request) {
@@ -70,7 +68,5 @@ export async function DELETE(request: Request) {
             id: Number(recordId),
         },
     });
-    return NextResponse.json({message: "Income deleted."});
+    return NextResponse.json({ message: "Income deleted." });
 }
-
-

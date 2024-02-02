@@ -3,46 +3,26 @@ import { auth } from "@clerk/nextjs";
 import prisma from "@/prisma/client";
 
 export async function POST(request: Request) {
-    const {
-        date,
-        startTime,
-        endTime,
-        paymentType,
-        paymentAmount,
-        roadTest,
-        remarks,
-        selectStudent,
-    } = await request.json();
+    const { date, location, testTime, remarks, selectStudent } =
+        await request.json();
 
     const { userId }: { userId: string | null } = auth();
     if (!userId) {
         return new Response("Unauthorized", { status: 401 });
     }
 
-    // Parse the startTime and endTime strings to Date objects
-    const start = new Date(`1970-01-01T${startTime}:00`); // Adding ":00" for seconds
-    const end = new Date(`1970-01-01T${endTime}:00`);
-
-    // Calculate the duration in minutes
-    const duration = (end.getTime() - start.getTime()) / 60000;
-
-    const record = await prisma.lesson.create({
+    const record = await prisma.roadTest.create({
         data: {
             date: date,
-            startTime: startTime,
-            endTime: endTime,
-            duration: duration,
-            paymentType: paymentType,
-            paymentAmount: paymentAmount,
-            roadTest: roadTest,
+            testTime: testTime,
+            location: location,
             remarks: remarks,
-            instructorId: 0,
             studentId: Number(selectStudent),
             instructorClerkId: userId,
         },
     });
 
-    return NextResponse.json({ message: "Lesson added.", record });
+    return NextResponse.json({ message: "Road Test added.", record });
 }
 
 export async function GET(request: Request) {
@@ -54,8 +34,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const selectedMonth = url.searchParams.get("month");
     const selectedYear = url.searchParams.get("year");
-
-    const records = await prisma.lesson.findMany({
+    const records = await prisma.roadTest.findMany({
         where: {
             instructorClerkId: userId,
             date: {
@@ -79,7 +58,7 @@ export async function GET(request: Request) {
             return dateComparison;
         } else {
             // If dates are the same, compare times
-            return a.startTime.localeCompare(b.startTime);
+            return a.testTime.localeCompare(b.testTime);
         }
     });
 
@@ -90,47 +69,29 @@ export async function PUT(request: Request) {
     const url = new URL(request.url);
     const recordId = url.searchParams.get("id");
 
-    const {
-        date,
-        startTime,
-        endTime,
-        paymentType,
-        paymentAmount,
-        roadTest,
-        remarks,
-    } = await request.json();
+    const { date, testTime, location, remarks } = await request.json();
 
-    // Parse the startTime and endTime strings to Date objects
-    const start = new Date(`1970-01-01T${startTime}:00`); // Adding ":00" for seconds
-    const end = new Date(`1970-01-01T${endTime}:00`);
-
-    // Calculate the duration in minutes
-    const duration = (end.getTime() - start.getTime()) / 60000;
-    await prisma.lesson.update({
+    await prisma.roadTest.update({
         where: {
             id: Number(recordId),
         },
         data: {
             date: date,
-            startTime: startTime,
-            endTime: endTime,
-            duration: duration,
-            paymentType: paymentType,
-            paymentAmount: paymentAmount,
-            roadTest: roadTest,
+            testTime: testTime,
+            location: location,
             remarks: remarks,
         },
     });
-    return NextResponse.json({ message: "Lesson updated." });
+    return NextResponse.json({ message: "Road Test updated." });
 }
 
 export async function DELETE(request: Request) {
     const url = new URL(request.url);
     const recordId = url.searchParams.get("id");
-    await prisma.lesson.delete({
+    await prisma.roadTest.delete({
         where: {
             id: Number(recordId),
         },
     });
-    return NextResponse.json({ message: "Lesson deleted." });
+    return NextResponse.json({ message: "Road Test deleted." });
 }

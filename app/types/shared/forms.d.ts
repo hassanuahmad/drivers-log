@@ -43,3 +43,12 @@ export interface IncomeFormValues {
     incomeMethod: string;
     remarks: string;
 }
+
+export interface RoadTestFormValues {
+    id?: number;
+    selectStudent: string;
+    date: string;
+    testTime: string;
+    location: string;
+    remarks: string;
+}

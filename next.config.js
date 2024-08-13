@@ -10,7 +10,7 @@ module.exports = {
         return [
             {
                 source: "/",
-                destination: "/homepage/home",
+                destination: "https://www.driverslog.app/",
                 permanent: true,
             },
         ];
